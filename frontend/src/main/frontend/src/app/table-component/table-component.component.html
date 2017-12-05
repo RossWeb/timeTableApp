@@ -1,0 +1,56 @@
+<p>
+  <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Zarządzanie salami
+  </a>
+</p>
+
+
+
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <ng-container  *ngFor="let colName of dataTable; let i = index">
+            <th scope="col">{{colName}}</th>
+
+          </ng-container>
+
+          <th scope="col">Edytuj</th>
+          <th scope="col">Usuń</th>
+        </tr>
+      </thead>
+      <tbody>
+
+          <ng-container  *ngFor="let row of tableRows; let i = index">
+            <tr>
+              <th scope="row">i</th>
+              <td>{{row.name}}</td>
+              <td>{{row.number}}</td>
+              <td>
+                <button type="button" class="btn btn-primary">Edytuj</button>
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger">Usuń</button>
+              </td>
+            </tr>
+          </ng-container>
+          <tr>
+          <th scope="row"></th>
+          <ng-container  *ngFor="let colName of dataTable; let i = index">
+            <td>
+              <input type="text" class="form-control" id="{{colName}}"  placeholder="{{colName}}">
+            </td>
+          </ng-container>
+
+          <td></td>
+          <td>
+            <button type="button" class="btn btn-success">Dodaj</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
