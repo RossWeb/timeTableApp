@@ -19,7 +19,7 @@ import {TableTypeProvider} from "./table-service/table.type.provider";
     FormsModule,
     HttpClientModule
   ],
-  providers: [TableTypeProvider],
+  providers: [],
   bootstrap: [AppComponent, AdminPanelComponent]
 })
 export class AppModule { }

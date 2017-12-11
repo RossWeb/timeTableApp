@@ -1,6 +1,7 @@
 package pl.timetable.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.BaseRequest;
 import pl.timetable.entity.BaseEntity;
@@ -18,7 +19,8 @@ public class GenericRestController<T1 extends BaseEntity, T2 extends BaseRequest
         return service.findAll();
     }
 
-    @PostMapping
+    @PostMapping(produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public void create(@RequestBody T2 request) {
         service.create(request);
     }

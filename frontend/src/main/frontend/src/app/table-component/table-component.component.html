@@ -40,13 +40,13 @@
           <th scope="row"></th>
           <ng-container  *ngFor="let colName of dataTable; let i = index">
             <td>
-              <input type="text" class="form-control" id="{{colName}}"  placeholder="{{colName}}">
+              <input type="text" class="form-control" [(ngModel)]="dataTableValues[i]"  placeholder="{{colName}}">
             </td>
           </ng-container>
 
           <td></td>
           <td>
-            <button type="button" (click)="create(dataTable)"class="btn btn-success">Dodaj</button>
+            <button type="button" (click)="create()"class="btn btn-success">Dodaj</button>
           </td>
         </tr>
       </tbody>
