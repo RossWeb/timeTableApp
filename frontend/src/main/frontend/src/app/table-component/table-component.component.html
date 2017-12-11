@@ -25,7 +25,7 @@
 
           <ng-container  *ngFor="let row of tableRows; let i = index">
             <tr>
-              <th scope="row">i</th>
+              <th scope="row">{{i + 1}}</th>
               <td>{{row.name}}</td>
               <td>{{row.number}}</td>
               <td>
@@ -46,7 +46,7 @@
 
           <td></td>
           <td>
-            <button type="button" class="btn btn-success">Dodaj</button>
+            <button type="button" (click)="create(dataTable)"class="btn btn-success">Dodaj</button>
           </td>
         </tr>
       </tbody>

@@ -6,6 +6,7 @@ import {HttpClientModule} from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { TableComponentComponent } from './table-component/table-component.component';
 import { AdminPanelComponent } from './admin-panel-component/admin-panel-component.component';
+import {TableTypeProvider} from "./table-service/table.type.provider";
 
 @NgModule({
   declarations: [
@@ -16,10 +17,9 @@ import { AdminPanelComponent } from './admin-panel-component/admin-panel-compone
   imports: [
     BrowserModule,
     FormsModule,
-  
     HttpClientModule
   ],
-  providers: [],
+  providers: [TableTypeProvider],
   bootstrap: [AppComponent, AdminPanelComponent]
 })
 export class AppModule { }
