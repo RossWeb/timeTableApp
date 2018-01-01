@@ -5,6 +5,9 @@ import {Table} from "../interface/table.type";
 import {Room} from "../model/room.type";
 import { Pipe, PipeTransform } from '@angular/core';
 
+const ADD_NAME = 'Dodaj';
+const SAVE_NAME = 'Zapisz';
+
 @Pipe({
     name: 'values',
     pure: false
@@ -31,6 +34,7 @@ export class TableComponentComponent implements OnInit {
   @Output('tableRows') tableRows: Table;
   @Output('dataTable') dataTable: string[];
   @Output('rowActive') rowActive : string;
+  @Output('addButtonName') addButtonName : string = ADD_NAME;
 
 
   constructor(private tableServiceProvider: TableServiceProvider){}
@@ -41,8 +45,12 @@ export class TableComponentComponent implements OnInit {
     this.dataTable = this.service.getDataTableParameters();
   }
 
-  create(){
-    this.service.create(this.tableTypeName, this.dataTableValues);
+  add(){
+    if(this.addButtonName === ADD_NAME){
+      this.service.create(this.tableTypeName, this.dataTableValues);
+    }else{
+      this.service.update(this.dataTableValues, this.rowActive);
+    }
     this.dataTableValues = [];
     this.list();
   };
@@ -51,6 +59,7 @@ export class TableComponentComponent implements OnInit {
     console.log(row);
     this.rowActive = row.id;
     this.dataTableValues = (<any>Object).values(row).splice(1);
+    this.addButtonName = SAVE_NAME;
   };
 
   list(){
