@@ -19,7 +19,7 @@ public class GenericRestController<T1 extends BaseEntity, T2 extends BaseRequest
         return service.findAll();
     }
 
-    @PostMapping(produces = "application/json")
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void create(@RequestBody T2 request) {
         service.create(request);

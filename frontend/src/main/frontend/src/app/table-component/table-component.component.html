@@ -24,12 +24,13 @@
       <tbody>
 
           <ng-container  *ngFor="let row of tableRows; let i = index">
-            <tr>
-              <th scope="row">{{i + 1}}</th>
-              <td>{{row.name}}</td>
-              <td>{{row.number}}</td>
+            <tr [ngClass] = "[rowActive === i+1 ? 'active': '']">
+              <th scope="row">{{i + 1}} </th>
+              <ng-container *ngFor=" let rowValues of row | values; let j = index">
+                <td>{{rowValues}}</td>
+              </ng-container>
               <td>
-                <button type="button" class="btn btn-primary">Edytuj</button>
+                <button type="button" class="btn btn-primary" (click)="edit(row)">Edytuj</button>
               </td>
               <td>
                 <button type="button" class="btn btn-danger">Usuń</button>
