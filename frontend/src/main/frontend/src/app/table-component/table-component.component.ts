@@ -45,14 +45,24 @@ export class TableComponentComponent implements OnInit {
     this.dataTable = this.service.getDataTableParameters();
   }
 
-  add(){
-    if(this.addButtonName === ADD_NAME){
-      this.service.create(this.tableTypeName, this.dataTableValues);
-    }else{
-      this.service.update(this.dataTableValues, this.rowActive);
-    }
+  private refreshTable(){
     this.dataTableValues = [];
     this.list();
+    this.addButtonName = ADD_NAME;
+  }
+
+  add(){
+    if(this.addButtonName === ADD_NAME){
+      this.service.create(this.tableTypeName, this.dataTableValues).subscribe(
+        data => {this.refreshTable()},
+        err => {console.log("Error occured.")}
+      );
+    }else{
+      this.service.update(this.dataTableValues, this.rowActive).subscribe(
+        data => {this.refreshTable()},
+        err => {console.log("Error occured.")}
+      );
+    }
   };
 
   edit(row: any){
