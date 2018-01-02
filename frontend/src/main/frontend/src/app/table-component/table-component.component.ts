@@ -32,7 +32,8 @@ export class TableComponentComponent implements OnInit {
   @Input('dataTableValues') dataTableValues: string[] = [];
   @Input('tableTypeName') tableTypeName: string;
   @Output('tableRows') tableRows: Table;
-  @Output('dataTable') dataTable: string[];
+  @Output('dataTableNames') dataTableNames: string[];
+  @Output('title') title : string;
   @Output('rowActive') rowActive : string;
   @Output('addButtonName') addButtonName : string = ADD_NAME;
 
@@ -42,7 +43,8 @@ export class TableComponentComponent implements OnInit {
   ngOnInit() {
     this.service = this.tableServiceProvider.getServiceByName(this.tableTypeName);
     this.list();
-    this.dataTable = this.service.getDataTableParameters();
+    this.dataTableNames = this.service.getDataTableParameters();
+    this.title = this.service.getTitle();
   }
 
   private refreshTable(){
