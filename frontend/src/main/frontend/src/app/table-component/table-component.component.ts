@@ -65,8 +65,14 @@ export class TableComponentComponent implements OnInit {
     }
   };
 
+  remove(rowId){
+    this.service.remove(rowId).subscribe(
+      data => {this.refreshTable()},
+      err => {console.log("Error occured.")}
+    );
+  };
+
   edit(row: any){
-    console.log(row);
     this.rowActive = row.id;
     this.dataTableValues = (<any>Object).values(row).splice(1);
     this.addButtonName = SAVE_NAME;
