@@ -1,17 +1,21 @@
 package pl.timetable.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-public class Course extends BaseEntity{
+public class Course extends BaseEntity implements Serializable{
 
     private String name;
 
     private Set<Subject> subjectSet = new HashSet<>();
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(name = "course_subject", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "subject_id", referencedColumnName = "id"))
     public Set<Subject> getSubjectSet() {

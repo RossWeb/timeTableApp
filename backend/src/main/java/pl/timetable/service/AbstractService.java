@@ -6,7 +6,7 @@ import pl.timetable.exception.EntityNotFoundException;
 
 import java.util.List;
 
-public abstract class AbstractService<T extends BaseEntity, T2 extends BaseRequest> {
+public abstract class AbstractService<T, T2 extends BaseRequest> {
 
     public abstract List<T> findAll();
 
@@ -17,4 +17,5 @@ public abstract class AbstractService<T extends BaseEntity, T2 extends BaseReque
     public abstract void delete(int id) throws EntityNotFoundException;
 
     public abstract T get(int id) throws EntityNotFoundException;
+
 }

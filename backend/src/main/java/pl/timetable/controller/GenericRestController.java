@@ -12,7 +12,7 @@ import pl.timetable.service.AbstractService;
 
 import java.util.List;
 
-public class GenericRestController<T1 extends BaseEntity, T2 extends BaseRequest> {
+public class GenericRestController<T1 , T2 extends BaseRequest> {
 
     private final Logger logger;
 

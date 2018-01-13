@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.SubjectRequest;
+import pl.timetable.dto.SubjectDto;
 import pl.timetable.entity.Subject;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.repository.SubjectRepository;
@@ -12,10 +13,11 @@ import pl.timetable.repository.SubjectRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class SubjectServiceImpl extends AbstractService<Subject, SubjectRequest> {
+public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectRequest> {
 
     public static final Logger LOGGER = Logger.getLogger(SubjectServiceImpl.class);
 
@@ -23,9 +25,9 @@ public class SubjectServiceImpl extends AbstractService<Subject, SubjectRequest>
     private SubjectRepository subjectRepository;
 
     @Override
-    public List<Subject> findAll() {
-        Optional<List<Subject>> subjectList = subjectRepository.findAll();
-        return subjectList.orElse(Collections.emptyList());
+    public List<SubjectDto> findAll() {
+        List<Subject> subjectList = subjectRepository.findAll().orElse(Collections.emptyList());
+        return subjectList.stream().map(this::mapEntityToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -35,23 +37,32 @@ public class SubjectServiceImpl extends AbstractService<Subject, SubjectRequest>
     }
 
     @Override
-    public Subject update(SubjectRequest request, int id) {
+    public SubjectDto update(SubjectRequest request, int id) {
         Subject entity = mapRequestToEntity(request);
         entity.setId(id);
-        return subjectRepository.update(entity);
+        return mapEntityToDto(subjectRepository.update(entity));
     }
 
 
     @Override
     public void delete(int id) throws EntityNotFoundException {
-        Subject entity = get(id);
+        Subject entity = Optional.ofNullable(subjectRepository.getById(id))
+                .orElseThrow(() -> new EntityNotFoundException(id, "Subject"));
         subjectRepository.remove(entity);
     }
 
     @Override
-    public Subject get(int id) throws EntityNotFoundException {
-        return Optional.ofNullable(subjectRepository.getById(id))
+    public SubjectDto get(int id) throws EntityNotFoundException {
+        Subject subject = Optional.ofNullable(subjectRepository.getById(id))
                 .orElseThrow(() -> new EntityNotFoundException(id, "Subject"));
+        return mapEntityToDto(subject);
+    }
+
+    private SubjectDto mapEntityToDto(Subject entity) {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(entity.getId());
+        subjectDto.setName(entity.getName());
+        return subjectDto;
     }
 
     private Subject mapRequestToEntity(SubjectRequest subjectRequest) {
