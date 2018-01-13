@@ -1,6 +1,7 @@
 package pl.timetable.entity;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -8,7 +9,7 @@ public class Course extends BaseEntity{
 
     private String name;
 
-    private Set<Subject> subjectSet;
+    private Set<Subject> subjectSet = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "course_subject", joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),

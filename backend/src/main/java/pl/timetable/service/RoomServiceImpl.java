@@ -1,10 +1,12 @@
 package pl.timetable.service;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.RoomRequest;
 import pl.timetable.entity.Room;
+import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.repository.RoomRepository;
 
 import java.util.Collections;
@@ -14,6 +16,8 @@ import java.util.Optional;
 @Service
 @Transactional
 public class RoomServiceImpl extends AbstractService<Room, RoomRequest> {
+
+    public static final Logger LOGGER = Logger.getLogger(RoomServiceImpl.class);
 
     @Autowired
     private RoomRepository roomRepository;
@@ -37,14 +41,15 @@ public class RoomServiceImpl extends AbstractService<Room, RoomRequest> {
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(int id) throws EntityNotFoundException {
         Room entity = get(id);
         roomRepository.remove(entity);
     }
 
     @Override
-    public Room get(int id) {
-        return roomRepository.getById(id);
+    public Room get(int id) throws EntityNotFoundException {
+        return Optional.ofNullable(roomRepository.getById(id))
+                .orElseThrow(() -> new EntityNotFoundException(id, "Room"));
     }
 
     private Room mapRequestToEntity(RoomRequest roomRequest){

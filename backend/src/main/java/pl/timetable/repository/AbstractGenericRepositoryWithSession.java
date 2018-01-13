@@ -39,7 +39,7 @@ public abstract class AbstractGenericRepositoryWithSession<T extends Object> {
 
     public Optional<List<T>> findAll(){
         String tableName = getClass().getSimpleName().replace("RepositoryImpl", "");
-        return Optional.of(getSession().createQuery( "from " + tableName).list());
+        return Optional.ofNullable((List<T>) getSession().createQuery( "from " + tableName).list());
     }
 
     protected Session getSession() {

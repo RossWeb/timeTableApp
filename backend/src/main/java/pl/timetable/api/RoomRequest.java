@@ -1,5 +1,7 @@
 package pl.timetable.api;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class RoomRequest extends BaseRequest {
 
     private String name;
@@ -19,5 +21,13 @@ public class RoomRequest extends BaseRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("number", number)
+                .toString();
     }
 }
