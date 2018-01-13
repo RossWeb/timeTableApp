@@ -9,15 +9,15 @@ import java.io.Serializable;
 @MappedSuperclass
 public class BaseEntity implements Serializable{
 
-    protected int id;
+    protected Integer id;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 }

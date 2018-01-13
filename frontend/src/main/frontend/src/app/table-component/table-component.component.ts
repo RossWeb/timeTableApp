@@ -1,8 +1,10 @@
 import { Component, OnInit, Input, Output } from '@angular/core';
 import {TableServiceProvider} from "../table-service/table.service.provider";
 import {RoomService} from "../table-service/room.service";
+import {GroupService} from "../table-service/group.service";
 import {Table} from "../interface/table.type";
 import {Room} from "../model/room.type";
+import {Group} from "../model/group.type";
 import { Pipe, PipeTransform } from '@angular/core';
 
 const ADD_NAME = 'Dodaj';
@@ -23,7 +25,7 @@ export class ValuesPipe implements PipeTransform {
   selector: 'app-table-component',
   templateUrl: './table-component.component.html',
   styleUrls: ['./table-component.component.css'],
-  providers: [RoomService, TableServiceProvider]
+  providers: [RoomService, GroupService, TableServiceProvider]
 })
 export class TableComponentComponent implements OnInit {
 

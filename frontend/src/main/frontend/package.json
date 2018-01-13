@@ -1,5 +1,4 @@
 {
-  "start": "ng serve --proxy-config proxy.conf.json",
   "name": "ng-time-table",
   "version": "0.0.0",
   "license": "MIT",

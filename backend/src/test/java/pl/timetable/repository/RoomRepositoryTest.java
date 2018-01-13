@@ -1,4 +1,4 @@
-package pl.timetable.controller;
+package pl.timetable.repository;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class RoomRepositoryTest {
         room.setName("someName");
         room.setNumber("1");
         Room roomCreated = roomRepository.create(room);
-        Assert.assertEquals(1, roomCreated.getId());
+        Assert.assertNotNull(roomCreated.getId());
 
     }
 
@@ -52,7 +52,7 @@ public class RoomRepositoryTest {
         room.setNumber("1");
         roomRepository.create(room);
         Room roomCreated = roomRepository.getById(1);
-        Assert.assertEquals(1, roomCreated.getId());
+        Assert.assertNotNull(roomCreated.getId());
 
     }
 
