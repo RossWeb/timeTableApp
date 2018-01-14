@@ -5,59 +5,68 @@
 </p>
 <div class="collapse" id="collapseExample{{tableTypeName}}">
   <div class="card card-body">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-            <th scope="col">{{colName.value}}</th>
-
-          </ng-container>
-
-          <th scope="col">Edytuj</th>
-          <th scope="col">Dodaj/Usuń</th>
-          <th scope="col">Parametry</th>
-        </tr>
-      </thead>
-      <tbody>
-
-          <ng-container  *ngFor="let row of tableRows; let i = index">
-            <tr [ngClass] = "[rowActive === i+1 ? 'active': '']">
-              <th scope="row">{{i + 1}}</th>
-              <ng-container *ngFor=" let rowValues of row | values; let j = index">
-                <td>{{rowValues}}</td>
+    <div class="row">
+      <div class="col-md-8">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <ng-container  *ngFor="let colName of dataTableNames; let i = index">
+                <th scope="col">{{colName.value}}</th>
               </ng-container>
+              <th scope="col">Edytuj</th>
+              <th scope="col">Dodaj/Usuń</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container  *ngFor="let row of tableRows; let i = index">
+              <tr>
+                <th scope="row">{{i + 1}}</th>
+                <ng-container *ngFor=" let rowValues of row | values; let j = index">
+                  <td>{{rowValues}}</td>
+                </ng-container>
+                <td>
+                  <button type="button" class="btn btn-primary" (click)="edit(row)">Edytuj</button>
+                </td>
+                <td>
+                  <button type="button" class="btn btn-danger" (click)="remove(row.id)">Usuń</button>
+                </td>
+              </tr>
+            </ng-container>
+            <tr>
+              <th scope="row"></th>
+              <ng-container  *ngFor="let colName of dataTableNames; let i = index">
+                <td *ngIf="colName.type === 'Select'; else elseBlock">
+                  <select [(ngModel)]="dataTableValues[i]">
+                    <option *ngFor="let item of selectDefinions[colName.value]" [ngValue]="item.id">{{item.name}}</option>
+                  </select>
+                </td>
+                <ng-template #elseBlock>
+                  <td>
+                    <input type="text" class="form-control" [(ngModel)]="dataTableValues[i]"  placeholder="{{colName.value}}">
+                  </td>
+                </ng-template>
+              </ng-container>
+              <td></td>
               <td>
-                <button type="button" class="btn btn-primary" (click)="edit(row)">Edytuj</button>
-              </td>
-              <td>
-                <button type="button" class="btn btn-danger" (click)="remove(row.id)">Usuń</button>
+                <button type="button" (click)="add()"class="btn btn-success">{{addButtonName}}</button>
               </td>
             </tr>
-          </ng-container>
-          <tr>
-          <th scope="row"></th>
-          <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-            <td *ngIf="colName.type === 'Select'; else elseBlock">
-              <select [(ngModel)]="dataTableValues[i]">
-                <option *ngFor="let item of selectDefinions[colName.value]" [ngValue]="item.id">{{item.name}}</option>
-              </select>
-            </td>
-            <ng-template #elseBlock>
-              <td>
-                <input type="text" class="form-control" [(ngModel)]="dataTableValues[i]"  placeholder="{{colName.value}}">
-              </td>
-            </ng-template>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-4">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Parametry</th>
+            </tr>
+          </thead>
+          <tbody>
 
-          </ng-container>
-
-          <td></td>
-          <td>
-            <button type="button" (click)="add()"class="btn btn-success">{{addButtonName}}</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

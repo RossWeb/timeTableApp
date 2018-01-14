@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/zip';
+import 'rxjs/add/operator/map';
 import {TableService} from "../interface/table.service";
 import {Room} from "../model/room.type";
 
@@ -46,7 +46,7 @@ export class RoomService implements TableService<Room> {
   }
 
   getDefinions(): any {
-    return Observable.zip();
+    return new Observable(observer => {});
   }
 
 }

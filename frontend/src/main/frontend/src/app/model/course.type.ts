@@ -24,6 +24,10 @@ export class Course implements Table {
       {
         value : 'Nazwa',
         type : 'Input'
+      },
+      {
+        value : 'Przedmioty',
+        type : 'Input'
       }
     ];
     return params;

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
-import 'rxjs/add/observable/zip';
 import 'rxjs/add/operator/map';
 import {TableService} from "../interface/table.service";
 import {CourseService} from "../table-service/course.service";
