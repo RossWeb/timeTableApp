@@ -102,4 +102,7 @@ export class TableComponentComponent implements OnInit {
     );
   }
 
+  onSelect(itemId) {
+  }
+
 }

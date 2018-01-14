@@ -3,9 +3,6 @@
     {{title}}
   </a>
 </p>
-
-
-
 <div class="collapse" id="collapseExample{{tableTypeName}}">
   <div class="card card-body">
     <table class="table">
@@ -42,8 +39,8 @@
           <th scope="row"></th>
           <ng-container  *ngFor="let colName of dataTableNames; let i = index">
             <td *ngIf="colName.type === 'Select'; else elseBlock">
-              <select (change)="onSelect($event.target.value)">
-                <option *ngFor="let item of selectDefinions[colName.value]" [value]="item.id">{{item.name}}</option>
+              <select [(ngModel)]="dataTableValues[i]">
+                <option *ngFor="let item of selectDefinions[colName.value]" [ngValue]="item.id">{{item.name}}</option>
               </select>
             </td>
             <ng-template #elseBlock>
