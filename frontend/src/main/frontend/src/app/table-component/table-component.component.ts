@@ -34,9 +34,10 @@ export class TableComponentComponent implements OnInit {
   @Input('dataTableValues') dataTableValues: string[] = [];
   @Input('tableTypeName') tableTypeName: string;
   @Output('tableRows') tableRows: Table;
-  @Output('dataTableNames') dataTableNames: string[];
+  @Output('dataTableNames') dataTableNames: any;
   @Output('title') title : string;
   @Output('rowActive') rowActive : string;
+  @Output('selectDefinions') selectDefinions : any;
   @Output('addButtonName') addButtonName : string = ADD_NAME;
 
 
@@ -45,6 +46,18 @@ export class TableComponentComponent implements OnInit {
   ngOnInit() {
     this.service = this.tableServiceProvider.getServiceByName(this.tableTypeName);
     this.list();
+    this.selectDefinions =
+    this.service.getDefinions().subscribe(
+      dataDefinions => {
+        dataDefinions.subscribe(
+          firstSubscribers => {
+            console.log("Definions : " + firstSubscribers);
+            this.selectDefinions = firstSubscribers;
+          }
+        );
+      },
+      err => {console.log("Error occured when get definions")}
+    );
     this.dataTableNames = this.service.getDataTableParameters();
     this.title = this.service.getTitle();
   }
@@ -59,12 +72,12 @@ export class TableComponentComponent implements OnInit {
     if(this.addButtonName === ADD_NAME){
       this.service.create(this.tableTypeName, this.dataTableValues).subscribe(
         data => {this.refreshTable()},
-        err => {console.log("Error occured.")}
+        err => {console.log("Error occured when add.")}
       );
     }else{
       this.service.update(this.dataTableValues, this.rowActive).subscribe(
         data => {this.refreshTable()},
-        err => {console.log("Error occured.")}
+        err => {console.log("Error occured when update.")}
       );
     }
   };
@@ -72,7 +85,7 @@ export class TableComponentComponent implements OnInit {
   remove(rowId){
     this.service.remove(rowId).subscribe(
       data => {this.refreshTable()},
-      err => {console.log("Error occured.")}
+      err => {console.log("Error occured when remove.")}
     );
   };
 
@@ -83,8 +96,10 @@ export class TableComponentComponent implements OnInit {
   };
 
   list(){
-    this.service.list().then(data =>
-      this.tableRows = data);
+    this.service.list().subscribe(
+      data => {this.tableRows = data},
+      err => {console.log("Error occured.")}
+    );
   }
 
 }

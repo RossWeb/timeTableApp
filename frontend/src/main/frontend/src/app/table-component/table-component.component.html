@@ -13,19 +13,20 @@
         <tr>
           <th scope="col">#</th>
           <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-            <th scope="col">{{colName}}</th>
+            <th scope="col">{{colName.value}}</th>
 
           </ng-container>
 
           <th scope="col">Edytuj</th>
-          <th scope="col">Usuń</th>
+          <th scope="col">Dodaj/Usuń</th>
+          <th scope="col">Parametry</th>
         </tr>
       </thead>
       <tbody>
 
           <ng-container  *ngFor="let row of tableRows; let i = index">
             <tr [ngClass] = "[rowActive === i+1 ? 'active': '']">
-              <th scope="row">{{i + 1}} </th>
+              <th scope="row">{{i + 1}}</th>
               <ng-container *ngFor=" let rowValues of row | values; let j = index">
                 <td>{{rowValues}}</td>
               </ng-container>
@@ -40,9 +41,17 @@
           <tr>
           <th scope="row"></th>
           <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-            <td>
-              <input type="text" class="form-control" [(ngModel)]="dataTableValues[i]"  placeholder="{{colName}}">
+            <td *ngIf="colName.type === 'Select'; else elseBlock">
+              <select (change)="onSelect($event.target.value)">
+                <option *ngFor="let item of selectDefinions[colName.value]" [value]="item.id">{{item.name}}</option>
+              </select>
             </td>
+            <ng-template #elseBlock>
+              <td>
+                <input type="text" class="form-control" [(ngModel)]="dataTableValues[i]"  placeholder="{{colName.value}}">
+              </td>
+            </ng-template>
+
           </ng-container>
 
           <td></td>
