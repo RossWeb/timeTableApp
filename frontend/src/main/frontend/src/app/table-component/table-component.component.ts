@@ -98,7 +98,7 @@ export class TableComponentComponent implements OnInit {
   list(){
     this.service.list().subscribe(
       data => {this.tableRows = data},
-      err => {console.log("Error occured.")}
+      err => {console.log("Error occured when get all elements.")}
     );
   }
 

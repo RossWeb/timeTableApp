@@ -14,7 +14,8 @@ export class Group implements Table {
 
   getParams(dataTableValues: string[]): any {
     const params = {
-      name : dataTableValues[0]
+      name : dataTableValues[0],
+      courseId : dataTableValues[1]
     };
     return params;
   }

@@ -30,7 +30,15 @@ export class GroupService implements TableService<Group> {
   }
 
   list() {
-    return this.http.get<Group>('/api/group');
+    return this.http.get<Group>('/api/group').map(res => {return this.getResponse(res)});
+  }
+
+  private getResponse(res: any): any{
+    for (var i = 0; i < res.length; i++){
+      if(res[i].course !== null)
+      res[i].course = res[i].course.name;
+    }
+    return res;
   }
 
   getName(): string {
