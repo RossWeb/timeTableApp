@@ -49,4 +49,8 @@ export class RoomService implements TableService<Room> {
     return new Observable(observer => {});
   }
 
+  getRelationParameterName() : string {
+    return this.type.getRelationParameterName();
+  }
+
 }

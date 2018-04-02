@@ -29,19 +29,22 @@ export class ValuesPipe implements PipeTransform {
 })
 export class TableComponentComponent implements OnInit {
 
-  private service;
+  protected service;
 
   @Input('dataTableValues') dataTableValues: string[] = [];
   @Input('tableTypeName') tableTypeName: string;
   @Output('tableRows') tableRows: Table;
   @Output('dataTableNames') dataTableNames: any;
   @Output('title') title : string;
+  @Output('relationParameterName') relationParameterName : string;
   @Output('rowActive') rowActive : string;
   @Output('selectDefinions') selectDefinions : any;
   @Output('addButtonName') addButtonName : string = ADD_NAME;
 
 
-  constructor(private tableServiceProvider: TableServiceProvider){}
+  constructor(protected tableServiceProvider: TableServiceProvider){
+
+  }
 
   ngOnInit() {
     this.service = this.tableServiceProvider.getServiceByName(this.tableTypeName);
@@ -60,6 +63,8 @@ export class TableComponentComponent implements OnInit {
     );
     this.dataTableNames = this.service.getDataTableParameters();
     this.title = this.service.getTitle();
+    this.relationParameterName = this.service.getRelationParameterName();
+    console.log(this.relationParameterName);
   }
 
   private refreshTable(){
@@ -97,7 +102,7 @@ export class TableComponentComponent implements OnInit {
 
   list(){
     this.service.list().subscribe(
-      data => {this.tableRows = data; 
+      data => {this.tableRows = data;
         console.log(data);
       },
       err => {console.log("Error occured when get all elements.")}

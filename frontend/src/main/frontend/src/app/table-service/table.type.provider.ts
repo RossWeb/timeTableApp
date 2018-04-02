@@ -8,22 +8,24 @@ import {Subject} from "../model/subject.type";
 @Injectable()
 export class TableTypeProvider {
 
-  private tableTypeArray: Table[];
+  //Do usuniecia
 
-  constructor() {
-      this.tableTypeArray = [
-        new Room(),
-        new Group(),
-        new Course(),
-        new Subject()
-      ];
-  }
+  // private tableTypeArray: Table[];
+  //
+  // constructor() {
+  //     this.tableTypeArray = [
+  //       new Room(),
+  //       new Group(),
+  //       new Course(),
+  //       new Subject()
+  //     ];
+  // }
 
-  getTypeByName(name: string) : Table{
-    console.log(this.tableTypeArray[0].getType());
-    console.log("equals" + this.tableTypeArray[0].getType() == name);
-    console.log(this.tableTypeArray.filter(tableType => tableType.getType() === name));
-    return this.tableTypeArray.filter(tableType => tableType.getType() === name)[0];
-  }
+  // getTypeByName(name: string) : Table{
+  //   console.log(this.tableTypeArray[0].getType());
+  //   console.log("equals" + this.tableTypeArray[0].getType() == name);
+  //   console.log(this.tableTypeArray.filter(tableType => tableType.getType() === name));
+  //   return this.tableTypeArray.filter(tableType => tableType.getType() === name)[0];
+  // }
 
 }

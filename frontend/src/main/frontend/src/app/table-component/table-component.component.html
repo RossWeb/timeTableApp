@@ -55,8 +55,9 @@
           </tbody>
         </table>
       </div>
-      <div class="col-md-4">
-        <table class="table">
+      <div *ngIf="relationParameterName !== null;" class="col-md-4">
+        <app-table-parameter [tableTypeName]="'Subject'">Loading..</app-table-parameter>
+        <!-- <table class="table">
           <thead>
             <tr>
               <th scope="col">Parametry</th>
@@ -65,7 +66,7 @@
           <tbody>
 
           </tbody>
-        </table>
+        </table> -->
       </div>
     </div>
   </div>

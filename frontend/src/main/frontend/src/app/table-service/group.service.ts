@@ -52,6 +52,10 @@ export class GroupService implements TableService<Group> {
     return this.type.getTitle();
   }
 
+  getRelationParameterName() : string {
+    return this.type.getRelationParameterName();
+  }
+
   getDefinions(): any {
     return new Observable(observer => {
         observer.next(this.courseService.list()

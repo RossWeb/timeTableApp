@@ -6,6 +6,8 @@ export interface Table {
 
   getParams(dataTableValues: string[]): any;
 
-  getDataTableParameters() : string[]
+  getDataTableParameters() : string[];
+
+  getRelationParameterName() : string;
 
 }

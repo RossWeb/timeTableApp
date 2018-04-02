@@ -49,4 +49,8 @@ export class SubjectService implements TableService<Subject> {
     return new Observable(observer => {});
   }
 
+  getRelationParameterName() : string {
+    return this.type.getRelationParameterName();
+  }
+
 }

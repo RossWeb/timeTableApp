@@ -29,5 +29,9 @@ export class Subject implements Table {
     return params;
   }
 
+  getRelationParameterName() : string {
+    return null;
+  }
+
 
 }

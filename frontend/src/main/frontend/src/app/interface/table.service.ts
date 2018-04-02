@@ -1,6 +1,7 @@
 
-export interface TableService<T> {
+export abstract TableService<T> {
 
+  private type : T;
 
   create(name: string, dataTableValues: string[]): any;
 
@@ -17,5 +18,7 @@ export interface TableService<T> {
   getTitle(): string;
 
   getDefinions(): any;
+
+  getRelationParameterName() : string;
 
 }

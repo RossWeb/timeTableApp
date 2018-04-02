@@ -8,13 +8,15 @@ import { TableComponentComponent } from './table-component/table-component.compo
 import { ValuesPipe } from './table-component/table-component.component';
 import { AdminPanelComponent } from './admin-panel-component/admin-panel-component.component';
 import {TableTypeProvider} from "./table-service/table.type.provider";
+import { TableParameterComponent } from './table-parameter/table-parameter.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TableComponentComponent,
     AdminPanelComponent,
-    ValuesPipe
+    ValuesPipe,
+    TableParameterComponent,
   ],
   imports: [
     BrowserModule,

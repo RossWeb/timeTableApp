@@ -34,5 +34,8 @@ export class Group implements Table {
     return params;
   }
 
+  getRelationParameterName() : string {
+    return 'Course';
+  }
 
 }

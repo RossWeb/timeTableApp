@@ -35,5 +35,8 @@ export class Room implements Table {
     return params;
   }
 
+  getRelationParameterName() : string {
+    return null;
+  }
 
 }

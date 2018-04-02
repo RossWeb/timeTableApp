@@ -49,4 +49,8 @@ export class CourseService implements TableService<Course> {
     return new Observable(observer => {});
   }
 
+  getRelationParameterName() : string {
+    return this.type.getRelationParameterName();
+  }
+
 }

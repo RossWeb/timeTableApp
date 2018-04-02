@@ -33,5 +33,9 @@ export class Course implements Table {
     return params;
   }
 
+  getRelationParameterName() : string {
+    return 'Subject';
+  }
+
 
 }
