@@ -69,6 +69,7 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
     public CourseDto get(int id) throws EntityNotFoundException {
         Course course = Optional.ofNullable(courseRepository.getById(id))
                 .orElseThrow(() -> new EntityNotFoundException(id, "Course"));
+        Hibernate.initialize(course.getSubjectSet());
         return mapEntityToDto(course);
     }
 

@@ -33,6 +33,10 @@ export class CourseService implements TableService<Course> {
     return this.http.get<Course>('api/course');
   }
 
+  get(id: string): any {
+    return  this.http.get<Course>('api/course/' + id);
+  }
+
   getName(): string {
     return 'Course';
   }
@@ -51,6 +55,13 @@ export class CourseService implements TableService<Course> {
 
   getRelationParameterName() : string {
     return this.type.getRelationParameterName();
+  }
+
+  transformValues(data) : any {
+    for(let value of data) {
+        value.subjectSet = value.subjectSet.length;
+    }
+    return data;
   }
 
 }

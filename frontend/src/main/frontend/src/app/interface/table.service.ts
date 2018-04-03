@@ -11,6 +11,8 @@ export abstract TableService<T> {
 
   list() : any;
 
+  get(id: string): any;
+
   getName(): string;
 
   getDataTableParameters(): string[];
@@ -20,5 +22,7 @@ export abstract TableService<T> {
   getDefinions(): any;
 
   getRelationParameterName() : string;
+
+  transformValues() : any;
 
 }

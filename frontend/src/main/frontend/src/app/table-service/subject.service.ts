@@ -53,4 +53,8 @@ export class SubjectService implements TableService<Subject> {
     return this.type.getRelationParameterName();
   }
 
+  transformValues(data) : any {
+    return data;
+  }
+
 }

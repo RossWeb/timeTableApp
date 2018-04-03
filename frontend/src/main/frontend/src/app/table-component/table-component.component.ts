@@ -39,6 +39,7 @@ export class TableComponentComponent implements OnInit {
   @Output('relationParameterName') relationParameterName : string;
   @Output('rowActive') rowActive : string;
   @Output('selectDefinions') selectDefinions : any;
+  @Output('hiddenParameters') hiddenParameters : boolean = true;
   @Output('addButtonName') addButtonName : string = ADD_NAME;
 
 
@@ -102,14 +103,29 @@ export class TableComponentComponent implements OnInit {
 
   list(){
     this.service.list().subscribe(
-      data => {this.tableRows = data;
+      data => {
+        if(this.relationParameterName !== null){
+          data = this.service.transformValues(data);
+        }
+        this.tableRows = data;
         console.log(data);
       },
       err => {console.log("Error occured when get all elements.")}
     );
   }
 
-  onSelect(itemId) {
+  private onSelectRelationParameter(row: any) {
+      if(this.relationParameterName !== null){
+        this.hiddenParameters = false;
+        this.service.get(row.id).subscribe(
+          data => {
+            console.log("Get element with id " + row.id + " " + data);
+          },
+          err => {console.log("Error occured when get elements.")}
+        );
+      }
+
+    console.log('Select parameter ' + row.id);
   }
 
 }

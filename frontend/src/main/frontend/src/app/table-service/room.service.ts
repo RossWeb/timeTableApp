@@ -53,4 +53,8 @@ export class RoomService implements TableService<Room> {
     return this.type.getRelationParameterName();
   }
 
+  transformValues(data) : any {
+    return data;
+  }
+
 }

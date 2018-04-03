@@ -71,4 +71,8 @@ export class GroupService implements TableService<Group> {
     });
   }
 
+  transformValues(data) : any {
+    return data;
+  }
+
 }
