@@ -1,6 +1,7 @@
 package pl.timetable.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Persistent;
 
 import javax.persistence.*;
 import java.io.Serializable;

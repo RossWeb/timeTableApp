@@ -10,31 +10,54 @@ import {Course} from "../model/course.type";
 @Injectable()
 export class CourseService implements TableService<Course> {
   private type;
+  private isParameterTable : boolean;
+  private primaryKey : number;
 
   constructor(private http: HttpClient) {
     this.type = new Course();
   }
 
+  private getParametersUrlIfNeeded() : string {
+    if(this.isParameterTable){
+      return this.primaryKey + '/parameters/';
+    }else{
+      return '';
+    }
+  }
+
+  setParameterTable(isParameterTable: boolean){
+    this.isParameterTable = isParameterTable;
+  }
+
+  setPrimaryKey(primaryKey : number){
+    this.primaryKey = primaryKey;
+  }
+
   create(name: string, dataTableValues: string[]) {
-    return this.http.post('api/course', this.type.getParams(dataTableValues),
+    return this.http.post('api/course/' + this.getParametersUrlIfNeeded(), this.type.getParams(dataTableValues),
+      {responseType: 'text'});
+  }
+
+  createParameters(id: number) {
+    return this.http.post('api/course/' + this.getParametersUrlIfNeeded() + '/' + id,
       {responseType: 'text'});
   }
 
   remove(id: string){
-    return this.http.delete('api/course/' + id,{responseType: 'text'})
+    return this.http.delete('api/course/' + this.getParametersUrlIfNeeded() + id,{responseType: 'text'})
   }
 
   update(dataTableValues: string[], id: string){
-    return this.http.put('api/course/' + id, this.type.getParams(dataTableValues),
+    return this.http.put('api/course/'+ this.getParametersUrlIfNeeded() + id, this.type.getParams(dataTableValues),
     {responseType: 'text'});
   }
 
   list() {
-    return this.http.get<Course>('api/course');
+    return this.http.get<Course>('api/course/' + this.getParametersUrlIfNeeded());
   }
 
   get(id: string): any {
-    return  this.http.get<Course>('api/course/' + id);
+    return  this.http.get<Course>('api/course/' + this.getParametersUrlIfNeeded() + id);
   }
 
   getName(): string {

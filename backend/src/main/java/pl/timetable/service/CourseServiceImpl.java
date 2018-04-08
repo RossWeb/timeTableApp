@@ -9,6 +9,7 @@ import pl.timetable.api.CourseRequest;
 import pl.timetable.dto.CourseDto;
 import pl.timetable.entity.Course;
 import pl.timetable.entity.Subject;
+import pl.timetable.exception.EntityDuplicateFoundException;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.repository.CourseRepository;
 import pl.timetable.repository.SubjectRepository;
@@ -36,7 +37,8 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
         List<Course> entityCourses = courseRepository.findAll().orElse(Collections.emptyList());
         return entityCourses.stream().map(course -> {
             Hibernate.initialize(course.getSubjectSet());
-            return mapEntityToDto(course);}).collect(Collectors.toList());
+            return mapEntityToDto(course);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -65,12 +67,39 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
         courseRepository.remove(course);
     }
 
+    public void deleteParameter(int id, int parameterId) throws EntityNotFoundException {
+        Course course = Optional.ofNullable(courseRepository.getById(id))
+                .orElseThrow(() -> new EntityNotFoundException(id, "Course"));
+        Subject subjectFounded = course.getSubjectSet().stream().filter(subject -> parameterId == subject.getId()).findAny()
+                .orElseThrow(() -> new EntityNotFoundException(parameterId, "Subject"));
+        course.getSubjectSet().remove(subjectFounded);
+        courseRepository.update(course);
+    }
+
+    public void addParameter(int id, int parameterId) throws EntityNotFoundException, EntityDuplicateFoundException {
+        Course course = Optional.ofNullable(courseRepository.getById(id))
+                .orElseThrow(() -> new EntityNotFoundException(id, "Course"));
+        course.getSubjectSet().stream()
+            .filter(subject -> subject.getId() == parameterId).findAny().ifPresent(
+                    subject -> new EntityDuplicateFoundException(parameterId, "Subject")
+            );
+        Subject subjectToAdd = subjectRepository.getById(parameterId);
+        course.getSubjectSet().add(subjectToAdd);
+        courseRepository.update(course);
+
+    }
+
     @Override
     public CourseDto get(int id) throws EntityNotFoundException {
         Course course = Optional.ofNullable(courseRepository.getById(id))
                 .orElseThrow(() -> new EntityNotFoundException(id, "Course"));
         Hibernate.initialize(course.getSubjectSet());
         return mapEntityToDto(course);
+    }
+
+    public List<Subject> getParameters(int id) throws EntityNotFoundException {
+        return Optional.ofNullable(courseRepository.getParameters(id))
+                .orElseThrow(() -> new EntityNotFoundException(id, "SubjectList"));
     }
 
     private Subject getSubject(Integer subjectId) throws EntityNotFoundException {

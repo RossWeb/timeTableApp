@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { TableComponentComponent } from './table-component/table-component.component';
-import { ValuesPipe } from './table-component/table-component.component';
+import { ValuesPipe } from './table-component/table-base.component';
 import { AdminPanelComponent } from './admin-panel-component/admin-panel-component.component';
 import {TableTypeProvider} from "./table-service/table.type.provider";
 import { TableParameterComponent } from './table-parameter/table-parameter.component';
