@@ -2,17 +2,17 @@ package pl.timetable.entity;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.springframework.data.annotation.Transient;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 @Entity
 public class Subject extends BaseEntity {
 
     private String name;
 
-    @Transient
+
     private boolean exists = false;
 
     @Column(name = "name", nullable = false)
@@ -24,10 +24,11 @@ public class Subject extends BaseEntity {
         this.name = name;
     }
 
+    @Transient
     public boolean isExists() {
         return exists;
     }
-
+    @Transient
     public void setExists(boolean exists) {
         this.exists = exists;
     }

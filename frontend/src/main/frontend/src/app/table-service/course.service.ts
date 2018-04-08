@@ -39,7 +39,7 @@ export class CourseService implements TableService<Course> {
   }
 
   createParameters(id: number) {
-    return this.http.post('api/course/' + this.getParametersUrlIfNeeded() + '/' + id,
+    return this.http.post('api/course/' + this.getParametersUrlIfNeeded()  + id, null,
       {responseType: 'text'});
   }
 
