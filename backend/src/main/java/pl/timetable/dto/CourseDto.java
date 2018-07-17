@@ -5,19 +5,11 @@ import pl.timetable.entity.Subject;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CourseDto {
+public class CourseDto extends BaseDto{
 
-    private Integer id;
+
     private String name;
     private Set<Subject> subjectSet = new HashSet<>();
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

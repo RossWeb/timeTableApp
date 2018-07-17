@@ -1,15 +1,16 @@
 package pl.timetable.dto;
 
-public class SubjectDto {
+public class SubjectDto extends BaseDto{
 
-    private Integer id;
+    private String name;
+    private Integer size;
 
-    public Integer getId() {
-        return id;
+    public Integer getSize() {
+        return size;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
     public String getName() {
@@ -19,6 +20,4 @@ public class SubjectDto {
     public void setName(String name) {
         this.name = name;
     }
-
-    private String name;
 }

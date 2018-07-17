@@ -11,9 +11,8 @@ import javax.persistence.Transient;
 public class Subject extends BaseEntity {
 
     private String name;
-
-
     private boolean exists = false;
+    private Integer size = 0;
 
     @Column(name = "name", nullable = false)
     public String getName() {
@@ -22,6 +21,15 @@ public class Subject extends BaseEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Column(name = "size", nullable = false)
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
     }
 
     @Transient
@@ -43,6 +51,7 @@ public class Subject extends BaseEntity {
 
         return new EqualsBuilder()
                 .append(name, subject.name)
+                .append(id, subject.id)
                 .isEquals();
     }
 
@@ -50,6 +59,7 @@ public class Subject extends BaseEntity {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(name)
+                .append(id)
                 .toHashCode();
     }
 }

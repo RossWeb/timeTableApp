@@ -1,18 +1,11 @@
 package pl.timetable.dto;
 
-public class RoomDto {
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-    private Integer id;
+public class RoomDto extends BaseDto{
+
     private String name;
     private String number;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -28,5 +21,14 @@ public class RoomDto {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append(super.toString())
+                .append("name", name)
+                .append("number", number)
+                .toString();
     }
 }
