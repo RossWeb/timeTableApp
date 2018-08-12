@@ -12,10 +12,14 @@ public class GeneticUtilityTestClass {
 
     private static Supplier<RoomDto> supplierRoom = RoomDto::new;
     private static Supplier<GroupDto> supplierGroup = GroupDto::new;
-    private static Supplier<SubjectDto> supplierSubject = SubjectDto::new;
+    private static Supplier<SubjectDto> supplierSubject = () -> {
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setSize(5);
+        return subjectDto;
+    };
     private static Supplier<CourseDto> supplierCourse = CourseDto::new;
 
-    public static GeneticInitialData getGeneticInitialDataParametrized(Lecture lecture,
+    public static GeneticInitialData getGeneticInitialDataParametrized(LectureDescription lectureDescription,
                                                                        Integer roomSize,
                                                                        Integer subjectSize,
                                                                        Integer courseSize,
@@ -23,7 +27,7 @@ public class GeneticUtilityTestClass {
 
 
         GeneticInitialData geneticInitialData = new GeneticInitialData();
-        geneticInitialData.setLecture(lecture);
+        geneticInitialData.setLectureDescription(lectureDescription);
         geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, roomSize));
         geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, subjectSize));
         geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, courseSize).stream().map(courseDto ->
@@ -37,8 +41,8 @@ public class GeneticUtilityTestClass {
 
 
         GeneticInitialData geneticInitialData = new GeneticInitialData();
-        geneticInitialData.setLecture(new Lecture(5, Lecture.REGULAR, 5));
-        geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, 10));
+        geneticInitialData.setLectureDescription(new LectureDescription(5, LectureDescription.REGULAR, 2));
+        geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, 20));
         geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, 10));
         geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, 5).stream().map(courseDto ->
         fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 5)).collect(Collectors.toList()));

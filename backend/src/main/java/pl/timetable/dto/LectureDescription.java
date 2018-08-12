@@ -1,6 +1,6 @@
 package pl.timetable.dto;
 
-public class Lecture {
+public class LectureDescription {
 
     public final static Integer WEEKLY = 2;
     public final static Integer REGULAR = 5;
@@ -10,7 +10,7 @@ public class Lecture {
     private Integer weeksPerSemester;
 
 
-    public Lecture(Integer numberPerDay, Integer daysPerWeek, Integer weeksPerSemester) {
+    public LectureDescription(Integer numberPerDay, Integer daysPerWeek, Integer weeksPerSemester) {
         this.numberPerDay = numberPerDay;
         this.daysPerWeek = daysPerWeek;
         this.weeksPerSemester = weeksPerSemester;

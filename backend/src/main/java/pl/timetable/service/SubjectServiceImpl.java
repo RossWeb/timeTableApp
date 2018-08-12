@@ -27,7 +27,7 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
     @Override
     public List<SubjectDto> findAll() {
         List<Subject> subjectList = subjectRepository.findAll().orElse(Collections.emptyList());
-        return subjectList.stream().map(this::mapEntityToDto).collect(Collectors.toList());
+        return subjectList.stream().map(SubjectServiceImpl::mapEntityToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
         return mapEntityToDto(subject);
     }
 
-    private SubjectDto mapEntityToDto(Subject entity) {
+    public static SubjectDto mapEntityToDto(Subject entity) {
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(entity.getId());
         subjectDto.setName(entity.getName());

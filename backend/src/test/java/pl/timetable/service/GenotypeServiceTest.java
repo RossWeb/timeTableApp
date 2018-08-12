@@ -11,6 +11,7 @@ import pl.timetable.dto.Cell;
 import pl.timetable.dto.GeneticInitialData;
 import pl.timetable.dto.Genotype;
 import pl.timetable.dto.RoomDto;
+import pl.timetable.entity.Subject;
 
 import java.util.*;
 
@@ -47,29 +48,33 @@ public class GenotypeServiceTest {
     public void createInitialGenotypeTest() {
         //given
         final GeneticInitialData geneticInitialData = getGeneticInitialData();
-        final Integer lectureSize = geneticInitialData.getLecture().getNumberPerDay() * geneticInitialData.getLecture().getDaysPerWeek();
-        final Integer lectureAndRoomSize = lectureSize * geneticInitialData.getRoomDtoList().size();
+        final int lectureSize = geneticInitialData.getLectureDescription().getNumberPerDay() * geneticInitialData.getLectureDescription().getWeeksPerSemester()* geneticInitialData.getLectureDescription().getDaysPerWeek();
+        final int subjectSize = geneticInitialData.getGroupDtoList().get(0).getCourse().getSubjectSet().stream().map(Subject::getSize).mapToInt(value -> value).sum();
         //when
         Genotype genotype = genotypeService.createInitialGenotype(geneticInitialData);
         //then
-        Cell[] genotypeElement = genotype.getGenotypeTable()[0];
+        Arrays.stream(genotype.getGenotypeTable()).forEach(group -> {
+            Cell[] genotypeElement = group;
 
-        Assert.assertEquals("lectureNumber must be correct for genotype", lectureSize, genotypeElement[genotypeElement.length-1].getLecture());
-        Assert.assertEquals("cell number must be correct" , lectureAndRoomSize, (Integer) genotypeElement.length);
+            Assert.assertEquals("lectureNumber must be correct for genotype", (lectureSize), genotypeElement.length);
+            Assert.assertEquals("subjectSize must be equals room " , subjectSize  , ((Long)Arrays.stream(genotypeElement).filter(cell -> Objects.nonNull(cell) && Objects.nonNull(cell.getRoomDto())).count()).intValue());
 
-        Set<Integer> lectureKindSet = new HashSet<>();
-        List<RoomDto> roomPerLectureListArray = new ArrayList<>();
-        for (Cell aGenotypeElement : genotypeElement) {
-            lectureKindSet.add(aGenotypeElement.getLecture());
-            if (Objects.nonNull(aGenotypeElement.getRoomDto())) {
-                roomPerLectureListArray.add(aGenotypeElement.getRoomDto());
+            Set<Integer> lectureKindSet = new HashSet<>();
+            List<RoomDto> roomPerLectureListArray = new ArrayList<>();
+            for (Cell aGenotypeElement : genotypeElement) {
+                if(Objects.nonNull(aGenotypeElement) && Objects.nonNull(aGenotypeElement.getRoomDto())) {
+                    lectureKindSet.add(aGenotypeElement.getLecture());
+                    roomPerLectureListArray.add(aGenotypeElement.getRoomDto());
+                }
             }
-        }
-        Integer roomSizeByLecture = genotype.getRoomByLecture().values().stream().map(List::size).mapToInt(value -> value).sum();
+            Integer roomSizeByLecture = genotype.getRoomByLecture().values().stream().map(List::size).mapToInt(value -> value).sum();
 
-        Assert.assertEquals("lecture number kind must be correct" , lectureSize, (Integer) lectureKindSet.size());
-        Assert.assertTrue("room per lecture must be one for array", lectureSize >= (Integer) roomPerLectureListArray.size());
-        Assert.assertTrue("room per lecture must be one for map", (Integer)(lectureSize*geneticInitialData.getGroupDtoList().size()) >= roomSizeByLecture);
+            Assert.assertEquals("lecture number kind must be correct" , subjectSize, lectureKindSet.size());
+            Assert.assertTrue("room per lecture must be one for array", lectureSize >= (Integer) roomPerLectureListArray.size());
+            Assert.assertTrue("room per lecture must be one for map", (Integer)(lectureSize*geneticInitialData.getGroupDtoList().size()) >= roomSizeByLecture);
+        });
+        Assert.assertEquals("all subjects has room", subjectSize*geneticInitialData.getGroupDtoList().size() , genotype.getRoomBySubject().values().stream().mapToInt(List::size).sum());
+
 
     }
 

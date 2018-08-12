@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
 import pl.timetable.dto.GeneticInitialData;
-import pl.timetable.dto.Lecture;
+import pl.timetable.dto.LectureDescription;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InitialGenotypeCriteriaTest {
@@ -16,17 +16,17 @@ public class InitialGenotypeCriteriaTest {
 
     @Test
     public void roomAndLectureToSubjectIsValid(){
-        Lecture lecture = new Lecture(4,2, 8);
-        GeneticInitialData geneticInitialData = GeneticUtilityTestClass.getGeneticInitialDataParametrized(lecture, 5, 5, 3, 5);
+        LectureDescription lectureDescription = new LectureDescription(4,2, 8);
+        GeneticInitialData geneticInitialData = GeneticUtilityTestClass.getGeneticInitialDataParametrized(lectureDescription, 5, 5, 3, 5);
         boolean isValid = initialGenotypeCriteria.checkData(geneticInitialData);
         Assert.assertTrue(isValid);
     }
 
     @Test
     public void roomAndLectureToSubjectIsNotValid(){
-        Lecture lecture = new Lecture(4,2, 1);
+        LectureDescription lectureDescription = new LectureDescription(4,2, 1);
         GeneticInitialData geneticInitialData =
-                GeneticUtilityTestClass.getGeneticInitialDataParametrized(lecture, 5, 5, 3, 5);
+                GeneticUtilityTestClass.getGeneticInitialDataParametrized(lectureDescription, 5, 5, 3, 5);
         boolean isValid = initialGenotypeCriteria.checkData(geneticInitialData);
         Assert.assertTrue(isValid);
     }

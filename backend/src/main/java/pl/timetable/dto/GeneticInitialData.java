@@ -4,19 +4,19 @@ import java.util.List;
 
 public class GeneticInitialData {
 
-    private Lecture lecture;
+    private LectureDescription lectureDescription;
     private List<CourseDto> courseDtoList;
     private List<GroupDto> groupDtoList;
     private List<RoomDto> roomDtoList;
     private List<SubjectDto> subjectDtoList;
     private Integer populationSize;
 
-    public Lecture getLecture() {
-        return lecture;
+    public LectureDescription getLectureDescription() {
+        return lectureDescription;
     }
 
-    public void setLecture(Lecture lecture) {
-        this.lecture = lecture;
+    public void setLectureDescription(LectureDescription lectureDescription) {
+        this.lectureDescription = lectureDescription;
     }
 
     public List<CourseDto> getCourseDtoList() {

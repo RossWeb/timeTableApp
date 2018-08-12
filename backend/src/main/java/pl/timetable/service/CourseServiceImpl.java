@@ -107,7 +107,7 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
                 .orElseThrow(() -> new EntityNotFoundException(subjectId, "Subject"));
     }
 
-    private CourseDto mapEntityToDto(Course course) {
+    public static CourseDto mapEntityToDto(Course course) {
         CourseDto courseDto = new CourseDto();
         courseDto.setId(course.getId());
         courseDto.setName(course.getName());

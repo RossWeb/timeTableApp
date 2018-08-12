@@ -36,25 +36,39 @@ public class GeneticAlgorithmService {
 
         //create initial population
         Population population = new Population();
+        Double globalFitnessScore =0.0;
+        Integer counterSameFitnesScore = 0;
+        Integer populationIteration = 0;
         for (int i = 0; i < geneticInitialData.getPopulationSize(); i++) {
             LOGGER.info("Create population : " + i);
             population.getGenotypePopulation().add(genotypeService.createInitialGenotype(geneticInitialData));
         }
-        Population newPopulation = processGenetic(population);
+//        Population newPopulation = processGenetic(population);
         for (;;) {
-            newPopulation = processGenetic(newPopulation);
-            //mutate
-            //create next population
-            genotypeService.mapHintNewPopulation(newPopulation);
-            //end and present score
-            if(newPopulation.getFitnessScore() == 100 || newPopulation.getGenotypePopulation().size() == 0){
+            LOGGER.info("Population generation : " + ++populationIteration);
+            Population newPopulation = processGenetic(population);
+            if(population.getFitnessScore() == 100 || population.getGenotypePopulation().size() == 0 || counterSameFitnesScore == 10){
                 break;
+            }else{
+                if(globalFitnessScore.equals(population.getFitnessScore())){
+                    counterSameFitnesScore++;
+                }else{
+                    globalFitnessScore = population.getFitnessScore();
+                }
             }
 
+            //mutate
+            //mutate newPopulation
+            //create next population
+            population = genotypeService.mapHintNewPopulation(newPopulation);
+            //end and present score
+            LOGGER.info("Max fitness score for generation " + population.getFitnessScore());
+
         }
-
-
-        return newPopulation;
+        LOGGER.info("Max fitness score : "+ population.getFitnessScore());
+        LOGGER.info("Generation end " + populationIteration);
+        LOGGER.info("Same fitness score " + counterSameFitnesScore);
+        return population;
 
     }
 
