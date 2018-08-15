@@ -22,20 +22,30 @@ public class HardGenotypeCriteria implements AbstractCriteria {
     private static final Logger LOGGER = Logger.getLogger(HardGenotypeCriteria.class);
 
     @Override
-    public boolean checkData(Genotype genotype) {
+    public boolean checkData(Genotype genotype, LectureDescription lectureDescription) {
         Boolean isValid = true;
-        Boolean isValidGroup = true;
+        int groupSize = genotype.getGenotypeTable().length;
+        double hardFitnessScoreByGroupDefinition = 0.5;
+        double hardFitnessScoreByGroup = 0.0;
         for (Cell[] group: genotype.getGenotypeTable()) {
             Integer subjectSize = group[0].getCourseDto().getSubjectSet().stream().map(Subject::getSize).mapToInt(value -> value).sum();
             Integer lectureSize = ((Long) Arrays.stream(group).filter(cell -> Objects.nonNull(cell) && Objects.nonNull(cell.getRoomDto())).count()).intValue();
-            isValidGroup = hasEnoughSizeLectureToSubject(lectureSize, subjectSize) &&
-                    hasNoEmptyLectureByGroup(genotype.getRoomByGroup().get(group[0].getGroupDto()), genotype.getLectureDescription().getNumberPerDay());
-            if(!isValidGroup){
-                return false;
+            boolean isEnoughSizeLecture = hasEnoughSizeLectureToSubject(lectureSize, subjectSize);
+            boolean hasNoEmptyLectureByGroup = hasNoEmptyLectureByGroup(genotype.getRoomByGroup().get(group[0].getGroupDto()), lectureDescription.getNumberPerDay());
+            if(isEnoughSizeLecture){
+                hardFitnessScoreByGroup += 0.75 / groupSize;
+                if(hasNoEmptyLectureByGroup){
+                    hardFitnessScoreByGroup += 0.25 / groupSize;
+                }
             }
         }
 
+        genotype.setHardFitnessScore(hardFitnessScoreByGroup * hardFitnessScoreByGroupDefinition);
         isValid = hasNoRoomDuplicatesByLecture(genotype.getRoomByLecture()) && hasNoGroupDuplicatesByRoom(genotype.getGenotypeTable());
+        if(isValid){
+            genotype.setHardFitnessScore(genotype.getHardFitnessScore() + hardFitnessScoreByGroupDefinition);
+        }
+        genotype.setHardFitnessScore(genotype.getHardFitnessScore()*100);
         return isValid;
     }
 
@@ -55,7 +65,7 @@ public class HardGenotypeCriteria implements AbstractCriteria {
     public boolean hasEnoughSizeLectureToSubject(Integer lectureSize, Integer subjectSize){
         boolean isValid = lectureSize >= subjectSize;
         if(!isValid){
-            LOGGER.error("Group has no space to subject. LectureDescription : " + lectureSize + " subject : " + subjectSize);
+            LOGGER.error("Group has no space to subject. Lecture : " + lectureSize + " subject : " + subjectSize);
         }
         return isValid;
     }

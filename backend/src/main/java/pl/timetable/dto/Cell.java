@@ -9,13 +9,21 @@ public class Cell {
     private CourseDto courseDto;
     private SubjectDto subjectDto;
     private GroupDto groupDto;
+    private Integer day;
 
-    public Cell(Integer lecture, RoomDto roomDto, CourseDto courseDto, SubjectDto subjectDto, GroupDto groupDto) {
+    public Cell(Integer lecture, CourseDto courseDto, GroupDto groupDto, Integer day) {
         this.lecture = lecture;
-        this.roomDto = roomDto;
         this.courseDto = courseDto;
-        this.subjectDto = subjectDto;
         this.groupDto = groupDto;
+        this.day = day;
+    }
+
+    public Integer getDay() {
+        return day;
+    }
+
+    public void setDay(Integer day) {
+        this.day = day;
     }
 
     public GroupDto getGroupDto() {
@@ -62,6 +70,7 @@ public class Cell {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("lecture", lecture)
+                .append("day", day)
                 .append("roomDto", roomDto)
                 .append("courseDto", courseDto)
                 .append("subjectDto", subjectDto)

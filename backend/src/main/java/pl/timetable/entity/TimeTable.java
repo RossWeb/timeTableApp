@@ -1,24 +1,48 @@
 package pl.timetable.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "findTimeTableByDays",
+                query = "from TimeTable tt where tt.day in (:days)"
+        )
+})
 public class TimeTable extends BaseEntity {
 
-    private Integer position;
+    private Integer lectureNumber;
+    private Integer day;
     private Room room;
     private Group group;
     private Subject subject;
+    private TimeTableDescription timeTableDescription;
 
-    @Column(name = "position", nullable = false)
-    public Integer getPosition() {
-        return position;
+    @ManyToOne
+    public TimeTableDescription getTimeTableDescription() {
+        return timeTableDescription;
     }
 
-    public void setPosition(Integer position) {
-        this.position = position;
+    public void setTimeTableDescription(TimeTableDescription timeTableDescription) {
+        this.timeTableDescription = timeTableDescription;
+    }
+
+    @Column(name = "lecture", nullable = false)
+    public Integer getLectureNumber() {
+        return lectureNumber;
+    }
+
+    public void setLectureNumber(Integer lectureNumber) {
+        this.lectureNumber = lectureNumber;
+    }
+
+    @Column(name = "day", nullable = false)
+    public Integer getDay() {
+        return day;
+    }
+
+    public void setDay(Integer day) {
+        this.day = day;
     }
 
     @ManyToOne

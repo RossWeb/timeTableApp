@@ -23,9 +23,10 @@ public class GeneticAlgorithmServiceTest {
     @Before
     public void init(){
         HardGenotypeCriteria hardGenotypeCriteria = new HardGenotypeCriteria();
+        SoftGenotypeCriteria softGenotypeCriteria = new SoftGenotypeCriteria();
         GenotypeService genotypeService = new GenotypeService(hardGenotypeCriteria);
         genotypeService.setHardGenotypeCriteria(hardGenotypeCriteria);
-        FitnessService fitnessService = new FitnessService(hardGenotypeCriteria);
+        FitnessService fitnessService = new FitnessService(hardGenotypeCriteria, softGenotypeCriteria);
         geneticAlgorithmService.setGenotypeService(genotypeService);
         geneticAlgorithmService.setFitnessService(fitnessService);
     }
@@ -35,7 +36,7 @@ public class GeneticAlgorithmServiceTest {
         //given
         //when
         GeneticInitialData geneticInitialData = getGeneticInitialData();
-        geneticInitialData.setPopulationSize(10);
+        geneticInitialData.setPopulationSize(100);
         Population population = geneticAlgorithmService.init(geneticInitialData);
         //then
         Assert.assertNotNull(population);

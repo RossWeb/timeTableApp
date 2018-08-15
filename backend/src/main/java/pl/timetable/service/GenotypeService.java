@@ -8,6 +8,8 @@ import pl.timetable.dto.*;
 import pl.timetable.entity.Subject;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class GenotypeService {
@@ -61,14 +63,14 @@ public class GenotypeService {
         GenotypeServiceDto genotypeServiceDto = new GenotypeServiceDto();
 
         fillRoomListPerLecture(geneticInitialData, lectureSize, genotypeServiceDto);
-        Genotype genotype = new Genotype(geneticInitialData.getGroupDtoList().size(), lectureSize, geneticInitialData.getLectureDescription());
+        Genotype genotype = new Genotype(geneticInitialData.getGroupDtoList().size(), lectureSize);
 //        genotype.getRoomByLecture().put(lectureIncrementNumber, new ArrayList<>());
 //        genotype.getLectureByRoom().put(geneticInitialData.getRoomDtoList().get(roomIncrementNumber), new ArrayList<>());
 //        Integer putRoomPosition = getRandomIntegerBetweenRange(0, geneticInitialData.getRoomDtoList().size());
         //group iteration
         boolean initialGenotypeValid = false;
         while (!initialGenotypeValid) {
-            createInitialGenotypesWithRoomAndGroup(geneticInitialData, lectureSize, lectureIncrementNumber, genotypeServiceDto, genotype);
+            createInitialGenotypesWithRoom(geneticInitialData, lectureSize, lectureIncrementNumber, genotypeServiceDto, genotype);
             initialGenotypeValid = hardGenotypeCriteria.hasNoGroupDuplicatesByRoom(genotype.getGenotypeTable());
         }
         addSubject(genotype, geneticInitialData);
@@ -82,7 +84,24 @@ public class GenotypeService {
         return genotype;
     }
 
-    private void createInitialGenotypesWithRoomAndGroup(GeneticInitialData geneticInitialData, int lectureSize, int lectureIncrementNumber, GenotypeServiceDto genotypeServiceDto, Genotype genotype) {
+    public void mutateGenotype(Genotype genotype, GeneticInitialData geneticInitialData){
+        Arrays.stream(genotype.getGenotypeTable()).forEach(group -> {
+            IntStream.range(0, group.length).forEach(value -> {
+                if(new Random().doubles(0, 1).findFirst().getAsDouble()
+                        < geneticInitialData.getMutationValue()){
+                    CourseDto courseDto = group[0].getCourseDto();
+                    List<Subject> subjectList = new ArrayList<>(courseDto.getSubjectSet());
+                    SubjectDto randomSubject = SubjectServiceImpl.mapEntityToDto(
+                            subjectList.get(getRandomIntegerBetweenRange(0 , subjectList.size())));
+                    RoomDto roomDto = geneticInitialData.getRoomDtoList().get(getRandomIntegerBetweenRange(0,geneticInitialData.getRoomDtoList().size()));
+                    group[value].setSubjectDto(randomSubject);
+                    group[value].setRoomDto(roomDto);
+                }
+            });
+        });
+    }
+
+    private void createInitialGenotypesWithRoom(GeneticInitialData geneticInitialData, int lectureSize, int lectureIncrementNumber, GenotypeServiceDto genotypeServiceDto, Genotype genotype) {
         for (int i = 0; i < genotype.getGenotypeTable().length; ) {
             GroupDto groupDto = geneticInitialData.getGroupDtoList().get(i);
 //            Map<RoomDto, List<Integer>> lectureByRoomTemporary = new HashMap<>();
@@ -90,6 +109,7 @@ public class GenotypeService {
             Integer subjectSize = getSubjectPerGroup(courseDto);
             genotypeServiceDto.getRoomByGroupTemporary().put(groupDto, new LinkedList<>());
 //            lectureByRoomTemporary.put(geneticInitialData.getRoomDtoList().get(0), new ArrayList<>());
+            fillInitialValueGenotypeTable(geneticInitialData, genotype, i, groupDto, courseDto);
             //lecture iteration per group
             for (int actualLecture = 0; actualLecture < genotype.getGenotypeTable()[i].length; actualLecture++) {
 
@@ -108,20 +128,17 @@ public class GenotypeService {
                         break;
                     }
                 }
-                RoomDto roomFounded = getRoomByRandomNumber(genotypeServiceDto.getRoomListPerLecture().get(actualLecture));
+                RoomDto roomFounded = getRoomByRandomNumberWithNull(genotypeServiceDto.getRoomListPerLecture().get(actualLecture));
 //                LOGGER.debug("Actual lecture " + actualLecture + " for group " + i + " " + roomFounded);
                 genotype.getRoomByLecture().putIfAbsent(actualLecture, new LinkedList<>());
-                genotype.getGenotypeTable()[i][actualLecture] = new Cell(actualLecture,
-                        roomFounded,
-                        courseDto, null,
-                        groupDto);
+                genotype.getGenotypeTable()[i][actualLecture].setRoomDto(roomFounded);
                 genotypeServiceDto.getRoomByLectureTemporary().putIfAbsent(actualLecture, new LinkedList<>());
                 genotypeServiceDto.getRoomByLectureTemporary().get(actualLecture).add(roomFounded);
                 genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).add(roomFounded);
                 List<RoomDto> listToCheck = genotypeServiceDto.getRoomByGroupTemporary().get(groupDto);
-                if (Arrays.stream(genotype.getGenotypeTable()[i]).filter(cell -> Objects.nonNull(cell) && Objects.nonNull(cell.getRoomDto())).count() == 26) {
-                    LOGGER.error("To much cell for group " + i);
-                }
+//                if (Arrays.stream(genotype.getGenotypeTable()[i]).filter(cell -> Objects.nonNull(cell) && Objects.nonNull(cell.getRoomDto())).count() == 26) {
+//                    LOGGER.error("To much cell for group " + i);
+//                }
                 try {
                     if (genotype.getGenotypeTable()[i][actualLecture].getRoomDto() != genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).get(actualLecture)) {
                         LOGGER.info("Different cell for group " + i + "and lecture " + actualLecture);
@@ -155,13 +172,30 @@ public class GenotypeService {
 //                        genotype.getRoomByGroup().get(geneticInitialData.getGroupDtoList().get(i)));
 //            }
             boolean isValidCriteria = hardGenotypeCriteria.hasNoRoomDuplicatesByLecture(genotypeServiceDto.getRoomByLectureTemporary()) &&
-                    hardGenotypeCriteria.hasEnoughSizeLectureToSubject(
-                            ((Long) genotypeServiceDto.getRoomByLectureTemporary().values().stream().filter(roomDtos -> !roomDtos.isEmpty()).count()).intValue()
-                            , subjectSize) &&
                     hardGenotypeCriteria.hasNoEmptyLectureByGroup(genotypeServiceDto.getRoomByGroupTemporary().get(groupDto)
                             , geneticInitialData.getLectureDescription().getNumberPerDay());
-
+//            hardGenotypeCriteria.hasEnoughSizeLectureToSubject(
+//                    ((Long) genotypeServiceDto.getRoomByLectureTemporary().values().stream().filter(roomDtos -> !roomDtos.isEmpty()).count()).intValue()
+//                    , subjectSize)
             if (isValidCriteria) {
+                List<Cell> cellWithEmptyRoomList = Arrays.stream(genotype.getGenotypeTable()[i])
+                        .filter(cell -> Objects.isNull(cell.getRoomDto())).collect(Collectors.toList());
+                while(subjectSize > ((Long) genotypeServiceDto.getRoomByLectureTemporary().values().stream().filter(roomDtos -> !roomDtos.isEmpty()).count()).intValue()){
+
+                    int cellPosition = getRandomIntegerBetweenRange(0, cellWithEmptyRoomList.size());
+                    Cell cellFound = cellWithEmptyRoomList.get(cellPosition);
+                    RoomDto roomFound = getRoomByRandomNumber(genotypeServiceDto.getRoomListPerLecture()
+                                    .get(cellFound.getLecture()));
+                    cellWithEmptyRoomList.remove(cellPosition);
+                    if(Objects.nonNull(roomFound)){
+                        genotypeServiceDto.getRoomByGroupTemporary().get(groupDto)
+                                .addAll(Arrays.asList(new RoomDto[lectureSize - genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).size()]));
+                        genotype.getGenotypeTable()[i][cellFound.getLecture()].setRoomDto(roomFound);
+                        genotypeServiceDto.getRoomByLectureTemporary().get(cellFound.getLecture()).add(roomFound);
+                        genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).set(cellFound.getLecture(), roomFound);
+                        genotypeServiceDto.getRoomListPerLecture().get(cellFound.getLecture()).remove(roomFound);
+                    }
+                }
                 genotype.setRoomByLecture(genotypeServiceDto.getRoomByLectureTemporary());
                 genotype.setRoomByGroup(genotypeServiceDto.getRoomByGroupTemporary());
                 i++;
@@ -178,6 +212,15 @@ public class GenotypeService {
                 genotype.getGenotypeTable()[i] = new Cell[lectureSize];
             }
 
+        }
+    }
+
+    private void fillInitialValueGenotypeTable(GeneticInitialData geneticInitialData, Genotype genotype, int i, GroupDto groupDto, CourseDto courseDto) {
+        for (int j = 0; j < genotype.getGenotypeTable()[i].length; j++) {
+            genotype.getGenotypeTable()[i][j] = new Cell(
+                    j,
+                    courseDto,
+                    groupDto, j / geneticInitialData.getLectureDescription().getNumberPerDay() + 1);
         }
     }
 
@@ -239,9 +282,61 @@ public class GenotypeService {
         return population;
     }
 
-    public void crossover(Genotype genotypeFirst, Genotype genotypeSecond) {
+    public void crossover(Genotype genotypeFirst, Genotype genotypeSecond, int lectureDays) {
+
         Integer rowSize = genotypeFirst.getGenotypeTable().length;
         Integer columnSize = genotypeFirst.getGenotypeTable()[0].length;
+//        for (int i = 0; i < rowSize; i++) {
+//            int lecturePositionToCut = new Random().ints(0, (lectureDays)).findFirst().getAsInt();
+//            boolean cutLeftOrRight = new Random().nextBoolean();
+//            int startPosition = 0;
+//            int endPosition = 0;
+//            if(cutLeftOrRight){
+//                startPosition = lecturePositionToCut;
+//                endPosition = lectureDays;
+//            }else{
+//                endPosition = lecturePositionToCut;
+//            }
+//
+//            for (int j = startPosition; j < endPosition; j++) {
+//                int daySearched = j +1;
+//                try {
+//                    List<Cell> lecturePerDayFirst = Arrays.stream(genotypeFirst.getGenotypeTable()[i])
+//                            .filter(cell -> cell.getDay().equals(daySearched)).collect(Collectors.toList());
+//                    List<Cell> lecturePerDaySecond = Arrays.stream(genotypeSecond.getGenotypeTable()[i])
+//                            .filter(cell -> cell.getDay().equals(daySearched)).collect(Collectors.toList());
+//
+//
+//                int lectureDayPositionToCut = new Random().ints(0, (lecturePerDayFirst.size())).findFirst().getAsInt();
+//                int startDayPosition = 0;
+//                int endDayPosition = 0;
+//                if(cutLeftOrRight){
+//                    startDayPosition = lectureDayPositionToCut;
+//                    endDayPosition = lecturePerDayFirst.size();
+//                }else{
+//                    endDayPosition = lectureDayPositionToCut;
+//                }
+//                for (int k = startDayPosition; k < endDayPosition ; k++) {
+//                    int dayPosition = k;
+////                    List<Cell> subjectListFirstAsSecound = Arrays.stream(genotypeFirst.getGenotypeTable()[i])
+////                            .filter(cell -> cell.getSubjectDto().equals(lecturePerDaySecond.get(dayPosition).getSubjectDto())).collect(Collectors.toList());
+////                    List<Cell> subjectListSecondAsFirst = Arrays.stream(genotypeSecond.getGenotypeTable()[i])
+////                            .filter(cell -> cell.getSubjectDto().equals(lecturePerDayFirst.get(dayPosition).getSubjectDto())).collect(Collectors.toList());
+////                    int subjectPosition = getRandomIntegerBetweenRange(0, subjectListFirstAsSecound.size());
+////                    genotypeFirst.getGenotypeTable()[i][subjectListFirstAsSecound.get(subjectPosition).getLecture()].setSubjectDto(lecturePerDayFirst.get(k).getSubjectDto());
+////                    subjectPosition = getRandomIntegerBetweenRange(0, subjectListSecondAsFirst.size());
+////                    genotypeFirst.getGenotypeTable()[i][subjectListSecondAsFirst.get(subjectPosition).getLecture()].setSubjectDto(lecturePerDaySecond.get(k).getSubjectDto());
+//                    genotypeFirst.getGenotypeTable()[i][lecturePerDayFirst.get(k).getLecture()] = lecturePerDaySecond.get(k);
+//                    genotypeSecond.getGenotypeTable()[i][lecturePerDayFirst.get(k).getLecture()] = lecturePerDayFirst.get(k);
+//                }
+//
+//                LOGGER.debug("Crossover");
+//                }catch(Exception e){
+//                    LOGGER.info("dasdas");
+//                }
+//
+//            }
+//        }
         Set<Integer> rowSet = new HashSet<>();
         Set<Integer> columnSet = new HashSet<>();
         for (int i = 0; i < rowSize; i++) {
@@ -260,9 +355,10 @@ public class GenotypeService {
         });
     }
 
-    private RoomDto getRoomByRandomNumber(List<RoomDto> roomDtoList) {
-        Integer roomPosition = getRandomIntegerBetweenRange(0, roomDtoList.size());
-        if (Objects.isNull(roomPosition)) {
+    private RoomDto getRoomByRandomNumberWithNull(List<RoomDto> roomDtoList) {
+        Integer nullRange = ((Long)Math.round(roomDtoList.size() * 0.25)).intValue();
+        Integer roomPosition = getRandomIntegerBetweenRange(0, roomDtoList.size() + nullRange);
+        if (roomPosition >= roomDtoList.size()) {
             return null;
         } else {
             RoomDto roomDto = roomDtoList.get(roomPosition);
@@ -271,15 +367,18 @@ public class GenotypeService {
         }
     }
 
+    private RoomDto getRoomByRandomNumber(List<RoomDto> roomDtoList){
+        Integer roomPosition = getRandomIntegerBetweenRange(0, roomDtoList.size());
+        RoomDto roomDto = roomDtoList.get(roomPosition);
+        roomDtoList.remove(roomDto);
+        return roomDto;
+    }
+
 
     public static Integer getRandomIntegerBetweenRange(Integer min, Integer max) {
         Random random = new Random();
-        Integer randomNumber = random.ints(min, (max + 1)).findFirst().getAsInt();
-        if (Objects.equals(randomNumber, max) || max == 2) {
-            return null;
-        } else {
-            return randomNumber;
-        }
+        return random.ints(min, max).findFirst().getAsInt();
+
     }
 
     private static Integer getLectureSlot(GeneticInitialData geneticInitialData) {

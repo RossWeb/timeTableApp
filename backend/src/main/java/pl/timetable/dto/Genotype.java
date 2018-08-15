@@ -12,11 +12,37 @@ public class Genotype {
     private Map<GroupDto, LinkedList<RoomDto>> roomByGroup = new HashMap<>();
     private Map<SubjectDto, List<RoomDto>> roomBySubject = new HashMap<>();
     private Double fitnessScore = 0.0;
-    private LectureDescription lectureDescription;
+    private Double softFitnessScore = 0.0;
+    private Double hardFitnessScore = 0.0;
 
-    public Genotype(int x, int y, LectureDescription lectureDescription){
+    public Genotype(Genotype another) {
+        this.genotypeTable = Arrays.copyOf(another.getGenotypeTable(), another.getGenotypeTable().length);
+        this.roomByLecture = new HashMap<>(another.getRoomByLecture());
+        this.roomByGroup = new HashMap<>(another.getRoomByGroup());
+        this.roomBySubject = new HashMap<>(another.getRoomBySubject());
+        this.fitnessScore = new Double(another.getFitnessScore());
+        this.softFitnessScore = new Double(another.getSoftFitnessScore());
+        this.hardFitnessScore = new Double(another.getHardFitnessScore());
+    }
+
+    public Double getSoftFitnessScore() {
+        return softFitnessScore;
+    }
+
+    public void setSoftFitnessScore(Double softFitnessScore) {
+        this.softFitnessScore = softFitnessScore;
+    }
+
+    public Double getHardFitnessScore() {
+        return hardFitnessScore;
+    }
+
+    public void setHardFitnessScore(Double hardFitnessScore) {
+        this.hardFitnessScore = hardFitnessScore;
+    }
+
+    public Genotype(int x, int y){
         genotypeTable = new Cell[x][y];
-        this.lectureDescription = lectureDescription;
     }
 
     public Cell[][] getGenotypeTable() {
@@ -33,14 +59,6 @@ public class Genotype {
 
     public Map<GroupDto, LinkedList<RoomDto>> getRoomByGroup() {
         return roomByGroup;
-    }
-
-    public LectureDescription getLectureDescription() {
-        return lectureDescription;
-    }
-
-    public void setLectureDescription(LectureDescription lectureDescription) {
-        this.lectureDescription = lectureDescription;
     }
 
     public void setRoomByGroup(Map<GroupDto, LinkedList<RoomDto>> roomByGroup) {

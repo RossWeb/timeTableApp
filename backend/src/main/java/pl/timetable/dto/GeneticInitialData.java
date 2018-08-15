@@ -10,6 +10,15 @@ public class GeneticInitialData {
     private List<RoomDto> roomDtoList;
     private List<SubjectDto> subjectDtoList;
     private Integer populationSize;
+    private Double mutationValue;
+
+    public Double getMutationValue() {
+        return mutationValue;
+    }
+
+    public void setMutationValue(Double mutationValue) {
+        this.mutationValue = mutationValue;
+    }
 
     public LectureDescription getLectureDescription() {
         return lectureDescription;

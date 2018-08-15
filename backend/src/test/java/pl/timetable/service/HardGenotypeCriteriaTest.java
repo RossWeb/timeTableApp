@@ -55,7 +55,8 @@ public class HardGenotypeCriteriaTest {
         Cell[][] genotypesTable = new Cell[2][4];
         for (int i = 0; i < genotypesTable.length ; i++) {
             for (int j = 0; j < genotypesTable[i].length; j++) {
-                genotypesTable[i][j] = new Cell(j, new RoomDto("", "", i+j), null, null, null);
+                genotypesTable[i][j] = new Cell(j, null, null, null);
+                genotypesTable[i][j].setRoomDto(new RoomDto("", "", i+j));
             }
         }
         boolean isValid = hardGenotypeCriteria.hasNoGroupDuplicatesByRoom(genotypesTable);
@@ -67,7 +68,8 @@ public class HardGenotypeCriteriaTest {
         Cell[][] genotypesTable = new Cell[2][4];
         for (int i = 0; i < genotypesTable.length ; i++) {
             for (int j = 0; j < genotypesTable[i].length; j++) {
-                genotypesTable[i][j] = new Cell(j, new RoomDto("", "", j), null, null, null);
+                genotypesTable[i][j] = new Cell(j, null, null, null);
+                genotypesTable[i][j].setRoomDto(new RoomDto("", "", j));
             }
         }
         boolean isValid = hardGenotypeCriteria.hasNoGroupDuplicatesByRoom(genotypesTable);

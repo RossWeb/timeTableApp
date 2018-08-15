@@ -11,8 +11,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.timetable.entity.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static org.hamcrest.Matchers.is;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -52,7 +56,8 @@ public class TimeTableRepositoryTest {
     @Test
     public void createTimeTableTest() {
         TimeTable timeTable = new TimeTable();
-        timeTable.setPosition(1);
+        timeTable.setDay(1);
+        timeTable.setLectureNumber(1);
         timeTable.setRoom(getRoomEntity());
         Group group = getGroupEntity();
         timeTable.setGroup(getGroupEntity());
@@ -65,19 +70,39 @@ public class TimeTableRepositoryTest {
     }
 
     @Test
-    public void findGroupTest() {
-        TimeTable timeTable = new TimeTable();
-        timeTable.setPosition(1);
-        timeTable.setRoom(getRoomEntity());
-        Group group = getGroupEntity();
-        timeTable.setGroup(getGroupEntity());
-        timeTable.setSubject((Subject)group.getCourse().getSubjectSet().toArray()[0]);
-        TimeTable timeTableCreated = timeTableRepository.create(timeTable);
+    public void findTimeTableTest() {
+        TimeTable timeTableCreated = createTimeTableRow();
         TimeTable timeTableFounded = timeTableRepository.getById(timeTableCreated.getId());
         Assert.assertNotNull(timeTableFounded.getId());
         Assert.assertEquals(timeTableCreated.getId(),timeTableFounded.getId());
 
     }
+
+    @Test
+    public void findByWeeks(){
+        createTimeTableRow();
+        createTimeTableRow();
+        List<Integer> days = new ArrayList<>();
+        days.add(1);
+        List<TimeTable> timeTables = timeTableRepository.getTimeTableRowsByDays(days);
+        Assert.assertThat(timeTables.isEmpty(), is(false));
+        Assert.assertThat(timeTables.size(), is(2));
+
+    }
+
+    private TimeTable createTimeTableRow(){
+        TimeTable timeTable = new TimeTable();
+        timeTable.setLectureNumber(1);
+        timeTable.setDay(1);
+        timeTable.setLectureNumber(1);
+        timeTable.setRoom(getRoomEntity());
+        Group group = getGroupEntity();
+        timeTable.setGroup(getGroupEntity());
+        timeTable.setSubject((Subject)group.getCourse().getSubjectSet().toArray()[0]);
+        return timeTableRepository.create(timeTable);
+
+    }
+
 
     private Room getRoomEntity(){
         Room room = new Room();

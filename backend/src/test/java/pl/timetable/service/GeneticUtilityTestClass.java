@@ -14,7 +14,7 @@ public class GeneticUtilityTestClass {
     private static Supplier<GroupDto> supplierGroup = GroupDto::new;
     private static Supplier<SubjectDto> supplierSubject = () -> {
         SubjectDto subjectDto = new SubjectDto();
-        subjectDto.setSize(5);
+        subjectDto.setSize(8);
         return subjectDto;
     };
     private static Supplier<CourseDto> supplierCourse = CourseDto::new;
@@ -42,12 +42,13 @@ public class GeneticUtilityTestClass {
 
         GeneticInitialData geneticInitialData = new GeneticInitialData();
         geneticInitialData.setLectureDescription(new LectureDescription(5, LectureDescription.REGULAR, 2));
-        geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, 20));
+        geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, 25));
         geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, 10));
         geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, 5).stream().map(courseDto ->
-        fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 5)).collect(Collectors.toList()));
+        fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 6)).collect(Collectors.toList()));
         geneticInitialData.setGroupDtoList(getDtoList(supplierGroup, 4).stream()
                 .map(groupDto -> fillCourseToGroup(geneticInitialData.getCourseDtoList(), groupDto)).collect(Collectors.toList()));
+        geneticInitialData.setMutationValue(0.15);
         return geneticInitialData;
     }
 
