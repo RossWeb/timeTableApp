@@ -48,7 +48,7 @@ public class GenotypeServiceTest {
     public void createInitialGenotypeTest() {
         //given
         final GeneticInitialData geneticInitialData = getGeneticInitialData();
-        final int lectureSize = geneticInitialData.getLectureDescription().getNumberPerDay() * geneticInitialData.getLectureDescription().getWeeksPerSemester()* geneticInitialData.getLectureDescription().getDaysPerWeek();
+        final int lectureSize = geneticInitialData.getLectureDescriptionDto().getNumberPerDay() * geneticInitialData.getLectureDescriptionDto().getWeeksPerSemester()* geneticInitialData.getLectureDescriptionDto().getDaysPerWeek();
         final int subjectSize = geneticInitialData.getGroupDtoList().get(0).getCourse().getSubjectSet().stream().map(Subject::getSize).mapToInt(value -> value).sum();
         //when
         Genotype genotype = genotypeService.createInitialGenotype(geneticInitialData);

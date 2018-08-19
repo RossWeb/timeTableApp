@@ -3,6 +3,12 @@ package pl.timetable.entity;
 import javax.persistence.*;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "findGroupByName",
+                query = "from Group g where g.name = :name"
+        )
+})
 public class Group extends BaseEntity {
 
     private String name;
@@ -18,7 +24,7 @@ public class Group extends BaseEntity {
         this.course = course;
     }
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     public String getName() {
         return name;
     }

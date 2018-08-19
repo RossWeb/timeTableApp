@@ -4,7 +4,7 @@ import javax.persistence.*;
 @Entity
 @NamedQueries({
         @NamedQuery(
-                name = "findDaysPerWeekByTimeTableDescriptionId",
+                name = "findByTimeTableDescriptionId",
                 query = "from LectureDescription ld where ld.timeTableDescription.id = :timeTableId"
         )
 })

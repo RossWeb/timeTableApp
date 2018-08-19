@@ -31,7 +31,7 @@ public class GenericRestController<T1 , T2 extends BaseRequest> {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void create(@RequestBody T2 request) throws EntityNotFoundException {
-        logger.info("Try to create entity from request : " + request);
+        logger.info("Try to createIfNotExists entity from request : " + request);
         service.create(request);
     }
 

@@ -1,4 +1,3 @@
-
 export abstract TableService<T> {
 
   private type : T;

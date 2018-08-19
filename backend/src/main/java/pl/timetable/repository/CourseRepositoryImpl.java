@@ -19,4 +19,8 @@ public class CourseRepositoryImpl extends AbstractGenericRepositoryWithSession<C
         subjectSet.stream().filter(subjectRootSet::contains).forEach(subject -> subject.setExists(true));
         return subjectSet;
     }
+
+    public Course getCourseByName(String courseName){
+        return (Course) getSession().getNamedQuery("findCourseByName").setParameter("name", courseName).uniqueResult();
+    }
 }

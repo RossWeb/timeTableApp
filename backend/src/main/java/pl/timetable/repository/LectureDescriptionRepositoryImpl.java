@@ -6,9 +6,9 @@ import pl.timetable.entity.TimeTableDescription;
 
 public class LectureDescriptionRepositoryImpl extends AbstractGenericRepositoryWithSession<LectureDescription> implements LectureDescriptionRepository {
 
-    public Integer getDaysPerWeekByTimeTableDescription(TimeTableDescription timeTableDescription){
-        Query query = getSession().getNamedQuery("findDaysPerWeekByTimeTableDescriptionId")
+    public LectureDescription getByTimeTableDescription(TimeTableDescription timeTableDescription){
+        Query query = getSession().getNamedQuery("findByTimeTableDescriptionId")
                 .setParameter("timeTableId", timeTableDescription.getId());
-        return ((LectureDescription)query.uniqueResult()).getDaysPerWeek();
+        return ((LectureDescription)query.uniqueResult());
     }
 }

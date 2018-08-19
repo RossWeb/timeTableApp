@@ -11,14 +11,14 @@ public class Population {
     private Genotype bestGenotype;
     private Integer populationIteration = 1;
     private Genotype[] selectionArray = new Genotype[100];
-    private LectureDescription lectureDescription;
+    private LectureDescriptionDto lectureDescriptionDto;
 
-    public LectureDescription getLectureDescription() {
-        return lectureDescription;
+    public LectureDescriptionDto getLectureDescriptionDto() {
+        return lectureDescriptionDto;
     }
 
-    public void setLectureDescription(LectureDescription lectureDescription) {
-        this.lectureDescription = lectureDescription;
+    public void setLectureDescriptionDto(LectureDescriptionDto lectureDescriptionDto) {
+        this.lectureDescriptionDto = lectureDescriptionDto;
     }
 
     public Genotype[] getSelectionArray() {
@@ -70,7 +70,7 @@ public class Population {
                 .append("bestGenotype", bestGenotype)
                 .append("populationIteration", populationIteration)
                 .append("selectionArray", selectionArray)
-                .append("lectureDescription", lectureDescription)
+                .append("lectureDescriptionDto", lectureDescriptionDto)
                 .append("genotypePopulation", genotypePopulation)
                 .toString();
     }

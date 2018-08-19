@@ -9,6 +9,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "findCourseByName",
+                query = "from Course c where c.name = :name"
+        )
+})
 public class Course extends BaseEntity implements Serializable{
 
     private String name;
@@ -27,7 +33,7 @@ public class Course extends BaseEntity implements Serializable{
         this.subjectSet = subjectSet;
     }
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     public String getName() {
         return name;
     }

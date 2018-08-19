@@ -57,7 +57,7 @@ public class GenotypeService {
 
     public Genotype createInitialGenotype(GeneticInitialData geneticInitialData) {
 
-        int lectureSize = geneticInitialData.getLectureDescription().getNumberPerDay() * geneticInitialData.getLectureDescription().getDaysPerWeek() * geneticInitialData.getLectureDescription().getWeeksPerSemester();
+        int lectureSize = geneticInitialData.getLectureDescriptionDto().getNumberPerDay() * geneticInitialData.getLectureDescriptionDto().getDaysPerWeek() * geneticInitialData.getLectureDescriptionDto().getWeeksPerSemester();
         int lectureIncrementNumber = 1;
 //        int roomIncrementNumber = 0;
         GenotypeServiceDto genotypeServiceDto = new GenotypeServiceDto();
@@ -147,7 +147,7 @@ public class GenotypeService {
                     LOGGER.error("Index out of bound");
                 }
                 //check lecture group per day
-                if (lectureIncrementNumber == geneticInitialData.getLectureDescription().getNumberPerDay() || actualLecture == genotype.getGenotypeTable()[i].length - 1) {
+                if (lectureIncrementNumber == geneticInitialData.getLectureDescriptionDto().getNumberPerDay() || actualLecture == genotype.getGenotypeTable()[i].length - 1) {
                     LecturePerDayIteration lecturePerDayIteration =
                             new LecturePerDayIteration(geneticInitialData, lectureIncrementNumber, genotypeServiceDto, groupDto, actualLecture)
                                     .invoke();
@@ -173,7 +173,7 @@ public class GenotypeService {
 //            }
             boolean isValidCriteria = hardGenotypeCriteria.hasNoRoomDuplicatesByLecture(genotypeServiceDto.getRoomByLectureTemporary()) &&
                     hardGenotypeCriteria.hasNoEmptyLectureByGroup(genotypeServiceDto.getRoomByGroupTemporary().get(groupDto)
-                            , geneticInitialData.getLectureDescription().getNumberPerDay());
+                            , geneticInitialData.getLectureDescriptionDto().getNumberPerDay());
 //            hardGenotypeCriteria.hasEnoughSizeLectureToSubject(
 //                    ((Long) genotypeServiceDto.getRoomByLectureTemporary().values().stream().filter(roomDtos -> !roomDtos.isEmpty()).count()).intValue()
 //                    , subjectSize)
@@ -220,7 +220,7 @@ public class GenotypeService {
             genotype.getGenotypeTable()[i][j] = new Cell(
                     j,
                     courseDto,
-                    groupDto, j / geneticInitialData.getLectureDescription().getNumberPerDay() + 1);
+                    groupDto, j / geneticInitialData.getLectureDescriptionDto().getNumberPerDay() + 1);
         }
     }
 
@@ -382,7 +382,7 @@ public class GenotypeService {
     }
 
     private static Integer getLectureSlot(GeneticInitialData geneticInitialData) {
-        return geneticInitialData.getLectureDescription().getNumberPerDay() * geneticInitialData.getLectureDescription().getDaysPerWeek();
+        return geneticInitialData.getLectureDescriptionDto().getNumberPerDay() * geneticInitialData.getLectureDescriptionDto().getDaysPerWeek();
     }
 
     private class LecturePerDayIteration {
@@ -412,7 +412,7 @@ public class GenotypeService {
             genotypeServiceDto.setRoomByGroupRecovery(new ArrayList<>(genotypeServiceDto.getRoomByGroupTemporary().get(groupDto)));
             boolean isValid = hardGenotypeCriteria.hasNoEmptyLectureByGroup(genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).
                             subList(actualLecture - lectureIncrementNumber + 1, genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).size())
-                    , geneticInitialData.getLectureDescription().getNumberPerDay());
+                    , geneticInitialData.getLectureDescriptionDto().getNumberPerDay());
 
             if (!isValid) {
                 for (int k = genotypeServiceDto.getRoomByGroupRecovery().size() - 1; k > actualLecture - lectureIncrementNumber; k--) {

@@ -21,8 +21,15 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
 
     public static final Logger LOGGER = Logger.getLogger(RoomServiceImpl.class);
 
-    @Autowired
     private RoomRepository roomRepository;
+
+    public RoomServiceImpl(RoomRepository roomRepository) {
+        this.roomRepository = roomRepository;
+    }
+
+    public void setRoomRepository(RoomRepository roomRepository) {
+        this.roomRepository = roomRepository;
+    }
 
     @Override
     public List<RoomDto> findAll() {
@@ -33,6 +40,12 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
     @Override
     public void create(RoomRequest roomRequest) {
         roomRepository.create(mapRequestToEntity(roomRequest));
+    }
+
+    public RoomDto getRoomByNameAndNumber(String name, String number) throws EntityNotFoundException {
+        return mapEntityToDto(Optional.ofNullable(roomRepository.getRoomByNameAndNumber(name, number))
+                .orElseThrow(() -> new EntityNotFoundException(name, "Room")));
+
     }
 
     @Override
@@ -69,5 +82,13 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
         entity.setName(roomRequest.getName());
         entity.setNumber(roomRequest.getNumber());
         return entity;
+    }
+
+    public static Room mapDtoToEntity(RoomDto roomDto){
+        Room room = new Room();
+        room.setName(roomDto.getName());
+        room.setNumber(roomDto.getNumber());
+        room.setId(roomDto.getId());
+        return room;
     }
 }

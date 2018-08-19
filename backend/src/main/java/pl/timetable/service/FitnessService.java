@@ -27,11 +27,11 @@ public class FitnessService {
 
     public void fitPopulation(Population population) {
         List<Genotype> genotypes = population.getGenotypePopulation().stream()
-//                .filter(genotype -> hardGenotypeCriteria.checkData(genotype, population.getLectureDescription()))
+//                .filter(genotype -> hardGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto()))
                 .collect(Collectors.toList());
         genotypes.forEach(genotype -> {
-            softGenotypeCriteria.checkData(genotype, population.getLectureDescription());
-            hardGenotypeCriteria.checkData(genotype, population.getLectureDescription());
+            softGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto());
+            hardGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto());
             genotype.setFitnessScore(genotype.getHardFitnessScore() + genotype.getSoftFitnessScore());
 //            genotype.setFitnessScore(genotypes.size() / population.getGenotypePopulation().size() * 1.00);
             population.setFitnessScore(population.getFitnessScore() + genotype.getFitnessScore());

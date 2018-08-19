@@ -22,7 +22,7 @@ public class HardGenotypeCriteria implements AbstractCriteria {
     private static final Logger LOGGER = Logger.getLogger(HardGenotypeCriteria.class);
 
     @Override
-    public boolean checkData(Genotype genotype, LectureDescription lectureDescription) {
+    public boolean checkData(Genotype genotype, LectureDescriptionDto lectureDescriptionDto) {
         Boolean isValid = true;
         int groupSize = genotype.getGenotypeTable().length;
         double hardFitnessScoreByGroupDefinition = 0.5;
@@ -31,7 +31,7 @@ public class HardGenotypeCriteria implements AbstractCriteria {
             Integer subjectSize = group[0].getCourseDto().getSubjectSet().stream().map(Subject::getSize).mapToInt(value -> value).sum();
             Integer lectureSize = ((Long) Arrays.stream(group).filter(cell -> Objects.nonNull(cell) && Objects.nonNull(cell.getRoomDto())).count()).intValue();
             boolean isEnoughSizeLecture = hasEnoughSizeLectureToSubject(lectureSize, subjectSize);
-            boolean hasNoEmptyLectureByGroup = hasNoEmptyLectureByGroup(genotype.getRoomByGroup().get(group[0].getGroupDto()), lectureDescription.getNumberPerDay());
+            boolean hasNoEmptyLectureByGroup = hasNoEmptyLectureByGroup(genotype.getRoomByGroup().get(group[0].getGroupDto()), lectureDescriptionDto.getNumberPerDay());
             if(isEnoughSizeLecture){
                 hardFitnessScoreByGroup += 0.75 / groupSize;
                 if(hasNoEmptyLectureByGroup){

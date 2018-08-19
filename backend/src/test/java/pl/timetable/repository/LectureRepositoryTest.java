@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.annotation.Persistent;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.timetable.entity.LectureDescription;
 import pl.timetable.entity.TimeTableDescription;
@@ -60,7 +59,7 @@ public class LectureRepositoryTest {
     @Test
     public void findDaysPerWeekByTimeTableId(){
         LectureDescription lectureDescription = createLectureDescription();
-        Integer daysPerWeek = lectureDescriptionRepository.getDaysPerWeekByTimeTableDescription(lectureDescription.getTimeTableDescription());
+        Integer daysPerWeek = lectureDescriptionRepository.getByTimeTableDescription(lectureDescription.getTimeTableDescription()).getDaysPerWeek();
         Assert.assertThat(daysPerWeek, notNullValue());
         Assert.assertThat(daysPerWeek, is(5));
     }

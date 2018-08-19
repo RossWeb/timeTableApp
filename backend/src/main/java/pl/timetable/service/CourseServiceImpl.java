@@ -51,6 +51,20 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
         courseRepository.create(course);
     }
 
+    public Course createAndAddSubjectIfNeeded(CourseDto courseDto, Subject subject){
+        Course course = mapDtoToEntity(courseDto);
+        return Optional.ofNullable(courseRepository.getCourseByName(course.getName())).map(courseFound -> {
+            Subject subjectFound = subjectRepository.getById(subject.getId());
+            if(!courseFound.getSubjectSet().contains(subjectFound)){
+                course.getSubjectSet().add(subjectFound);
+                return courseRepository.update(course);
+            }else{
+                return course;
+            }
+
+        }).orElseGet(()-> courseRepository.create(course));
+    }
+
     @Override
     public CourseDto update(CourseRequest request, int id) throws EntityNotFoundException {
         Course course = new Course();
@@ -113,5 +127,12 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
         courseDto.setName(course.getName());
         courseDto.setSubjectSet(course.getSubjectSet());
         return courseDto;
+    }
+
+    private Course mapDtoToEntity(CourseDto courseDto){
+        Course course = new Course();
+        course.setName(courseDto.getName());
+        course.setSubjectSet(courseDto.getSubjectSet());
+        return course;
     }
 }

@@ -10,16 +10,34 @@ import java.util.stream.Collectors;
 
 public class GeneticUtilityTestClass {
 
-    private static Supplier<RoomDto> supplierRoom = RoomDto::new;
-    private static Supplier<GroupDto> supplierGroup = GroupDto::new;
+    private static Integer roomNumber = 25;
+    private static Integer subjectNumber = 10;
+    private static Integer courseNumber = 5;
+    private static Integer groupNumber = 4;
+    private static Supplier<RoomDto> supplierRoom = () -> {
+        RoomDto roomDto = new RoomDto();
+        roomDto.setName("room" + roomNumber--);
+        roomDto.setNumber(String.valueOf(roomNumber));
+        return roomDto;
+    };
+    private static Supplier<GroupDto> supplierGroup = ()->{
+        GroupDto groupDto = new GroupDto();
+        groupDto.setName("Group" + groupNumber--);
+        return groupDto;
+    };
     private static Supplier<SubjectDto> supplierSubject = () -> {
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setSize(8);
+        subjectDto.setName("Subject " + subjectNumber--);
         return subjectDto;
     };
-    private static Supplier<CourseDto> supplierCourse = CourseDto::new;
+    private static Supplier<CourseDto> supplierCourse = () -> {
+        CourseDto courseDto = new CourseDto();
+        courseDto.setName("Course " + courseNumber--);
+        return courseDto;
+    };
 
-    public static GeneticInitialData getGeneticInitialDataParametrized(LectureDescription lectureDescription,
+    public static GeneticInitialData getGeneticInitialDataParametrized(LectureDescriptionDto lectureDescriptionDto,
                                                                        Integer roomSize,
                                                                        Integer subjectSize,
                                                                        Integer courseSize,
@@ -27,7 +45,7 @@ public class GeneticUtilityTestClass {
 
 
         GeneticInitialData geneticInitialData = new GeneticInitialData();
-        geneticInitialData.setLectureDescription(lectureDescription);
+        geneticInitialData.setLectureDescriptionDto(lectureDescriptionDto);
         geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, roomSize));
         geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, subjectSize));
         geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, courseSize).stream().map(courseDto ->
@@ -41,18 +59,18 @@ public class GeneticUtilityTestClass {
 
 
         GeneticInitialData geneticInitialData = new GeneticInitialData();
-        geneticInitialData.setLectureDescription(new LectureDescription(5, LectureDescription.REGULAR, 2));
-        geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, 25));
-        geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, 10));
-        geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, 5).stream().map(courseDto ->
-        fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 6)).collect(Collectors.toList()));
-        geneticInitialData.setGroupDtoList(getDtoList(supplierGroup, 4).stream()
+        geneticInitialData.setLectureDescriptionDto(new LectureDescriptionDto(5, LectureDescriptionDto.REGULAR, 2));
+        geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, roomNumber));
+        geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, subjectNumber));
+        geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, courseNumber).stream().map(courseDto ->
+                fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 6)).collect(Collectors.toList()));
+        geneticInitialData.setGroupDtoList(getDtoList(supplierGroup, groupNumber).stream()
                 .map(groupDto -> fillCourseToGroup(geneticInitialData.getCourseDtoList(), groupDto)).collect(Collectors.toList()));
         geneticInitialData.setMutationValue(0.15);
         return geneticInitialData;
     }
 
-    private static CourseDto fillSubjectToCourse(List<SubjectDto> subjectDtoList, CourseDto courseDto, Integer subjectSize){
+    private static CourseDto fillSubjectToCourse(List<SubjectDto> subjectDtoList, CourseDto courseDto, Integer subjectSize) {
         Set<Subject> subjectDtos = new HashSet<>();
         do {
             Integer subjectNumber = new Random().ints(0, subjectDtoList.size()).findFirst().getAsInt();
@@ -63,19 +81,20 @@ public class GeneticUtilityTestClass {
         return courseDto;
     }
 
-    private static GroupDto fillCourseToGroup(List<CourseDto> courseDtoList, GroupDto groupDto){
+    private static GroupDto fillCourseToGroup(List<CourseDto> courseDtoList, GroupDto groupDto) {
         Integer courseNumber = new Random().ints(0, courseDtoList.size()).findFirst().getAsInt();
         groupDto.setCourse(mapCourseDtoToCourse(courseDtoList.get(courseNumber)));
         return groupDto;
     }
 
-    private static Course mapCourseDtoToCourse(CourseDto courseDto){
+    private static Course mapCourseDtoToCourse(CourseDto courseDto) {
         Course course = new Course();
         course.setSubjectSet(courseDto.getSubjectSet());
         course.setName(courseDto.getName());
         return course;
     }
-    private static Subject mapSubjectDtoToSubject(SubjectDto subjectDto){
+
+    private static Subject mapSubjectDtoToSubject(SubjectDto subjectDto) {
         Subject subject = new Subject();
         subject.setName(subjectDto.getName());
         subject.setSize(subjectDto.getSize());

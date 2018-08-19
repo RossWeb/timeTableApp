@@ -8,4 +8,5 @@ import java.util.List;
 public interface CourseRepository extends GenericRepository<Course> {
 
     List<Subject> getParameters(Integer id);
+    public Course getCourseByName(String courseName);
 }

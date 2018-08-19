@@ -5,5 +5,5 @@ import pl.timetable.entity.TimeTableDescription;
 
 public interface LectureDescriptionRepository extends GenericRepository<LectureDescription> {
 
-    Integer getDaysPerWeekByTimeTableDescription(TimeTableDescription timeTableDescription);
+    LectureDescription getByTimeTableDescription(TimeTableDescription timeTableDescription);
 }

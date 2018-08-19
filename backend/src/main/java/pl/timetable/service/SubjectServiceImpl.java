@@ -21,8 +21,16 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
 
     public static final Logger LOGGER = Logger.getLogger(SubjectServiceImpl.class);
 
-    @Autowired
     private SubjectRepository subjectRepository;
+
+
+    public SubjectServiceImpl(SubjectRepository subjectRepository) {
+        this.subjectRepository = subjectRepository;
+    }
+
+    public void setSubjectRepository(SubjectRepository subjectRepository) {
+        this.subjectRepository = subjectRepository;
+    }
 
     @Override
     public List<SubjectDto> findAll() {
@@ -34,6 +42,12 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
     public void create(SubjectRequest request) {
 
         subjectRepository.create(mapRequestToEntity(request));
+    }
+
+
+    public SubjectDto getByName(String name) throws EntityNotFoundException {
+        return mapEntityToDto(
+                Optional.ofNullable(subjectRepository.getSubjectByName(name)).orElseThrow(() -> new EntityNotFoundException(name , "Subject")));
     }
 
     @Override
@@ -69,5 +83,14 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
         Subject subject = new Subject();
         subject.setName(subjectRequest.getName());
         return subject;
+    }
+
+    public static Subject mapDtoToEntity(SubjectDto subjectDto){
+        Subject subject = new Subject();
+        subject.setSize(subjectDto.getSize());
+        subject.setName(subjectDto.getName());
+        subject.setId(subjectDto.getId());
+        return subject;
+
     }
 }

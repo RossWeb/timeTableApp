@@ -3,18 +3,22 @@ package pl.timetable.entity;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "findSubjectByName",
+                query = "from Subject s where s.name = :name"
+        )
+})
 public class Subject extends BaseEntity {
 
     private String name;
     private boolean exists = false;
     private Integer size = 0;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     public String getName() {
         return name;
     }

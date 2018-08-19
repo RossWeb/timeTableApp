@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
 
 import {HttpClientModule} from '@angular/common/http';
 import { AppComponent } from './app.component';
@@ -9,6 +10,18 @@ import { ValuesPipe } from './table-component/table-base.component';
 import { AdminPanelComponent } from './admin-panel-component/admin-panel-component.component';
 import {TableTypeProvider} from "./table-service/table.type.provider";
 import { TableParameterComponent } from './table-parameter/table-parameter.component';
+import { MainComponent } from './main/main.component';
+
+const appRoutes: Routes = [
+  { path: 'konfiguracja', component: AppComponent },
+  { path: 'main',      component: MainComponent },
+  { path: '',
+    redirectTo: '/main',
+    pathMatch: 'full'
+  },
+  { path: '**', component: AppComponent }
+];
+
 
 @NgModule({
   declarations: [
@@ -17,13 +30,19 @@ import { TableParameterComponent } from './table-parameter/table-parameter.compo
     AdminPanelComponent,
     ValuesPipe,
     TableParameterComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    RouterModule.forRoot(
+      appRoutes,
+      { enableTracing: true } // <-- debugging purposes only
+    )
   ],
   providers: [],
   bootstrap: [AppComponent, AdminPanelComponent]
 })
+
 export class AppModule { }

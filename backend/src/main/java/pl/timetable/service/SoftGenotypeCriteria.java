@@ -3,7 +3,7 @@ package pl.timetable.service;
 import org.springframework.stereotype.Service;
 import pl.timetable.dto.Cell;
 import pl.timetable.dto.Genotype;
-import pl.timetable.dto.LectureDescription;
+import pl.timetable.dto.LectureDescriptionDto;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,17 +14,17 @@ import java.util.stream.Collectors;
 public class SoftGenotypeCriteria implements AbstractCriteria {
 
     @Override
-    public boolean checkData(Genotype genotype, LectureDescription lectureDescription) {
+    public boolean checkData(Genotype genotype, LectureDescriptionDto lectureDescriptionDto) {
         genotype.setSoftFitnessScore(
-                (addBonusForMorningLecture(genotype, lectureDescription) +
-                        addBonusForLecturePerAnyDayPerWeekForSemester(genotype, lectureDescription)) * 100);
+                (addBonusForMorningLecture(genotype, lectureDescriptionDto) +
+                        addBonusForLecturePerAnyDayPerWeekForSemester(genotype, lectureDescriptionDto)) * 100);
 
         return true;
     }
 
-    public Double addBonusForMorningLecture(Genotype genotype, LectureDescription lectureDescription){
-        int bonusScoreDefinition = lectureDescription.getNumberPerDay() * lectureDescription.getNumberPerDay();
-        int daysSize = lectureDescription.getWeeksPerSemester() * lectureDescription.getDaysPerWeek();
+    public Double addBonusForMorningLecture(Genotype genotype, LectureDescriptionDto lectureDescriptionDto){
+        int bonusScoreDefinition = lectureDescriptionDto.getNumberPerDay() * lectureDescriptionDto.getNumberPerDay();
+        int daysSize = lectureDescriptionDto.getWeeksPerSemester() * lectureDescriptionDto.getDaysPerWeek();
         int maxBonus = bonusScoreDefinition * daysSize;
         int groupSize = genotype.getGenotypeTable().length;
         int score = Arrays.stream(genotype.getGenotypeTable()).mapToInt(group -> {
@@ -35,7 +35,7 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
                 for (int j = 0; j < cellsPerDay.size(); j++) {
                     Cell cell = cellsPerDay.get(j);
                     if(Objects.nonNull(cell.getRoomDto()) && Objects.nonNull(cell.getSubjectDto())){
-                        bonusScore += bonusScoreDefinition - j*lectureDescription.getNumberPerDay();
+                        bonusScore += bonusScoreDefinition - j* lectureDescriptionDto.getNumberPerDay();
                         break;
                     }
 
@@ -47,12 +47,12 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
 
     }
 
-    public Double addBonusForLecturePerAnyDayPerWeekForSemester(Genotype genotype, LectureDescription lectureDescription){
-        int maxBonus = lectureDescription.getWeeksPerSemester() * lectureDescription.getDaysPerWeek();
+    public Double addBonusForLecturePerAnyDayPerWeekForSemester(Genotype genotype, LectureDescriptionDto lectureDescriptionDto){
+        int maxBonus = lectureDescriptionDto.getWeeksPerSemester() * lectureDescriptionDto.getDaysPerWeek();
         int groupSize = genotype.getGenotypeTable().length;
         int score = Arrays.stream(genotype.getGenotypeTable()).mapToInt(group -> {
             int bonusScore = 0;
-            for (int i = 0; i < group.length/lectureDescription.getNumberPerDay() ; i++) {
+            for (int i = 0; i < group.length/ lectureDescriptionDto.getNumberPerDay() ; i++) {
                 int searchedDay = i +1;
                 List<Cell> cellsPerDay = Arrays.stream(group).filter(cell -> cell.getDay().equals(searchedDay)).collect(Collectors.toList());
                 boolean lectureExisted = cellsPerDay.stream().anyMatch(cell -> Objects.nonNull(cell.getRoomDto()) && Objects.nonNull(cell.getSubjectDto()));

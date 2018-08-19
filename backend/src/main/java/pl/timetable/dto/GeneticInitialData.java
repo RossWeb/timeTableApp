@@ -4,7 +4,7 @@ import java.util.List;
 
 public class GeneticInitialData {
 
-    private LectureDescription lectureDescription;
+    private LectureDescriptionDto lectureDescriptionDto;
     private List<CourseDto> courseDtoList;
     private List<GroupDto> groupDtoList;
     private List<RoomDto> roomDtoList;
@@ -20,12 +20,12 @@ public class GeneticInitialData {
         this.mutationValue = mutationValue;
     }
 
-    public LectureDescription getLectureDescription() {
-        return lectureDescription;
+    public LectureDescriptionDto getLectureDescriptionDto() {
+        return lectureDescriptionDto;
     }
 
-    public void setLectureDescription(LectureDescription lectureDescription) {
-        this.lectureDescription = lectureDescription;
+    public void setLectureDescriptionDto(LectureDescriptionDto lectureDescriptionDto) {
+        this.lectureDescriptionDto = lectureDescriptionDto;
     }
 
     public List<CourseDto> getCourseDtoList() {

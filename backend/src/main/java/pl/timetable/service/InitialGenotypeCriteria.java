@@ -17,8 +17,8 @@ public class InitialGenotypeCriteria {
     private boolean checkEnoughRoomAndLectureToSubjectPerSemester(GeneticInitialData geneticInitialData) {
         LOGGER.info("Checking enough room and lecture to subject per semester");
         Integer roomSize = geneticInitialData.getRoomDtoList().size();
-        Integer lectureSizePerWeek = geneticInitialData.getLectureDescription().getNumberPerDay() * geneticInitialData.getLectureDescription().getDaysPerWeek();
-        Integer spaceSizePerSemester = roomSize * lectureSizePerWeek * geneticInitialData.getLectureDescription().getWeeksPerSemester();
+        Integer lectureSizePerWeek = geneticInitialData.getLectureDescriptionDto().getNumberPerDay() * geneticInitialData.getLectureDescriptionDto().getDaysPerWeek();
+        Integer spaceSizePerSemester = roomSize * lectureSizePerWeek * geneticInitialData.getLectureDescriptionDto().getWeeksPerSemester();
         Integer subjectSizePerSemester = ((Long) geneticInitialData.getGroupDtoList().stream().map(groupDto -> groupDto.getCourse().getSubjectSet().size()).count()).intValue();
         boolean enough = spaceSizePerSemester >= subjectSizePerSemester;
         if (!enough) {

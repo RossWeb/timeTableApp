@@ -1,9 +1,17 @@
 package pl.timetable.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "findRoomByNameAndNumber",
+                query = "from Room r where r.name = :name and r.number = :number"
+        )
+})
+@Table(name = "room",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "number"})
+)
 public class Room extends BaseEntity {
 
     private String name;
