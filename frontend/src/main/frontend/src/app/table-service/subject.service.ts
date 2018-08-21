@@ -8,10 +8,11 @@ import {Subject} from "../model/subject.type";
 
 
 @Injectable()
-export class SubjectService implements TableService<Subject> {
-  private type;
+export class SubjectService extends TableService<Subject> {
+  // private type;
 
   constructor(private http: HttpClient) {
+    super();
     this.type = new Subject();
   }
 
@@ -35,6 +36,10 @@ export class SubjectService implements TableService<Subject> {
 
   getName(): string {
     return 'Subject';
+  }
+
+  get(id: string): any {
+    return  this.http.get<Subject>('api/subject/' + id);
   }
 
   getDataTableParameters(): string[] {

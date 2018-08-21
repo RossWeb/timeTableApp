@@ -8,11 +8,13 @@ import {Room} from "../model/room.type";
 
 
 @Injectable()
-export class RoomService implements TableService<Room> {
-  private type;
+export class RoomService extends TableService<Room> {
+  // private type;
 
   constructor(private http: HttpClient) {
+    super();
     this.type = new Room();
+
   }
 
   create(name: string, dataTableValues: string[]) {
@@ -35,6 +37,10 @@ export class RoomService implements TableService<Room> {
 
   getName(): string {
     return 'Room';
+  }
+
+  get(id: string): any {
+    return  this.http.get<Room>('api/room/' + id);
   }
 
   getDataTableParameters(): string[] {

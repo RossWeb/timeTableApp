@@ -1,27 +1,27 @@
-export abstract TableService<T> {
+export abstract class TableService<T> {
 
-  private type : T;
+  protected type : T;
 
-  create(name: string, dataTableValues: string[]): any;
+  abstract create(name: string, dataTableValues: string[]): any;
 
-  update(dataTableValues: string[], id: string): any;
+  abstract update(dataTableValues: string[], id: string): any;
 
-  remove(id: string): any;
+  abstract remove(id: string): any;
 
-  list() : any;
+  abstract list() : any;
 
-  get(id: string): any;
+  abstract get(id: string): any;
 
-  getName(): string;
+  abstract getName(): string;
 
-  getDataTableParameters(): string[];
+  abstract getDataTableParameters(): string[];
 
-  getTitle(): string;
+  abstract getTitle(): string;
 
-  getDefinions(): any;
+  abstract getDefinions(): any;
 
-  getRelationParameterName() : string;
+  abstract getRelationParameterName() : string;
 
-  transformValues() : any;
+  abstract transformValues(data: any) : any;
 
 }

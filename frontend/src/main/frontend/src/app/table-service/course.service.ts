@@ -8,12 +8,13 @@ import {Course} from "../model/course.type";
 
 
 @Injectable()
-export class CourseService implements TableService<Course> {
-  private type;
+export class CourseService extends TableService<Course> {
+  // private type;
   private isParameterTable : boolean;
   private primaryKey : number;
 
   constructor(private http: HttpClient) {
+    super();
     this.type = new Course();
   }
 

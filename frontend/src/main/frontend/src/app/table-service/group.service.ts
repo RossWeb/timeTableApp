@@ -7,10 +7,10 @@ import {CourseService} from "../table-service/course.service";
 import {Group} from "../model/group.type";
 
 @Injectable()
-export class GroupService implements TableService<Group> {
-  private type;
+export class GroupService extends TableService<Group> {
 
   constructor(private courseService: CourseService, private http: HttpClient) {
+    super();
     this.type = new Group();
   }
 
@@ -42,6 +42,10 @@ export class GroupService implements TableService<Group> {
 
   getName(): string {
     return 'Group';
+  }
+
+  get(id: string): any {
+    return  this.http.get<Group>('api/group/' + id);
   }
 
   getDataTableParameters(): any {
