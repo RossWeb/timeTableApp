@@ -1,8 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-// import { RouterModule, Routes } from '@angular/router';
-
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import {HttpClientModule} from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { TableComponentComponent } from './table-component/table-component.component';
@@ -38,11 +37,8 @@ import { MainComponent } from './main/main.component';
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    AppRoutingModule
-    // RouterModule.forRoot(
-    //   appRoutes,
-    //   { enableTracing: true } // <-- debugging purposes only
-    // )
+    AppRoutingModule,
+    NgxDatatableModule
   ],
   providers: [],
   bootstrap: [AppComponent]
