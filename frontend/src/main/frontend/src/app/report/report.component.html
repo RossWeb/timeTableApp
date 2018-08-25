@@ -1,7 +1,7 @@
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-md-8">
     <div style="display: block;">
-    <canvas baseChart width="400" height="400"
+    <canvas baseChart width="600" height="400"
                 [datasets]="lineChartData"
                 [labels]="lineChartLabels"
                 [options]="lineChartOptions"
@@ -12,6 +12,8 @@
                 (chartClick)="chartClicked($event)"></canvas>
     </div>
   </div>
+</div>
+<div class="row">
   <div class="col-md-6" style="margin-bottom: 10px">
     <table class="table table-responsive table-condensed">
       <tr>

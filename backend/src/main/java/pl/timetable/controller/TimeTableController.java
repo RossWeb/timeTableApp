@@ -5,18 +5,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.TimeTableInitResponse;
+import pl.timetable.api.TimeTableReportResponse;
 import pl.timetable.api.TimeTableRequest;
 import pl.timetable.dto.GeneticInitialData;
 import pl.timetable.dto.Population;
+import pl.timetable.dto.ReportPopulationDto;
+import pl.timetable.entity.ReportPopulation;
 import pl.timetable.entity.TimeTableDescription;
 import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.facade.TimeTableFacade;
 import pl.timetable.service.GeneticAlgorithmService;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/timetable")
@@ -55,6 +55,20 @@ public class TimeTableController {
             return ResponseEntity.status(HttpStatus.OK).body(map);
         }else {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(null);
+        }
+
+    }
+    @GetMapping("{id}/report")
+    @ResponseBody
+    public ResponseEntity<TimeTableReportResponse> getReport(@PathVariable("id") Integer timeTableId){
+        LOGGER.info("Try to get report by timeTableId" + timeTableId);
+        List<ReportPopulationDto> reportPopulationDtoList = timeTableFacade.getReportPopulation(timeTableId);
+        if(reportPopulationDtoList.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }else{
+            TimeTableReportResponse reportResponse = new TimeTableReportResponse();
+            reportResponse.setReportPopulation(reportPopulationDtoList);
+            return ResponseEntity.status(HttpStatus.OK).body(reportResponse);
         }
 
     }

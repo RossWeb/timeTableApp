@@ -9,7 +9,7 @@ public class Population {
 
     private Double fitnessScore = 0.0;
     private Genotype bestGenotype;
-    private Integer populationIteration = 1;
+    private Integer populationIteration = 0;
     private Genotype[] selectionArray = new Genotype[100];
     private LectureDescriptionDto lectureDescriptionDto;
 

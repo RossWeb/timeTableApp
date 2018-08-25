@@ -111,7 +111,7 @@ public class DebugService {
             Integer position = new Random().ints(0, courseSet.size()).findFirst().getAsInt();
             createGroup((Course)courseSet.toArray()[position], "Informatyka " + i);
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             createRoom("room" + i, String.valueOf(i));
         }
     }

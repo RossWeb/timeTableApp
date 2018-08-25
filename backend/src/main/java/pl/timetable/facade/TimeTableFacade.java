@@ -122,17 +122,8 @@ public class TimeTableFacade {
     }
 
     private void saveGroup(Cell[] cells, TimeTableDescriptionDto timeTableDescriptionDto) throws EntityNotFoundException {
-//        Group group = null;
         for (int i = 0; i < cells.length; i++) {
             Cell cell = cells[i];
-//            Integer lectureNumber = cell.getLecture();
-//            Integer day = cell.getDay();
-//            Subject subject = saveSubject(cell);
-//            Room room = saveRoom(cell);
-//            saveCourse(cell);
-//            if(i == 0) {
-//                group = saveGroup(cell);
-//            }
             TimeTableDto timeTable = new TimeTableDto();
             timeTable.setLectureNumber(cell.getLecture());
             timeTable.setDay(cell.getDay());

@@ -1,4 +1,5 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
+import {ReportService} from '../report/report.service';
 import { ViewEncapsulation } from '@angular/core';
 
 /**
@@ -12,9 +13,12 @@ import { ViewEncapsulation } from '@angular/core';
    '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
    '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
     ],
+    providers: [ReportService],
     encapsulation: ViewEncapsulation.None
  })
 export class MainComponent implements OnInit {
+
+  private timeTableId: number;
 
   rows = [
     { name: 'Austin', gender: 'Male', company: 'Swimlane' },
@@ -27,9 +31,10 @@ export class MainComponent implements OnInit {
     { name: 'Company' }
   ];
 
-  constructor() {
+  constructor(private reportService : ReportService) {
   }
 
   ngOnInit() {
+    this.reportService.setTimeTableId(2);
   }
 }

@@ -84,14 +84,15 @@ public class GeneticAlgorithmService {
         }
 //        Population newPopulation = processGenetic(population);
         for (;;) {
-            LOGGER.info("Population generation : " + population.getPopulationIteration());
             population.setLectureDescriptionDto(geneticInitialData.getLectureDescriptionDto());
             population = processGenetic(population, geneticInitialData);
-            if((population.getBestGenotype().getHardFitnessScore() == 100)
+            LOGGER.info("Population generation : " + population.getPopulationIteration());
+            if((population.getBestGenotype().getHardFitnessScore() == 100 && population.getBestGenotype().getFitnessScore() >= 175)
                     || population.getGenotypePopulation().size() == 0
                     || counterSameFitnessScore.equals(sameFitnessScoreNumber) ){
                 break;
             }else{
+                addGenotypeReport(timeTableDescriptionDto, population);
                 if(globalFitnessScore.equals(population.getBestGenotype().getFitnessScore())){
                     counterSameFitnessScore++;
                 }else{
@@ -102,7 +103,6 @@ public class GeneticAlgorithmService {
 //            population = genotypeService.mapHintNewPopulation(newPopulation);
             //end and present score
             LOGGER.info("Max fitness score for generation " + population.getBestGenotype().getFitnessScore());
-            addGenotypeReport(timeTableDescriptionDto, population);
 
         }
         LOGGER.info("Max fitness score : "+ population.getBestGenotype().getFitnessScore());

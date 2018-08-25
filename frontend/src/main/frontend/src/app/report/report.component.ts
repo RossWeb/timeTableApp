@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, Output,ViewChild } from '@angular/core';
+import {ReportService} from './report.service';
+import { BaseChartDirective } from 'ng2-charts';
 import Chart from 'chart.js';
 
 @Component({
@@ -7,8 +9,13 @@ import Chart from 'chart.js';
   styleUrls: ['./report.component.css']
 })
 export class ReportComponent implements OnInit {
-  constructor() { }
 
+  // private reportService : ReportService;
+  @ViewChild(BaseChartDirective)
+  public chart: BaseChartDirective;
+
+  constructor(private reportService : ReportService) {
+  }
   ngOnInit() {
   }
 
@@ -33,14 +40,34 @@ export class ReportComponent implements OnInit {
  public lineChartType:string = 'line';
 
  public randomize():void {
-   let _lineChartData:Array<any> = new Array(this.lineChartData.length);
-   for (let i = 0; i < this.lineChartData.length; i++) {
-     _lineChartData[i] = {data: new Array(this.lineChartData[i].data.length), label: this.lineChartData[i].label};
-     for (let j = 0; j < this.lineChartData[i].data.length; j++) {
-       _lineChartData[i].data[j] = Math.floor((Math.random() * 100) + 1);
-     }
-   }
-   this.lineChartData = _lineChartData;
+   // let _lineChartData:Array<any> = new Array(this.lineChartData.length);
+   // for (let i = 0; i < this.lineChartData.length; i++) {
+   //   _lineChartData[i] = {data: new Array(this.lineChartData[i].data.length), label: this.lineChartData[i].label};
+   //   for (let j = 0; j < this.lineChartData[i].data.length; j++) {
+   //     _lineChartData[i].data[j] = Math.floor((Math.random() * 100) + 1);
+   //   }
+   // }
+   // this.lineChartData = _lineChartData;
+   this.reportService.get().subscribe(
+     data => {
+       this.lineChartLabels = [];
+       let score = [];
+       let generation = [];
+       for (let population of data.reportPopulation) {
+            generation.push(population.populationGeneration);
+            score.push(population.bestFitnessScore);
+        }
+        // this.lineChartLabels = generation;
+        this.lineChartData = [{data: score , label: 'Score'}];
+        this.chart.labels = generation;
+        this.chart.chart.data.labels = generation;
+
+        this.chart.chart.update();
+
+       console.log(data);
+     },
+     err => {console.log("Error occured when get elements.")}
+   );
  }
 
  // events
