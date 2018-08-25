@@ -1,6 +1,7 @@
 package pl.timetable.service;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,12 @@ public class GroupServiceImpl extends AbstractService<GroupDto, GroupRequest> {
     @Override
     public List<GroupDto> findAll() {
         List<Group> groupEntities = groupRepository.findAll().orElse(Collections.emptyList());
-        return groupEntities.stream().map(this::mapEntityToDto).collect(Collectors.toList());
+        return groupEntities.stream().map(group -> {
+            Hibernate.initialize(group.getCourse());
+            Hibernate.initialize(group.getCourse().getSubjectSet());
+            return mapEntityToDto(group);
+
+        }).collect(Collectors.toList());
     }
 
     @Override

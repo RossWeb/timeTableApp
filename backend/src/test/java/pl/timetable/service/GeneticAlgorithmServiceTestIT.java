@@ -47,6 +47,10 @@ public class GeneticAlgorithmServiceTestIT {
         }
 
         @Bean
+        public CourseServiceImpl courseService(){
+            return new CourseServiceImpl();
+        }
+        @Bean
         public RoomServiceImpl roomService(){
             return new RoomServiceImpl(new RoomRepositoryImpl());
         }
@@ -104,7 +108,8 @@ public class GeneticAlgorithmServiceTestIT {
 
         @Bean
         public TimeTableFacade timeTableFacade() {
-            return new TimeTableFacade( timeTableService(), lectureDescriptionService(),reportPopulationService(), timeTableDescriptionService());}
+            return new TimeTableFacade( timeTableService(), lectureDescriptionService(),timeTableDescriptionService(),
+                    reportPopulationService(), groupService(), roomService(), subjectService(),courseService());}
     }
 
     @Autowired
@@ -162,15 +167,16 @@ public class GeneticAlgorithmServiceTestIT {
     }
 
     @Test
+    //uwzlednic async !
     public void initTest() throws EntityNotFoundException {
         //given
         GeneticInitialData geneticInitialData = getGeneticInitialData();
         debugService.init(geneticInitialData);
         geneticInitialData.setPopulationSize(200);
         //when
-        Population population = geneticAlgorithmService.init(geneticInitialData);
+        Integer timeTableId = geneticAlgorithmService.init(geneticInitialData);
         //then
-        Assert.assertNotNull(population);
+        Assert.assertNotNull(timeTableId);
         TimeTableDescriptionDto timeTableDescriptionDto = timeTableDescriptionService.findAll().get(0);
         Assert.assertThat(timeTableDescriptionDto, notNullValue());
         LectureDescriptionDto lectureDescriptionDto = lectureDescriptionService.getLectureDescriptionByTimeTableDescription(timeTableDescriptionDto);

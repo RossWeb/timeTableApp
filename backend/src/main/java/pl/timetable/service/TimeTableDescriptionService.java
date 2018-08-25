@@ -7,6 +7,7 @@ import pl.timetable.api.TimeTableDescritpionRequest;
 import pl.timetable.dto.TimeTableDescriptionDto;
 import pl.timetable.entity.Subject;
 import pl.timetable.entity.TimeTableDescription;
+import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.repository.TimeTableDescriptionRepository;
 
@@ -49,9 +50,17 @@ public class TimeTableDescriptionService extends AbstractService<TimeTableDescri
         return null;
     }
 
-    public TimeTableDescription create(String name){
+    public void updateStatus(Integer timeTableDescriptionId, TimeTableDescriptionStatus status) throws EntityNotFoundException {
+        TimeTableDescription timeTableDescription = Optional.ofNullable(timeTableDescriptionRepository.getById(timeTableDescriptionId))
+                .orElseThrow(() -> new EntityNotFoundException(timeTableDescriptionId, "TimeTableDescription"));
+        timeTableDescription.setTimeTableDescriptionStatus(status);
+        timeTableDescriptionRepository.update(timeTableDescription);
+    }
+
+    public TimeTableDescription create(String name, LocalDateTime startedDate){
         TimeTableDescription timeTableDescription = new TimeTableDescription();
         timeTableDescription.setCreatedDate(LocalDateTime.now());
+        timeTableDescription.setStartedDate(startedDate);
         timeTableDescription.setName(name);
         timeTableDescriptionRepository.create(timeTableDescription);
         return timeTableDescription;
@@ -72,7 +81,10 @@ public class TimeTableDescriptionService extends AbstractService<TimeTableDescri
     }
 
     public static TimeTableDescriptionDto mapEntityToDto(TimeTableDescription timeTableDescription) {
-        return new TimeTableDescriptionDto(timeTableDescription.getName(), timeTableDescription.getId(), timeTableDescription.getCreatedDate());
+        TimeTableDescriptionDto timeTableDescriptionDto =  new TimeTableDescriptionDto(timeTableDescription.getName(),
+                timeTableDescription.getId(), timeTableDescription.getCreatedDate(), timeTableDescription.getStartedDate());
+        timeTableDescriptionDto.setStatus(timeTableDescription.getTimeTableDescriptionStatus());
+        return timeTableDescriptionDto;
     }
 
     public static TimeTableDescription mapDtoToEntity(TimeTableDescriptionDto timeTableDescriptionDto){
@@ -80,6 +92,7 @@ public class TimeTableDescriptionService extends AbstractService<TimeTableDescri
         timeTableDescription.setName(timeTableDescriptionDto.getName());
         timeTableDescription.setCreatedDate(timeTableDescriptionDto.getCreatedDate());
         timeTableDescription.setId(timeTableDescriptionDto.getId());
+        timeTableDescription.setTimeTableDescriptionStatus(timeTableDescriptionDto.getStatus());
         return timeTableDescription;
     }
 

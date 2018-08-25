@@ -17,6 +17,7 @@ import pl.timetable.repository.RoomRepository;
 import pl.timetable.repository.SubjectRepository;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 @Transactional
@@ -81,12 +82,38 @@ public class DebugService {
 
     public void init() {
         Logger.info("Fill datatable default value");
-        Subject subject = createSubject("Matematyka");
         Set<Subject> subjectSet = new HashSet<>();
-        subjectSet.add(subject);
-        Course course = createCourse(subjectSet, "Informatyka");
-        createGroup(course, "Informatyka 1");
-        createRoom("room1", "1");
+        Set<Course> courseSet = new HashSet<>();
+        for (int i = 0; i < 3 ; i++) {
+            Subject subject1 = createSubject("Matematyka" + i);
+            Subject subject2 = createSubject("Polski" + i);
+            Subject subject3 = createSubject("Fizyka" + i);
+            Subject subject4 = createSubject("Biologia" + i);
+            subjectSet.add(subject1);
+            subjectSet.add(subject2);
+            subjectSet.add(subject3);
+            subjectSet.add(subject4);
+
+        }
+        for (int i = 0; i < 2 ; i++) {
+            Set<Subject> subjectCourse = new HashSet<>();
+            do{
+                Integer position = new Random().ints(0, subjectSet.size()).findFirst().getAsInt();
+                Subject subject = (Subject) subjectSet.toArray()[position];
+                if(!subjectCourse.contains(subject)) {
+                    subjectCourse.add(subject);
+                }
+            }while (subjectCourse.size() >= 4);
+            Course course = createCourse(subjectCourse, "Informatyka" + i);
+            courseSet.add(course);
+        }
+        for (int i = 0; i < 4 ; i++) {
+            Integer position = new Random().ints(0, courseSet.size()).findFirst().getAsInt();
+            createGroup((Course)courseSet.toArray()[position], "Informatyka " + i);
+        }
+        for (int i = 0; i < 20; i++) {
+            createRoom("room" + i, String.valueOf(i));
+        }
     }
 
     private void createRoom(String name, String number){
@@ -113,6 +140,7 @@ public class DebugService {
     private Subject createSubject(String name) {
         Subject subject = new Subject();
         subject.setName(name);
+        subject.setSize(5);
         return subjectRepository.create(subject);
     }
 }

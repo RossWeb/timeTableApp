@@ -45,16 +45,18 @@ public class GeneticAlgorithmServiceTest {
     }
 
     @Test
+    //uwzglednic async
     public void initTest(){
         //given
         //when
         GeneticInitialData geneticInitialData = getGeneticInitialData();
         geneticInitialData.setPopulationSize(100);
-        Population population = geneticAlgorithmService.init(geneticInitialData);
+        Integer timeTableId = geneticAlgorithmService.init(geneticInitialData);
         //then
-        Assert.assertNotNull(population);
-        Assert.assertEquals(100, population.getGenotypePopulation().size());
-        Assert.assertFalse(Arrays.stream(population.getSelectionArray()).anyMatch(Objects::isNull));
+        Assert.assertNotNull(timeTableId);
+//        Assert.assertNotNull(population);
+//        Assert.assertEquals(100, population.getGenotypePopulation().size());
+//        Assert.assertFalse(Arrays.stream(population.getSelectionArray()).anyMatch(Objects::isNull));
     }
 
 }

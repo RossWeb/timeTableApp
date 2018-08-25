@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-
+import { ViewEncapsulation } from '@angular/core';
 
 /**
  * @title Data table with sorting, pagination, and filtering.
@@ -12,6 +12,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
    '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
    '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
     ]
+    encapsulation: ViewEncapsulation.None
  })
 export class MainComponent implements OnInit {
 

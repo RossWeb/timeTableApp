@@ -1,12 +1,16 @@
 package pl.timetable.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pl.timetable.dto.*;
 import pl.timetable.entity.TimeTableDescription;
+import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.facade.TimeTableFacade;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class GeneticAlgorithmService {
@@ -35,13 +39,40 @@ public class GeneticAlgorithmService {
         this.timeTableFacade = timeTableFacade;
     }
 
-    public Population init(GeneticInitialData geneticInitialData){
+    public Integer init(GeneticInitialData geneticInitialData){
 
         LectureDescriptionDto lectureDescriptionDto = geneticInitialData.getLectureDescriptionDto();
-        TimeTableDescriptionDto timeTableDescriptionDto = timeTableFacade.saveTimeTableDescription("timeTable" + LocalDateTime.now());
+        TimeTableDescriptionDto timeTableDescriptionDto = timeTableFacade.saveTimeTableDescription("timeTable" + LocalDateTime.now(),
+                LocalDateTime.now());
         lectureDescriptionDto.setTimeTableDescriptionId(timeTableDescriptionDto.getId());
         timeTableFacade.saveLectureDescription(lectureDescriptionDto);
-        //createIfNotExists initial population
+        //generate population async
+        CompletableFuture.supplyAsync(() -> generatePopulation(geneticInitialData, timeTableDescriptionDto)).whenComplete((population, throwable) -> {
+            if(Objects.nonNull(throwable)){
+                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
+                LOGGER.error("Error when async generic genotype. " + throwable);
+            }
+
+            if(Objects.nonNull(population)) {
+                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.SUCCESS);
+            }else{
+                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
+                LOGGER.error("No population. Genetic algorithm couldnt completed");
+            }
+        });
+        return timeTableDescriptionDto.getId();
+
+    }
+
+    private void changeTimeTableDescriptionStatus(TimeTableDescriptionDto timeTableDescriptionDto, TimeTableDescriptionStatus timeTableDescriptionStatus) {
+        boolean changed = timeTableFacade.changeTimeTableDescriptionStatus(timeTableDescriptionDto.getId(), timeTableDescriptionStatus);
+        if(!changed){
+            LOGGER.error("Couldnt change timeTableDescription status for id " + timeTableDescriptionDto.getId());
+        }
+    }
+
+    @Async
+    private Population generatePopulation(GeneticInitialData geneticInitialData, TimeTableDescriptionDto timeTableDescriptionDto) {
         Population population = new Population();
         Double globalFitnessScore =0.0;
         Integer counterSameFitnessScore = 0;
@@ -58,7 +89,7 @@ public class GeneticAlgorithmService {
             population = processGenetic(population, geneticInitialData);
             if((population.getBestGenotype().getHardFitnessScore() == 100)
                     || population.getGenotypePopulation().size() == 0
-                    || counterSameFitnessScore == sameFitnessScoreNumber ){
+                    || counterSameFitnessScore.equals(sameFitnessScoreNumber) ){
                 break;
             }else{
                 if(globalFitnessScore.equals(population.getBestGenotype().getFitnessScore())){
@@ -83,7 +114,6 @@ public class GeneticAlgorithmService {
         timeTableFacade.saveGenotype(population.getBestGenotype(), timeTableDescriptionDto);
         addGenotypeReport(timeTableDescriptionDto, population);
         return population;
-
     }
 
     private void addGenotypeReport(TimeTableDescriptionDto timeTableDescriptionDto, Population population) {

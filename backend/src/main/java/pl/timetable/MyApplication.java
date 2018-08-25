@@ -26,14 +26,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.persistence.EntityManagerFactory;
+
+import java.util.concurrent.Executor;
 
 import static org.springframework.orm.hibernate5.SessionFactoryUtils.getDataSource;
 
 @SpringBootApplication
 @EnableTransactionManagement
+@EnableAsync
 public class MyApplication {
 
     private static Log logger = LogFactory.getLog(MyApplication.class);
@@ -53,5 +58,16 @@ public class MyApplication {
         }
         return entityManagerFactory.unwrap(SessionFactory.class);
     }
+
+//    @Bean
+//    public Executor asyncExecutor() {
+//        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+//        executor.setCorePoolSize(2);
+//        executor.setMaxPoolSize(2);
+//        executor.setQueueCapacity(500);
+//        executor.setThreadNamePrefix("TimeTableThread-");
+//        executor.initialize();
+//        return executor;
+//    }
 
 }

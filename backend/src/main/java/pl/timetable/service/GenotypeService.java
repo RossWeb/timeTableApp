@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.dto.*;
 import pl.timetable.entity.Subject;
 
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
+@Transactional
 public class GenotypeService {
 
     private HardGenotypeCriteria hardGenotypeCriteria;
@@ -191,6 +193,7 @@ public class GenotypeService {
                         genotypeServiceDto.getRoomByGroupTemporary().get(groupDto)
                                 .addAll(Arrays.asList(new RoomDto[lectureSize - genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).size()]));
                         genotype.getGenotypeTable()[i][cellFound.getLecture()].setRoomDto(roomFound);
+                        genotypeServiceDto.getRoomByLectureTemporary().putIfAbsent(cellFound.getLecture(), new LinkedList<>());
                         genotypeServiceDto.getRoomByLectureTemporary().get(cellFound.getLecture()).add(roomFound);
                         genotypeServiceDto.getRoomByGroupTemporary().get(groupDto).set(cellFound.getLecture(), roomFound);
                         genotypeServiceDto.getRoomListPerLecture().get(cellFound.getLecture()).remove(roomFound);
@@ -232,7 +235,6 @@ public class GenotypeService {
 
 
     private int getSubjectPerGroup(CourseDto courseDto) {
-
         return courseDto.getSubjectSet().stream().map(Subject::getSize).mapToInt(value -> value).sum();
     }
 
