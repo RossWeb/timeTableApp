@@ -11,17 +11,8 @@ import {TableTypeProvider} from "./table-service/table.type.provider";
 import { TableParameterComponent } from './table-parameter/table-parameter.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
-
-// const appRoutes: Routes = [
-  // { path: 'konfiguracja', component: AppComponent },
-  // { path: 'main',      component: MainComponent },
-  // { path: '',
-  //   redirectTo: '/main',
-  //   pathMatch: 'full'
-  // },
-  // { path: '**', component: MainComponent }
-// ];
-
+import { ChartsModule } from 'ng2-charts';
+import { ReportComponent } from './report/report.component';
 
 @NgModule({
   declarations: [
@@ -30,15 +21,16 @@ import { MainComponent } from './main/main.component';
     AdminPanelComponent,
     ValuesPipe,
     TableParameterComponent,
-    MainComponent
-
+    MainComponent,
+    ReportComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     AppRoutingModule,
-    NgxDatatableModule
+    NgxDatatableModule,
+    ChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

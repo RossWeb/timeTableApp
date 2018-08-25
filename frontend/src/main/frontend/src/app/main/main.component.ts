@@ -11,7 +11,7 @@ import { ViewEncapsulation } from '@angular/core';
    '../../../node_modules/@swimlane/ngx-datatable/release/index.css',
    '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
    '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
-    ]
+    ],
     encapsulation: ViewEncapsulation.None
  })
 export class MainComponent implements OnInit {

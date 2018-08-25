@@ -1,4 +1,5 @@
-<div>
+<div class="container">
+  <div class="row">
       <ngx-datatable
       class='material ngx-datatable fixed-header'
         [rows]='rows'
@@ -11,4 +12,7 @@
         <ngx-datatable-column name="Gender" headerClass="is-gender" [cellClass]="getCellClass"></ngx-datatable-column>
         <ngx-datatable-column name="Age"></ngx-datatable-column>
       </ngx-datatable>
-    </div>
+  </div>
+  <div class="row top1">
+    <app-report></app-report>
+  </div>
