@@ -359,6 +359,9 @@ public class GenotypeService {
 
     private RoomDto getRoomByRandomNumberWithNull(List<RoomDto> roomDtoList) {
         Integer nullRange = ((Long)Math.round(roomDtoList.size() * 0.25)).intValue();
+        if(nullRange == 0){
+            return null;
+        }
         Integer roomPosition = getRandomIntegerBetweenRange(0, roomDtoList.size() + nullRange);
         if (roomPosition >= roomDtoList.size()) {
             return null;

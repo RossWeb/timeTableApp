@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pl.timetable.dto.*;
-import pl.timetable.entity.TimeTableDescription;
 import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.facade.TimeTableFacade;
 
@@ -39,7 +38,7 @@ public class GeneticAlgorithmService {
         this.timeTableFacade = timeTableFacade;
     }
 
-    public Integer init(GeneticInitialData geneticInitialData){
+    public Integer init(GeneticInitialData geneticInitialData) {
 
         LectureDescriptionDto lectureDescriptionDto = geneticInitialData.getLectureDescriptionDto();
         TimeTableDescriptionDto timeTableDescriptionDto = timeTableFacade.saveTimeTableDescription("timeTable" + LocalDateTime.now(),
@@ -48,14 +47,14 @@ public class GeneticAlgorithmService {
         timeTableFacade.saveLectureDescription(lectureDescriptionDto);
         //generate population async
         CompletableFuture.supplyAsync(() -> generatePopulation(geneticInitialData, timeTableDescriptionDto)).whenComplete((population, throwable) -> {
-            if(Objects.nonNull(throwable)){
+            if (Objects.nonNull(throwable)) {
                 changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
                 LOGGER.error("Error when async generic genotype. " + throwable);
             }
 
-            if(Objects.nonNull(population)) {
+            if (Objects.nonNull(population)) {
                 changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.SUCCESS);
-            }else{
+            } else {
                 changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
                 LOGGER.error("No population. Genetic algorithm couldnt completed");
             }
@@ -66,7 +65,7 @@ public class GeneticAlgorithmService {
 
     private void changeTimeTableDescriptionStatus(TimeTableDescriptionDto timeTableDescriptionDto, TimeTableDescriptionStatus timeTableDescriptionStatus) {
         boolean changed = timeTableFacade.changeTimeTableDescriptionStatus(timeTableDescriptionDto.getId(), timeTableDescriptionStatus);
-        if(!changed){
+        if (!changed) {
             LOGGER.error("Couldnt change timeTableDescription status for id " + timeTableDescriptionDto.getId());
         }
     }
@@ -74,28 +73,32 @@ public class GeneticAlgorithmService {
     @Async
     private Population generatePopulation(GeneticInitialData geneticInitialData, TimeTableDescriptionDto timeTableDescriptionDto) {
         Population population = new Population();
-        Double globalFitnessScore =0.0;
+        Double globalFitnessScore = 0.0;
         Integer counterSameFitnessScore = 0;
         Integer sameFitnessScoreNumber = 100;
 //        Integer populationIteration = 0;
         for (int i = 0; i < geneticInitialData.getPopulationSize(); i++) {
             LOGGER.info("Create population : " + i);
-            population.getGenotypePopulation().add(genotypeService.createInitialGenotype(geneticInitialData));
+            try {
+                population.getGenotypePopulation().add(genotypeService.createInitialGenotype(geneticInitialData));
+            }catch (Exception e){
+                LOGGER.error(e);
+            }
         }
 //        Population newPopulation = processGenetic(population);
-        for (;;) {
+        for (; ; ) {
             population.setLectureDescriptionDto(geneticInitialData.getLectureDescriptionDto());
             population = processGenetic(population, geneticInitialData);
             LOGGER.info("Population generation : " + population.getPopulationIteration());
-            if((population.getBestGenotype().getHardFitnessScore() == 100 && population.getBestGenotype().getFitnessScore() >= 175)
+            if ((population.getBestGenotype().getHardFitnessScore() == 100 && population.getBestGenotype().getFitnessScore() >= 200)
                     || population.getGenotypePopulation().size() == 0
-                    || counterSameFitnessScore.equals(sameFitnessScoreNumber) ){
+                    || counterSameFitnessScore.equals(sameFitnessScoreNumber)) {
                 break;
-            }else{
+            } else {
                 addGenotypeReport(timeTableDescriptionDto, population);
-                if(globalFitnessScore.equals(population.getBestGenotype().getFitnessScore())){
+                if (globalFitnessScore.equals(population.getBestGenotype().getFitnessScore())) {
                     counterSameFitnessScore++;
-                }else{
+                } else {
                     globalFitnessScore = population.getBestGenotype().getFitnessScore();
                 }
             }
@@ -105,12 +108,12 @@ public class GeneticAlgorithmService {
             LOGGER.info("Max fitness score for generation " + population.getBestGenotype().getFitnessScore());
 
         }
-        LOGGER.info("Max fitness score : "+ population.getBestGenotype().getFitnessScore());
-        LOGGER.info("Max hard fitness score : "+ population.getBestGenotype().getHardFitnessScore());
-        LOGGER.info("Max soft fitness score : "+ population.getBestGenotype().getSoftFitnessScore());
+        LOGGER.info("Max fitness score : " + population.getBestGenotype().getFitnessScore());
+        LOGGER.info("Max hard fitness score : " + population.getBestGenotype().getHardFitnessScore());
+        LOGGER.info("Max soft fitness score : " + population.getBestGenotype().getSoftFitnessScore());
         LOGGER.info("Generation end " + population.getPopulationIteration());
         LOGGER.info("Same fitness score " + counterSameFitnessScore);
-        LOGGER.info("Best genotype " +  population.getBestGenotype());
+        LOGGER.info("Best genotype " + population.getBestGenotype());
         timeTableFacade.saveGenotype(population.getBestGenotype(), timeTableDescriptionDto);
         addGenotypeReport(timeTableDescriptionDto, population);
         return population;
@@ -121,9 +124,9 @@ public class GeneticAlgorithmService {
         reportPopulationDto.setPopulationSize(population.getGenotypePopulation().size());
         reportPopulationDto.setTimeTableDescriptionId(timeTableDescriptionDto.getId());
         reportPopulationDto.setPopulationGeneration(population.getPopulationIteration());
-        reportPopulationDto.setBestSoftFitnessScore(population.getBestGenotype().getSoftFitnessScore());
-        reportPopulationDto.setBestHardFitnessScore(population.getBestGenotype().getHardFitnessScore());
-        reportPopulationDto.setBestFitnessScore(population.getBestGenotype().getFitnessScore());
+        reportPopulationDto.setBestSoftFitnessScore(population.getBestGenotypeGeneration().getSoftFitnessScore());
+        reportPopulationDto.setBestHardFitnessScore(population.getBestGenotypeGeneration().getHardFitnessScore());
+        reportPopulationDto.setBestFitnessScore(population.getBestGenotypeGeneration().getFitnessScore());
         timeTableFacade.addReportGenotype(reportPopulationDto);
     }
 
@@ -134,11 +137,12 @@ public class GeneticAlgorithmService {
         fitnessService.fitPopulation(population);
         //selection by roulete
 //        fitnessService.selectionRoulette(population);
-                //crossover
+        //crossover
         Population newPopulation = new Population();
         newPopulation.setBestGenotype(population.getBestGenotype());
-        newPopulation.setPopulationIteration(population.getPopulationIteration()+ 1);
-        for (int i = 0; i < population.getGenotypePopulation().size()/2; i++) {
+        newPopulation.setBestGenotypeGeneration(population.getBestGenotypeGeneration());
+        newPopulation.setPopulationIteration(population.getPopulationIteration() + 1);
+        for (int i = 0; i < population.getGenotypePopulation().size() / 2; i++) {
 //            Genotype genotypeFirst = fitnessService.getGenotypeBySelection(population);
             Genotype genotypeFirst = new Genotype(fitnessService.selectionTournament(population));
 //            Genotype genotypeSecond = fitnessService.getGenotypeBySelection(population);

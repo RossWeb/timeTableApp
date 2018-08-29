@@ -1,5 +1,6 @@
 package pl.timetable.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class GeneticInitialData {
@@ -11,6 +12,15 @@ public class GeneticInitialData {
     private List<SubjectDto> subjectDtoList;
     private Integer populationSize;
     private Double mutationValue;
+    private LocalDateTime startedDate;
+
+    public LocalDateTime getStartedDate() {
+        return startedDate;
+    }
+
+    public void setStartedDate(LocalDateTime startedDate) {
+        this.startedDate = startedDate;
+    }
 
     public Double getMutationValue() {
         return mutationValue;

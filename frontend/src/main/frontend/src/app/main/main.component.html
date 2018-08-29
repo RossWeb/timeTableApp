@@ -1,5 +1,71 @@
 <div class="container">
   <div class="row">
+    <div id="errorGlobal"  [hidden]="errorGlobalHidden" class="alert alert-danger">
+      <label>Wystąpił błąd</label>
+      <div >{{errorGlobalText}}</div>
+    </div>
+  </div>
+  <form [formGroup]="form">
+  <div class="row" >
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('weeksPerSemester')">
+        <label for="weeksPerSemestr">Ilość tygodni w semestrze</label>
+<!-- formControlName="weeksPerSemestrFormC" #weeksPerSemestr="ngModel" required -->
+        <input  type="number" formControlName="weeksPerSemester"
+          min="1" class="form-control" id="weeksPerSemestr" placeholder="Tygodnie w semestrze">
+      </div>
+  </div>
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('daysPerWeek')">
+        <label for="daysPerWeek">Ilość dni w tygodniu</label>
+        <input type="number"  formControlName="daysPerWeek" min="1" class="form-control" id="daysPerWeek" placeholder="Dni w tygodniu">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('numberPerDay')">
+        <label for="lecturePerDay">Ilość lekcji dziennie</label>
+        <input type="number" formControlName="numberPerDay" min="1" class="form-control" id="lecturePerDay" placeholder="Lekcje">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('startedDate')">
+        <label for="startedDate">Dzień rozpoczęcia semestru</label>
+        <input type="date"  formControlName="startedDate" class="form-control no-spinners" id="startedDate" placeholder="Start semestru">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('startedDay')">
+        <label for="startedDay">Dzień rozpoczęcia zajęć</label>
+        <select class="form-control"  formControlName="startedDay" id="startedDay">
+          <option value="1">Poniedziałek</option>
+          <option value="2">Wtorek</option>
+          <option value="3">Środa</option>
+          <option value="4">Czwartek</option>
+          <option value="5">Piątek</option>
+          <option value="6">Sobota</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('mutationValue')">
+        <label for="mutationValue">Wartość mutacji populacji</label>
+        <input type="number"  formControlName="mutationValue" min="0" max="1" class="form-control " id="mutationValue" placeholder="Stopień mutacji">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('populationSize')">
+        <label for="populationSize">Wielkość populacji</label>
+        <input type="number"  formControlName="populationSize" min="1" class="form-control " id="populationSize" placeholder="Liczba osobników">
+      </div>
+    </div>
+    <div class="col-md-2 col-md-offset-1">
+      <button (click)="init()" type="button" [disabled]="!form.valid" id="generateButton" class="btn btn-secondary pull-right top1">Generuj</button>
+    </div>
+  </div>
+</form>
+  <div class="row">
       <ngx-datatable
       class='material ngx-datatable fixed-header'
         [rows]='rows'
@@ -12,7 +78,13 @@
         <ngx-datatable-column name="Gender" headerClass="is-gender" [cellClass]="getCellClass"></ngx-datatable-column>
         <ngx-datatable-column name="Age"></ngx-datatable-column>
       </ngx-datatable>
+
+      <div class="form-group">
+        <label for="exampleInputFile">File input</label>
+        <input type="file" id="exampleInputFile">
+      </div>
   </div>
   <div class="row top1">
     <app-report ></app-report>
+
   </div>

@@ -9,9 +9,18 @@ public class Population {
 
     private Double fitnessScore = 0.0;
     private Genotype bestGenotype;
+    private Genotype bestGenotypeGeneration;
     private Integer populationIteration = 0;
     private Genotype[] selectionArray = new Genotype[100];
     private LectureDescriptionDto lectureDescriptionDto;
+
+    public Genotype getBestGenotypeGeneration() {
+        return bestGenotypeGeneration;
+    }
+
+    public void setBestGenotypeGeneration(Genotype bestGenotypeGeneration) {
+        this.bestGenotypeGeneration = bestGenotypeGeneration;
+    }
 
     public LectureDescriptionDto getLectureDescriptionDto() {
         return lectureDescriptionDto;

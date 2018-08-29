@@ -29,6 +29,7 @@ public class FitnessService {
         List<Genotype> genotypes = population.getGenotypePopulation().stream()
 //                .filter(genotype -> hardGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto()))
                 .collect(Collectors.toList());
+        population.setBestGenotypeGeneration(null);
         genotypes.forEach(genotype -> {
             softGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto());
             hardGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto());
@@ -37,6 +38,13 @@ public class FitnessService {
             population.setFitnessScore(population.getFitnessScore() + genotype.getFitnessScore());
             if(Objects.nonNull(population.getBestGenotype()) && population.getBestGenotype().getFitnessScore() < genotype.getFitnessScore()) {
                 population.setBestGenotype(genotype);
+            }
+
+            if(Objects.nonNull(population.getBestGenotypeGeneration()) && population.getBestGenotypeGeneration().getFitnessScore() < genotype.getFitnessScore()){
+                population.setBestGenotypeGeneration(genotype);
+            }
+            if(Objects.isNull(population.getBestGenotypeGeneration())){
+                population.setBestGenotypeGeneration(genotype);
             }
 
             if(Objects.isNull(population.getBestGenotype())){

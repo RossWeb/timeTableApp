@@ -14,7 +14,9 @@ import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.service.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -106,6 +108,7 @@ public class TimeTableFacade {
         geneticInitialData.setSubjectDtoList(subjectService.findAll());
         geneticInitialData.setGroupDtoList(groupService.findAll());
         geneticInitialData.setRoomDtoList(roomService.findAll());
+        geneticInitialData.setStartedDate(LocalDate.parse(timeTableRequest.getStartedDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay());
         LectureDescriptionDto lectureDescriptionDto =
                 new LectureDescriptionDto(timeTableRequest.getNumberPerDay(), timeTableRequest.getDaysPerWeek(), timeTableRequest.getWeeksPerSemester());
         geneticInitialData.setLectureDescriptionDto(lectureDescriptionDto);

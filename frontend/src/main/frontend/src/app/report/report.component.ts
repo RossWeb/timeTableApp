@@ -10,7 +10,7 @@ import Chart from 'chart.js';
 })
 export class ReportComponent implements OnInit {
 
-  // private reportService : ReportService;
+  private reportHidden: boolean = true;
   @ViewChild(BaseChartDirective)
   public chart: BaseChartDirective;
 
@@ -20,9 +20,9 @@ export class ReportComponent implements OnInit {
   }
 
   public lineChartData:Array<any> = [
-   {data: [65, 59, 80, 81, 56, 55, 40], label: 'Series A'},
+   {},
  ];
- public lineChartLabels:Array<any> = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+ public lineChartLabels:Array<any> = [];
  public lineChartOptions:any = {
    responsive: true
  };
@@ -39,28 +39,26 @@ export class ReportComponent implements OnInit {
  public lineChartLegend:boolean = true;
  public lineChartType:string = 'line';
 
- public randomize():void {
-   // let _lineChartData:Array<any> = new Array(this.lineChartData.length);
-   // for (let i = 0; i < this.lineChartData.length; i++) {
-   //   _lineChartData[i] = {data: new Array(this.lineChartData[i].data.length), label: this.lineChartData[i].label};
-   //   for (let j = 0; j < this.lineChartData[i].data.length; j++) {
-   //     _lineChartData[i].data[j] = Math.floor((Math.random() * 100) + 1);
-   //   }
-   // }
-   // this.lineChartData = _lineChartData;
+ initReport() :void {
+   this.reportHidden = false;
    this.reportService.get().subscribe(
      data => {
        this.lineChartLabels = [];
        let score = [];
+       let hardScore = [];
+       let softScore = [];
        let generation = [];
        for (let population of data.reportPopulation) {
             generation.push(population.populationGeneration);
             score.push(population.bestFitnessScore);
+            hardScore.push(population.bestHardFitnessScore);
+            softScore.push(population.bestSoftFitnessScore);
         }
         // this.lineChartLabels = generation;
-        this.lineChartData = [{data: score , label: 'Score'}];
+        this.lineChartData = [{data: score , label: 'Score'}, {data: hardScore , label: 'hardScore'}, {data: softScore , label: 'softScore'}];
         this.chart.labels = generation;
         this.chart.chart.data.labels = generation;
+        this.chart.chart.data.datasets = this.lineChartData;
 
         this.chart.chart.update();
 
