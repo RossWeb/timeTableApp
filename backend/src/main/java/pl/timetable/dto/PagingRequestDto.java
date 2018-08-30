@@ -1,6 +1,6 @@
-package pl.timetable.api;
+package pl.timetable.dto;
 
-public class BaseRequest {
+public class PagingRequestDto extends BaseDto {
 
     private Integer pageNumber;
     private Integer size;

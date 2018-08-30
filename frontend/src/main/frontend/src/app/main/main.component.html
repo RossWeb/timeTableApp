@@ -68,15 +68,17 @@
   <div class="row">
       <ngx-datatable
       class='material ngx-datatable fixed-header'
-        [rows]='rows'
-        [columnMode]="'force'"
-        [headerHeight]="50"
-        [rowHeight]="50"
-        [rowClass]="getRowClass"
-        [scrollbarV]="true">
-        <ngx-datatable-column name="Name"></ngx-datatable-column>
-        <ngx-datatable-column name="Gender" headerClass="is-gender" [cellClass]="getCellClass"></ngx-datatable-column>
-        <ngx-datatable-column name="Age"></ngx-datatable-column>
+      [rows]="rows"
+      [columns]="cols"
+      [columnMode]="'force'"
+      [headerHeight]="50"
+      [footerHeight]="50"
+      [rowHeight]="'auto'"
+      [externalPaging]="true"
+      [count]="page.totalElements"
+      [offset]="page.pageNumber"
+      [limit]="page.size"
+      (page)='setPage($event)'>
       </ngx-datatable>
 
       <div class="form-group">

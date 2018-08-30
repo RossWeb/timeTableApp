@@ -103,7 +103,7 @@ public class DebugService {
                 if(!subjectCourse.contains(subject)) {
                     subjectCourse.add(subject);
                 }
-            }while (subjectCourse.size() >= 4);
+            }while (subjectCourse.size() <= 4);
             Course course = createCourse(subjectCourse, "Informatyka" + i);
             courseSet.add(course);
         }

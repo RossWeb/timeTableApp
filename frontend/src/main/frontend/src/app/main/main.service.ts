@@ -18,4 +18,8 @@ export class MainService {
   checkStatus(timeTableId: number): any {
     return  this.http.get('api/timetable/' + timeTableId + "/status");
   }
+
+  public getResults(page: TimeTablePage, timeTableId: number): any  {
+        return  this.http.post('api/timetable/' + timeTableId + "/result", page);
+    }
 }

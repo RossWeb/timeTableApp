@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import pl.timetable.api.TimeTableRequest;
 import pl.timetable.dto.TimeTableDto;
+import pl.timetable.dto.TimeTableResultDto;
 import pl.timetable.entity.TimeTable;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.repository.TimeTableRepository;
@@ -11,6 +12,7 @@ import pl.timetable.repository.TimeTableRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +48,16 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
         TimeTable timeTable = mapDtoToEntity(timeTableDto);
         timeTableRepository.create(timeTable);
 
+    }
+
+    public List<TimeTableDto> getTimeTableResult(Integer timeTableId, Integer firstResult, Integer maxResult, Integer groupId) throws EntityNotFoundException {
+        return Optional.ofNullable(timeTableRepository.getTimeTableResult(timeTableId, firstResult, maxResult, groupId))
+                .orElseThrow(() -> new EntityNotFoundException(timeTableId, "TimeTable")).stream()
+                .map(this::mapEntityToDto).collect(Collectors.toList());
+    }
+
+    public Integer getTimeTableResultCount(Integer timeTableId, Integer groupId){
+        return timeTableRepository.getTimeTableCount(timeTableId, groupId);
     }
 
     @Override

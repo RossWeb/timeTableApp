@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.TimeTableRequest;
 import pl.timetable.dto.*;
-import pl.timetable.entity.ReportPopulation;
-import pl.timetable.entity.TimeTableDescription;
 import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.service.*;
@@ -63,7 +61,7 @@ public class TimeTableFacade {
         });
     }
 
-    public void addReportGenotype(ReportPopulationDto reportPopulationDto){
+    public void addReportGenotype(ReportPopulationDto reportPopulationDto) {
         try {
             reportPopulationService.create(reportPopulationDto);
         } catch (EntityNotFoundException e) {
@@ -71,7 +69,7 @@ public class TimeTableFacade {
         }
     }
 
-    public List<ReportPopulationDto> getReportPopulation(Integer timeTableDescriptionId){
+    public List<ReportPopulationDto> getReportPopulation(Integer timeTableDescriptionId) {
         return reportPopulationService.getByTimeTableDescription(timeTableDescriptionId);
     }
 
@@ -79,7 +77,7 @@ public class TimeTableFacade {
         return TimeTableDescriptionService.mapEntityToDto(timeTableDescriptionService.create(name, startedDate));
     }
 
-    public TimeTableDescriptionStatus getTimeTableDescriptionStatus(Integer timeTableDescriptionId){
+    public TimeTableDescriptionStatus getTimeTableDescriptionStatus(Integer timeTableDescriptionId) {
         try {
             return timeTableDescriptionService.get(timeTableDescriptionId).getStatus();
         } catch (EntityNotFoundException e) {
@@ -87,7 +85,7 @@ public class TimeTableFacade {
         }
     }
 
-    public boolean changeTimeTableDescriptionStatus(Integer timeTableDescriptionId, TimeTableDescriptionStatus status){
+    public boolean changeTimeTableDescriptionStatus(Integer timeTableDescriptionId, TimeTableDescriptionStatus status) {
         try {
             timeTableDescriptionService.updateStatus(timeTableDescriptionId, status);
         } catch (EntityNotFoundException e) {
@@ -100,7 +98,7 @@ public class TimeTableFacade {
         lectureDescriptionService.create(lectureDescriptionDto);
     }
 
-    public GeneticInitialData getGeneticInitialData(TimeTableRequest timeTableRequest){
+    public GeneticInitialData getGeneticInitialData(TimeTableRequest timeTableRequest) {
         GeneticInitialData geneticInitialData = new GeneticInitialData();
         geneticInitialData.setMutationValue(timeTableRequest.getMutationValue());
         geneticInitialData.setCourseDtoList(courseService.findAll());
@@ -122,6 +120,16 @@ public class TimeTableFacade {
             LOGGER.error("Couldnt get any lecture description by timetableId : " + timeTableDescriptionDto.getId());
             return null;
         }
+    }
+
+    public TimeTableResultDto getTimeTableResult(TimeTablePagingDto pagingRequestDto) throws EntityNotFoundException {
+        TimeTableResultDto timeTableResultDto = new TimeTableResultDto();
+        timeTableResultDto.setTimeTableDtos(
+                timeTableService.getTimeTableResult(pagingRequestDto.getId(),
+                        pagingRequestDto.getPageNumber(), pagingRequestDto.getSize(), pagingRequestDto.getGroupId()));
+        timeTableResultDto.setTotalElements(timeTableService.getTimeTableResultCount(pagingRequestDto.getId(), pagingRequestDto.getGroupId()));
+        timeTableResultDto.setTotalPages(timeTableResultDto.getTotalElements() / pagingRequestDto.getSize());
+        return timeTableResultDto;
     }
 
     private void saveGroup(Cell[] cells, TimeTableDescriptionDto timeTableDescriptionDto) throws EntityNotFoundException {
