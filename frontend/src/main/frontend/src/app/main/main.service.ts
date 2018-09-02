@@ -19,6 +19,10 @@ export class MainService {
     return  this.http.get('api/timetable/' + timeTableId + "/status");
   }
 
+  getGroup(): any {
+    return  this.http.get('api/group');
+  }
+
   public getResults(page: TimeTablePage, timeTableId: number): any  {
         return  this.http.post('api/timetable/' + timeTableId + "/result", page);
     }

@@ -70,6 +70,7 @@ export class MainComponent implements OnInit {
   private rows = [];
   private cols = [];
   private dayMap = new Map();
+  private groups = [];
   messages = {
               emptyMessage: 'Brak danych do wyświetlenia',
               totalMessage: 'Liczba elementów'
@@ -201,6 +202,20 @@ export class MainComponent implements OnInit {
   }
 
   initDataTable(){
+    this.mainService.getGroup().subscribe(
+      data => {
+        data.forEach((value, index) => {
+          this.groups.push({id: value.id, name: value.name});
+        });
+      },
+      err => {console.log("Error when get group.")}
+    );
+    this.setPage({ offset: 0 });
+  }
+
+  groupSelect(id: number){
+    console.log(id);
+    this.groupId = id;
     this.setPage({ offset: 0 });
   }
 

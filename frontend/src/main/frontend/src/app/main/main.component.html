@@ -66,6 +66,13 @@
   </div>
 </form>
   <div class="row">
+    <div class="form-group">
+      <label for="groupList">Grupa : </label>
+      <select class="form-control" id="groupList" (ngModelChange)="groupSelect($event)" [(ngModel)]="selectedGroupValue">
+        <option *ngFor="let group of groups" [ngValue]="group.id">{{group.name}}</option>
+      </select>
+  </div>
+  <div class="row">
       <ngx-datatable
       class='material ngx-datatable fixed-header'
       [rows]="rows"
