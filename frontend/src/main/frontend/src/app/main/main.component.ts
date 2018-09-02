@@ -60,15 +60,20 @@ export class MainComponent implements OnInit {
   @Output("errorGlobalText") errorGlobalText: String = "";
   @ViewChild('form') form;
   @ViewChild(ReportComponent) reportComponent;
+  @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
   private initProcess : InitProcess;
   private lecturePerDay: number;
+  private daysPerWeek: number;
   private startedDay: number;
   private groupId: number;
   private page = new TimeTablePage();
   private rows = [];
   private cols = [];
-
   private dayMap = new Map();
+  messages = {
+              emptyMessage: 'Brak danych do wyświetlenia',
+              totalMessage: 'Liczba elementów'
+             }
 
 
   constructor(private reportService : ReportService, private mainService : MainService,
@@ -77,7 +82,8 @@ export class MainComponent implements OnInit {
     this.page.size = 0;
     this.reportService.setTimeTableId(1);
     this.groupId = 1;
-    this.lecturePerDay = 4;
+    this.lecturePerDay = 5;
+    this.daysPerWeek = 4;
     this.startedDay = 2;
     this.dayMap.set(1, 'Poniedziałek');
     this.dayMap.set(2, 'Wtorek');
@@ -102,8 +108,8 @@ export class MainComponent implements OnInit {
       populationSize: [null, [Validators.required]]
     });
     this.form.get('numberPerDay').value = (this.lecturePerDay);
-    this.form.get('daysPerWeek').value = (5);
-    this.form.get('weeksPerSemester').value = (2);
+    this.form.get('daysPerWeek').value = (this.daysPerWeek);
+    this.form.get('weeksPerSemester').value = (5);
     this.form.get('mutationValue').value = (0.15);
     this.form.get('populationSize').value = (100);
     this.form.get('startedDay').value = (this.startedDay);
@@ -129,53 +135,87 @@ export class MainComponent implements OnInit {
   mapRowsAndCols(data: any){
     let tempCols = [];
     let tempRows = [];
-    for(var i = this.startedDay; i <= this.startedDay + this.form.get('daysPerWeek').value; i++){
-      tempCols.push({name:this.dayMap.get(i)});
+    let endPosition = this.startedDay + this.daysPerWeek;
+    tempCols.push({name:'Godziny'});
+
+    for(var i = this.startedDay; i < endPosition ; i++){
+      tempCols.push({name:this.dayMap.get(i), cellTemplate: this.editTmpl});
     }
 
-    let endPosition = this.startedDay + this.form.get('daysPerWeek').value;
+
     let startPosition = this.startedDay;
     let tempRow = {};
+    let tempDataRows = [];
     let endData = data.length;
+    let lectureStartPosition = 0;
+    let lectureEndPosition = this.lecturePerDay -1;
+
+    for(var i = 0; i < this.lecturePerDay; i++){
+      tempRow = {};
+      tempRow['godziny'] = i;
+      tempDataRows[i] = tempRow;
+    }
+
     data.forEach((value, index) => {
-        let cellText = '';
-        if(value.room !== null){
-          cellText += 'sala ' + value.room.name + ':'+  value.room.number+ '</br>\n';
-        }
+        let cellText = {};
+        let actualLecture = value.lectureNumber;
         if(value.subject !== null){
-            cellText += value.subject.name;
+            cellText.subject = value.subject.name;
         }
-        tempRow[this.dayMap.get(startPosition).toLowerCase()] = cellText;
+        if(value.room !== null){
+          cellText.room = 'Sala ' + value.room.name + ' numer: '+  value.room.number;
+        }
+
+        if(value.lectureNumber > this.lecturePerDay){
+          actualLecture = (this.lecturePerDay ) -  (this.lecturePerDay * value.day -  value.lectureNumber);
+        }
+
+        if( (actualLecture === 0 || value.lectureNumber % this.lecturePerDay === 0 ) && value.subject !== null){
+          tempDataRows[lectureStartPosition][this.dayMap.get(startPosition).toLowerCase()] = cellText;
+        }else if (actualLecture !== 0 && actualLecture % lectureStartPosition == 0){
+          tempDataRows[lectureStartPosition][this.dayMap.get(startPosition).toLowerCase()] = cellText;
+        }
+        // tempRow[this.dayMap.get(startPosition).toLowerCase()] = cellText;
+
+        if(lectureStartPosition == lectureEndPosition){
+          lectureStartPosition = 0;
+          startPosition++;
+        }else{
+            lectureStartPosition++;
+        }
 
         if(startPosition == endPosition){
           startPosition = this.startedDay;
-          tempRows.push(tempRow);
+          // tempRows.push(tempRow);
         }
+        //
+        // if(endData == index + 1){
+        //   tempRows.push(tempRow);
+        // }
 
-        if(endData == index + 1){
-          tempRows.push(tempRow);
-        }
-        startPosition++
+
     });
 
     this.cols = tempCols;
-    this.rows = tempRows;
+    this.rows = tempDataRows;
   }
 
   initDataTable(){
-
     this.setPage({ offset: 0 });
   }
 
   setPage(pageInfo){
     this.page.pageNumber = pageInfo.offset;
     this.page.size = this.lecturePerDay;
+    this.page.days = this.daysPerWeek;
     this.page.groupId = this.groupId;
-
     this.mainService.getResults(this.page, this.reportService.getTimeTableId()).subscribe(pagedData => {
       this.page.totalElements = pagedData.totalElements;
-      this.page.totalPages = pagedData.totalPages;
-      this.mapRowsAndCols(pagedData.data);
+      // this.page.totalPages = pagedData.totalPages;
+      // this.page.size = this.lecturePerDay;
+      if(pagedData != null && pagedData.totalElements != 0){
+        this.mapRowsAndCols(pagedData.data);
+      }
       // this.rows = pagedData.data;
     });
   }
@@ -208,6 +248,7 @@ export class MainComponent implements OnInit {
   init() {
     this.initProcess = new InitProcess(this.form);
     this.lecturePerDay = this.initProcess.numberPerDay;
+    this.daysPerWeek = this.initProcess.daysPerWeek;
     this.mainService.initProcess(this.initProcess).subscribe(
       data => {
         this.reportService.setTimeTableId(data.timeTableId);

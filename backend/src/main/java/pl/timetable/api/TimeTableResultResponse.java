@@ -7,13 +7,13 @@ import java.util.List;
 public class TimeTableResultResponse extends BaseResponse {
 
 
-    List<TimeTableDto> data;
+    List<TimeTableResponse> data;
 
-    public List<TimeTableDto> getData() {
+    public List<TimeTableResponse> getData() {
         return data;
     }
 
-    public void setData(List<TimeTableDto> data) {
+    public void setData(List<TimeTableResponse> data) {
         this.data = data;
     }
 }

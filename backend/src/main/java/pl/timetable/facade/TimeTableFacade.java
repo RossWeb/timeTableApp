@@ -125,9 +125,8 @@ public class TimeTableFacade {
     public TimeTableResultDto getTimeTableResult(TimeTablePagingDto pagingRequestDto) throws EntityNotFoundException {
         TimeTableResultDto timeTableResultDto = new TimeTableResultDto();
         timeTableResultDto.setTimeTableDtos(
-                timeTableService.getTimeTableResult(pagingRequestDto.getId(),
-                        pagingRequestDto.getPageNumber(), pagingRequestDto.getSize(), pagingRequestDto.getGroupId()));
-        timeTableResultDto.setTotalElements(timeTableService.getTimeTableResultCount(pagingRequestDto.getId(), pagingRequestDto.getGroupId()));
+                timeTableService.getTimeTableResult(pagingRequestDto));
+        timeTableResultDto.setTotalElements(timeTableService.getTimeTableResultCount(pagingRequestDto.getId(), pagingRequestDto.getGroupId(), pagingRequestDto.getDays()));
         timeTableResultDto.setTotalPages(timeTableResultDto.getTotalElements() / pagingRequestDto.getSize());
         return timeTableResultDto;
     }

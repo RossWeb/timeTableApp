@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import pl.timetable.api.TimeTableRequest;
 import pl.timetable.dto.TimeTableDto;
+import pl.timetable.dto.TimeTablePagingDto;
 import pl.timetable.dto.TimeTableResultDto;
 import pl.timetable.entity.TimeTable;
 import pl.timetable.exception.EntityNotFoundException;
@@ -50,14 +51,17 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
 
     }
 
-    public List<TimeTableDto> getTimeTableResult(Integer timeTableId, Integer firstResult, Integer maxResult, Integer groupId) throws EntityNotFoundException {
-        return Optional.ofNullable(timeTableRepository.getTimeTableResult(timeTableId, firstResult, maxResult, groupId))
-                .orElseThrow(() -> new EntityNotFoundException(timeTableId, "TimeTable")).stream()
+    public List<TimeTableDto> getTimeTableResult(TimeTablePagingDto pagingRequestDto) throws EntityNotFoundException {
+        Integer firstResult = pagingRequestDto.getPageNumber() * pagingRequestDto.getDays() + 1;
+        Integer maxResult = firstResult + pagingRequestDto.getDays();
+        return Optional.ofNullable(timeTableRepository.getTimeTableResult(
+                pagingRequestDto.getId(), firstResult, maxResult, pagingRequestDto.getGroupId()))
+                .orElseThrow(() -> new EntityNotFoundException(pagingRequestDto.getId(), "TimeTable")).stream()
                 .map(this::mapEntityToDto).collect(Collectors.toList());
     }
 
-    public Integer getTimeTableResultCount(Integer timeTableId, Integer groupId){
-        return timeTableRepository.getTimeTableCount(timeTableId, groupId);
+    public Integer getTimeTableResultCount(Integer timeTableId, Integer groupId, Integer days){
+        return timeTableRepository.getTimeTableCount(timeTableId, groupId) / days;
     }
 
     @Override

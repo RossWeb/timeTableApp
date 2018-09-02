@@ -78,7 +78,15 @@
       [count]="page.totalElements"
       [offset]="page.pageNumber"
       [limit]="page.size"
-      (page)='setPage($event)'>
+      [messages]="messages"
+      (page)='setPage($event)' >
+      <ng-template #editTmpl let-value="value">
+          <strong>{{value.subject}}</strong>
+          <br/>
+          {{value.room}}
+
+      </ng-template>
+
       </ngx-datatable>
 
       <div class="form-group">

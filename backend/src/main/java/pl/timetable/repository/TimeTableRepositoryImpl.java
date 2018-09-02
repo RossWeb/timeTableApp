@@ -21,7 +21,7 @@ public class TimeTableRepositoryImpl extends AbstractGenericRepositoryWithSessio
         return (List<TimeTable>) getSession().createCriteria(TimeTable.class)
                 .add(Restrictions.eq("timeTableDescription.id", timeTableId))
                 .add(Restrictions.eq("group.id", groupId))
-                .add(Restrictions.in("day", IntStream.range(firstResult, maxResult+1).boxed().collect(Collectors.toList())))
+                .add(Restrictions.in("day", IntStream.range(firstResult, maxResult).boxed().collect(Collectors.toList())))
                 .addOrder(Order.asc("lectureNumber"))
                 .list();
     }
@@ -30,7 +30,7 @@ public class TimeTableRepositoryImpl extends AbstractGenericRepositoryWithSessio
         return getSession().createCriteria(TimeTable.class)
                 .add(Restrictions.eq("timeTableDescription.id", timeTableId))
                 .add(Restrictions.eq("group.id", groupId))
-                .setProjection(Projections.distinct(Projections.property("day")))
+//                .setProjection(Projections.distinct(Projections.property("lecture.id")))
                 .list().size();
     }
 }

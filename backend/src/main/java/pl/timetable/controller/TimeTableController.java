@@ -10,11 +10,14 @@ import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.facade.TimeTableFacade;
 import pl.timetable.service.GeneticAlgorithmService;
+import pl.timetable.service.RoomServiceImpl;
+import pl.timetable.service.SubjectServiceImpl;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/timetable")
@@ -66,10 +69,22 @@ public class TimeTableController {
         timeTablePagingDto.setPageNumber(timeTableResultRequest.getPageNumber());
         timeTablePagingDto.setSize(timeTableResultRequest.getSize());
         timeTablePagingDto.setGroupId(timeTableResultRequest.getGroupId());
+        timeTablePagingDto.setDays(timeTableResultRequest.getDays());
         try {
             TimeTableResultDto timeTableResultDto = timeTableFacade.getTimeTableResult(timeTablePagingDto);
             TimeTableResultResponse resultResponse = new TimeTableResultResponse();
-            resultResponse.setData(timeTableResultDto.getTimeTableDtos());
+            resultResponse.setData(timeTableResultDto.getTimeTableDtos().stream().map(timeTableDto -> {
+                TimeTableResponse response = new TimeTableResponse();
+                response.setLectureNumber(timeTableDto.getLectureNumber());
+                if(Objects.nonNull(timeTableDto.getRoom())) {
+                    response.setRoom(RoomServiceImpl.mapEntityToDto(timeTableDto.getRoom()));
+                }
+                if(Objects.nonNull(timeTableDto.getSubject())) {
+                    response.setSubject(SubjectServiceImpl.mapEntityToDto(timeTableDto.getSubject()));
+                }
+                response.setDay(timeTableDto.getDay());
+                return response;
+            }).collect(Collectors.toList()));
             resultResponse.setTotalElements(timeTableResultDto.getTotalElements());
             resultResponse.setTotalPages(timeTableResultDto.getTotalPages());
             return ResponseEntity.status(HttpStatus.OK).body(resultResponse);

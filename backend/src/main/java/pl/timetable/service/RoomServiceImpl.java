@@ -34,7 +34,7 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
     @Override
     public List<RoomDto> findAll() {
         List<Room> roomList = roomRepository.findAll().orElse(Collections.emptyList());
-        return roomList.stream().map(this::mapEntityToDto).collect(Collectors.toList());
+        return roomList.stream().map(RoomServiceImpl::mapEntityToDto).collect(Collectors.toList());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
         return mapEntityToDto(room);
     }
 
-    private RoomDto mapEntityToDto(Room room) {
+    public static RoomDto mapEntityToDto(Room room) {
         RoomDto dto = new RoomDto();
         dto.setId(room.getId());
         dto.setName(room.getName());
