@@ -25,10 +25,12 @@ export class Room implements Table {
     const params = [
       {
         value : 'Nazwa',
+        data : 'name',
         type : 'Input'
       },
       {
         value : 'Number',
+        data : 'number',
         type : 'Input'
       }
     ];

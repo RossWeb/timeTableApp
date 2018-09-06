@@ -42,6 +42,12 @@ public abstract class AbstractGenericRepositoryWithSession<T extends Object> {
         return Optional.ofNullable((List<T>) getSession().createQuery( "from " + tableName).list());
     }
 
+    public Optional<List<T>> getResult(Integer first, Integer max){
+        String tableName = getClass().getSimpleName().replace("RepositoryImpl", "");
+        return Optional.ofNullable((List<T>) getSession().createQuery( "from " + tableName)
+                .setFirstResult(first).setMaxResults(max).list());
+    }
+
     protected Session getSession() {
         Session currentSession = sessionFactory.getCurrentSession();
         if (currentSession == null) {

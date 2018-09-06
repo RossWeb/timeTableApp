@@ -71,11 +71,7 @@ export class MainComponent implements OnInit {
   private cols = [];
   private dayMap = new Map();
   private groups = [];
-  messages = {
-              emptyMessage: 'Brak danych do wyświetlenia',
-              totalMessage: 'Liczba elementów'
-             }
-
+  
 
   constructor(private reportService : ReportService, private mainService : MainService,
               private formBuilder : FormBuilder) {
@@ -202,6 +198,7 @@ export class MainComponent implements OnInit {
   }
 
   initDataTable(){
+    this.groups = [];
     this.mainService.getGroup().subscribe(
       data => {
         data.forEach((value, index) => {

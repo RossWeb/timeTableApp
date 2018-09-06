@@ -6,6 +6,78 @@
 <div class="collapse" id="collapseExample{{tableTypeName}}">
   <div class="card card-body">
     <div class="row">
+      <ngx-datatable
+      class='material ngx-datatable fixed-header'
+      [rows]="rows"
+      [columns]="cols"
+      [columnMode]="'force'"
+      [headerHeight]="50"
+      [footerHeight]="100"
+      [rowHeight]="'auto'"
+      [externalPaging]="true"
+      [count]="page.totalElements"
+      [offset]="page.pageNumber"
+      [limit]="page.size"
+      [messages]="page.messages"
+      (page)='setPage($event)' >
+      <ng-template #indexTmpl let-value="value" width="10" let-rowIndex="rowIndex">
+          {{rowIndex + 1}}
+      </ng-template>
+      <ng-template #editTmpl let-value="value">
+          <button type="button" class="btn btn-primary" (click)="edit(value)">Edytuj</button>
+      </ng-template>
+      <ng-template #addDelTmpl let-value="value">
+          <button type="button" class="btn btn-danger" (click)="remove(value)">Usuń</button>
+      </ng-template>
+          <ngx-datatable-footer>
+            <ng-template
+              let-curPage="curPage"
+              let-offset="offset"
+              let-pageSize="pageSize"
+              let-rowCount="rowCount"
+              let-selectedCount="selectedCount"
+              ngx-datatable-footer-template>
+              <div class="container">
+                <div class="row pull-right margin-bottom-md">
+                  <div class="col-md-1 col-lg-1 col-sm-1">
+                  </div>
+                  <ng-container  *ngFor="let colName of dataTableNames; let i = index">
+                    <td *ngIf="colName.type === 'Select'; else elseBlock">
+                      <div class="col-md-4  col-lg-4 col-sm-4">
+                        <select [(ngModel)]="dataTableValues[i]">
+                          <option *ngFor="let item of selectDefinions[colName.value]" [ngValue]="item.id">{{item.name}}</option>
+                        </select>
+                      </div>
+                    </td>
+                    <ng-template #elseBlock>
+                        <div class="col-md-4 col-lg-4 col-sm-4">
+                          <input type="text" class="form-control " [(ngModel)]="dataTableValues[i]"  placeholder="{{colName.value}}">
+                        </div>
+                    </ng-template>
+                  </ng-container>
+                    <div class="col-md-1 col-lg-1 col-sm-1">
+                      <button type="button" (click)="add()"class="btn btn-success">{{addButtonName}}</button>
+                    </div>
+                </div>
+                <div class="row">
+                  <datatable-pager class=" pull-right "
+                  [pagerLeftArrowIcon]="'datatable-icon-left'"
+                  [pagerRightArrowIcon]="'datatable-icon-right'"
+                  [pagerPreviousIcon]="'datatable-icon-prev'"
+                  [pagerNextIcon]="'datatable-icon-skip'"
+                  [page]="curPage"
+                  [size]="pageSize"
+                  [count]="rowCount"
+                  [hidden]="!((rowCount / pageSize) > 1)"
+                  (change)="handlePageChange($event)">
+                  </datatable-pager>
+                </div>
+              </div>
+            </ng-template>
+          </ngx-datatable-footer>
+      </ngx-datatable>
+    </div>
+    <div class="row">
       <div class="col-md-8">
         <table class="table">
           <thead>

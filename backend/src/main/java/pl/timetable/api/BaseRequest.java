@@ -2,8 +2,8 @@ package pl.timetable.api;
 
 public class BaseRequest {
 
-    private Integer pageNumber;
-    private Integer size;
+    protected Integer pageNumber;
+    protected Integer size;
 
     public Integer getPageNumber() {
         return pageNumber;

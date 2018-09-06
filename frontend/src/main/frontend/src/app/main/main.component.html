@@ -85,7 +85,7 @@
       [count]="page.totalElements"
       [offset]="page.pageNumber"
       [limit]="page.size"
-      [messages]="messages"
+      [messages]="page.messages"
       (page)='setPage($event)' >
       <ng-template #editTmpl let-value="value">
           <strong>{{value.subject}}</strong>

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.GroupRequest;
+import pl.timetable.api.GroupResponse;
 import pl.timetable.dto.GroupDto;
 import pl.timetable.entity.Course;
 import pl.timetable.entity.Group;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class GroupServiceImpl extends AbstractService<GroupDto, GroupRequest> {
+public class GroupServiceImpl extends AbstractService<GroupDto, GroupRequest, GroupResponse> {
 
     public static final Logger LOGGER = Logger.getLogger(GroupServiceImpl.class);
 
@@ -43,6 +44,21 @@ public class GroupServiceImpl extends AbstractService<GroupDto, GroupRequest> {
             return mapEntityToDto(group);
 
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public GroupResponse find(GroupRequest request) {
+        GroupResponse groupResponse = new GroupResponse();
+        Integer first = request.getPageNumber() * request.getSize();
+        Integer max = first + request.getSize();
+        List<Group> groupList = groupRepository.getResult(first, max).orElse(Collections.emptyList());
+        groupResponse.setData(groupList.stream().map(group -> {
+            Hibernate.initialize(group.getCourse());
+            Hibernate.initialize(group.getCourse().getSubjectSet());
+            return mapEntityToDto(group);
+        }).collect(Collectors.toList()));
+        groupResponse.setTotalElements(findAll().size());
+        return groupResponse;
     }
 
     @Override

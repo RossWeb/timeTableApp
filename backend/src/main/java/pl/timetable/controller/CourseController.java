@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.CourseRequest;
+import pl.timetable.api.CourseResponse;
 import pl.timetable.dto.CourseDto;
 import pl.timetable.entity.Subject;
 import pl.timetable.exception.EntityDuplicateFoundException;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/course")
-public class CourseController extends GenericRestController<CourseDto, CourseRequest> {
+public class CourseController extends GenericRestController<CourseDto, CourseRequest, CourseResponse> {
 
     private static final Logger LOGGER = Logger.getLogger(CourseController.class);
 

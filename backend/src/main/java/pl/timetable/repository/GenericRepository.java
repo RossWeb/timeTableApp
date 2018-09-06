@@ -14,4 +14,6 @@ public interface GenericRepository<T extends Object> {
     T getById(Integer id);
 
     Optional<List<T>> findAll();
+
+    Optional<List<T>> getResult(Integer first, Integer max);
 }

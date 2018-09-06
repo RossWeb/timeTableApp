@@ -23,11 +23,13 @@ export class Course implements Table {
     const params = [
       {
         value : 'Nazwa',
+        data: 'name',
         type : 'Input'
       },
       {
         value : 'Przedmioty',
-        type : 'Input'
+        data: "subjectSet",
+        type : 'Select'
       }
     ];
     return params;

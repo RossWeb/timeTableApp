@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.SubjectRequest;
+import pl.timetable.api.SubjectResponse;
 import pl.timetable.dto.SubjectDto;
 import pl.timetable.entity.Subject;
 import pl.timetable.exception.EntityNotFoundException;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectRequest> {
+public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectRequest, SubjectResponse> {
 
     public static final Logger LOGGER = Logger.getLogger(SubjectServiceImpl.class);
 
@@ -36,6 +37,17 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
     public List<SubjectDto> findAll() {
         List<Subject> subjectList = subjectRepository.findAll().orElse(Collections.emptyList());
         return subjectList.stream().map(SubjectServiceImpl::mapEntityToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public SubjectResponse find(SubjectRequest request) {
+        SubjectResponse subjectResponse = new SubjectResponse();
+        Integer first = request.getPageNumber() * request.getSize();
+        Integer max = first + request.getSize();
+        List<Subject> subjectList = subjectRepository.getResult(first, max).orElse(Collections.emptyList());
+        subjectResponse.setData(subjectList.stream().map(SubjectServiceImpl::mapEntityToDto).collect(Collectors.toList()));
+        subjectResponse.setTotalElements(findAll().size());
+        return subjectResponse;
     }
 
     @Override

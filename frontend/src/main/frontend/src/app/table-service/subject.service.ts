@@ -34,6 +34,11 @@ export class SubjectService extends TableService<Subject> {
     return this.http.get<Subject>('api/subject');
   }
 
+  find(page: TablePage, dataTableValues: string[]){
+    page.data =  this.type.getParams(dataTableValues);
+    return this.http.post('api/subject/find', page);
+  }
+
   getName(): string {
     return 'Subject';
   }

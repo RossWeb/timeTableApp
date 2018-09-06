@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.timetable.api.BaseResponse;
 import pl.timetable.api.ReportPopulationRequest;
 import pl.timetable.dto.ReportPopulationDto;
 import pl.timetable.entity.ReportPopulation;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ReportPopulationService extends AbstractService<ReportPopulationDto, ReportPopulationRequest> {
+public class ReportPopulationService extends AbstractService<ReportPopulationDto, ReportPopulationRequest, BaseResponse> {
 
     public static final Logger LOGGER = Logger.getLogger(ReportPopulationService.class);
 
@@ -40,6 +41,11 @@ public class ReportPopulationService extends AbstractService<ReportPopulationDto
     public List<ReportPopulationDto> findAll() {
         List<ReportPopulation> reportPopulations = reportPopulationRepository.findAll().orElse(Collections.emptyList());
         return reportPopulations.stream().map(this::mapEntityToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public BaseResponse find(ReportPopulationRequest request) {
+        return null;
     }
 
     @Override

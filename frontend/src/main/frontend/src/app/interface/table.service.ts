@@ -10,6 +10,8 @@ export abstract class TableService<T> {
 
   abstract list() : any;
 
+  abstract find(page: TablePage, dataTableValues: string[]) : any;
+
   abstract get(id: string): any;
 
   abstract getName(): string;

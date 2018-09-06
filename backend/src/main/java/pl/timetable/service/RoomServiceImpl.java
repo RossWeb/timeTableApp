@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.RoomRequest;
+import pl.timetable.api.RoomResponse;
 import pl.timetable.dto.RoomDto;
 import pl.timetable.entity.Room;
 import pl.timetable.exception.EntityNotFoundException;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
+public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest, RoomResponse> {
 
     public static final Logger LOGGER = Logger.getLogger(RoomServiceImpl.class);
 
@@ -35,6 +36,17 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest> {
     public List<RoomDto> findAll() {
         List<Room> roomList = roomRepository.findAll().orElse(Collections.emptyList());
         return roomList.stream().map(RoomServiceImpl::mapEntityToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public RoomResponse find(RoomRequest request) {
+        RoomResponse roomResponse = new RoomResponse();
+        Integer first = request.getPageNumber() * request.getSize();
+        Integer max = first + request.getSize();
+        List<Room> roomList = roomRepository.getResult(first, max).orElse(Collections.emptyList());
+        roomResponse.setData(roomList.stream().map(RoomServiceImpl::mapEntityToDto).collect(Collectors.toList()));
+        roomResponse.setTotalElements(findAll().size());
+        return roomResponse;
     }
 
     @Override

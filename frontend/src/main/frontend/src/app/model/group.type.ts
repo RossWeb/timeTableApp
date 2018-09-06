@@ -24,10 +24,12 @@ export class Group implements Table {
     const params = [
       {
         value : 'Nazwa',
+        data: 'name',
         type : 'Input'
       },
       {
         value : 'Kierunek',
+        data: 'course',
         type : 'Select'
       }
     ];

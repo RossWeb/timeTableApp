@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.CourseRequest;
+import pl.timetable.api.CourseResponse;
 import pl.timetable.dto.CourseDto;
 import pl.timetable.entity.Course;
 import pl.timetable.entity.Subject;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest> {
+public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest, CourseResponse> {
 
     public static final Logger LOGGER = Logger.getLogger(CourseServiceImpl.class);
 
@@ -39,6 +40,20 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest>
             Hibernate.initialize(course.getSubjectSet());
             return mapEntityToDto(course);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public CourseResponse find(CourseRequest request) {
+        CourseResponse courseResponse = new CourseResponse();
+        Integer first = request.getPageNumber() * request.getSize();
+        Integer max = first + request.getSize();
+        List<Course> courseList = courseRepository.getResult(first, max).orElse(Collections.emptyList());
+        courseResponse.setData(courseList.stream().map(course -> {
+            Hibernate.initialize(course.getSubjectSet());
+            return mapEntityToDto(course);
+        }).collect(Collectors.toList()));
+        courseResponse.setTotalElements(findAll().size());
+        return courseResponse;
     }
 
     @Override

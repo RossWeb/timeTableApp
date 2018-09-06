@@ -6,18 +6,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.BaseRequest;
+import pl.timetable.api.BaseResponse;
 import pl.timetable.entity.BaseEntity;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.service.AbstractService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-public class GenericRestController<T1 , T2 extends BaseRequest> {
+public class GenericRestController<T1 , T2 extends BaseRequest, R1 extends BaseResponse> {
 
     private final Logger logger;
 
     @Autowired
-    private AbstractService<T1, T2> service;
+    private AbstractService<T1, T2, R1> service;
 
     public GenericRestController(Logger logger) {
         this.logger = logger;
@@ -28,6 +30,12 @@ public class GenericRestController<T1 , T2 extends BaseRequest> {
         return service.findAll();
     }
 
+    @PostMapping(value = "/find")
+    @ResponseStatus(HttpStatus.OK)
+    public R1 find(@RequestBody T2 request) {
+        logger.info("Try to find entity from request : " + request);
+        return service.find(request);
+    }
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void create(@RequestBody T2 request) throws EntityNotFoundException {

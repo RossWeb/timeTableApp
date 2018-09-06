@@ -57,6 +57,11 @@ export class CourseService extends TableService<Course> {
     return this.http.get<Course>('api/course/' + this.getParametersUrlIfNeeded());
   }
 
+  find(page: TablePage, dataTableValues: string[]){
+    page.data =  this.type.getParams(dataTableValues);
+    return this.http.post('api/course/find', page);
+  }
+
   get(id: string): any {
     return  this.http.get<Course>('api/course/' + this.getParametersUrlIfNeeded() + id);
   }

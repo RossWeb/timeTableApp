@@ -50,7 +50,7 @@ export class TableBaseComponent implements OnInit {
 
   ngOnInit() {
     this.service = this.tableServiceProvider.getServiceByName(this.tableTypeName);
-    this.list();
+    // this.list();
     this.selectDefinions =
     this.service.getDefinions().subscribe(
       dataDefinions => {

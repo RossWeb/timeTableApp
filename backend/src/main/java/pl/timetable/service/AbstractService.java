@@ -1,14 +1,17 @@
 package pl.timetable.service;
 
 import pl.timetable.api.BaseRequest;
+import pl.timetable.api.BaseResponse;
 import pl.timetable.entity.BaseEntity;
 import pl.timetable.exception.EntityNotFoundException;
 
 import java.util.List;
 
-public abstract class AbstractService<T, T2 extends BaseRequest> {
+public abstract class AbstractService<T, T2 extends BaseRequest, R1 extends BaseResponse> {
 
     public abstract List<T> findAll();
+
+    public abstract R1 find(T2 request);
 
     public abstract void create(T2 request) throws EntityNotFoundException;
 

@@ -28,6 +28,11 @@ export class GroupService extends TableService<Group> {
     {responseType: 'text'});
   }
 
+  find(page: TablePage, dataTableValues: string[]){
+    page.data =  this.type.getParams(dataTableValues);
+    return this.http.post('api/group/find', page);
+  }
+
   list() {
     return this.http.get<Group>('/api/group').map(res => {return this.getResponse(res)});
   }

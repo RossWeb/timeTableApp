@@ -3,6 +3,8 @@ package pl.timetable.service;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Service;
 import pl.timetable.api.TimeTableRequest;
+import pl.timetable.api.TimeTableResponse;
+import pl.timetable.api.TimeTableResultResponse;
 import pl.timetable.dto.TimeTableDto;
 import pl.timetable.dto.TimeTablePagingDto;
 import pl.timetable.dto.TimeTableResultDto;
@@ -17,7 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class TimeTableService extends AbstractService<TimeTableDto, TimeTableRequest> {
+public class TimeTableService extends AbstractService<TimeTableDto, TimeTableRequest, TimeTableResultResponse> {
 
     private GroupServiceImpl groupService;
     private RoomServiceImpl roomService;
@@ -38,6 +40,11 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
     public List<TimeTableDto> findAll() {
         List<TimeTable> timeTablelist = timeTableRepository.findAll().orElse(Collections.emptyList());
         return timeTablelist.stream().map(this::mapEntityToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public TimeTableResultResponse find(TimeTableRequest request) {
+        return null;
     }
 
     @Override

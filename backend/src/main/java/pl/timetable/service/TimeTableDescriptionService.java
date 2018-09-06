@@ -3,6 +3,7 @@ package pl.timetable.service;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.timetable.api.BaseResponse;
 import pl.timetable.api.TimeTableDescritpionRequest;
 import pl.timetable.dto.TimeTableDescriptionDto;
 import pl.timetable.entity.Subject;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class TimeTableDescriptionService extends AbstractService<TimeTableDescriptionDto, TimeTableDescritpionRequest> {
+public class TimeTableDescriptionService extends AbstractService<TimeTableDescriptionDto, TimeTableDescritpionRequest, BaseResponse> {
 
     public static final Logger LOGGER = Logger.getLogger(TimeTableDescriptionService.class);
 
@@ -37,6 +38,11 @@ public class TimeTableDescriptionService extends AbstractService<TimeTableDescri
     public List<TimeTableDescriptionDto> findAll() {
         List<TimeTableDescription> timeTableDescriptionList = timeTableDescriptionRepository.findAll().orElse(Collections.emptyList());
         return timeTableDescriptionList.stream().map(TimeTableDescriptionService::mapEntityToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public BaseResponse find(TimeTableDescritpionRequest request) {
+        return null;
     }
 
     @Override
