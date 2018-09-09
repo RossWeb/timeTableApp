@@ -81,7 +81,7 @@
         </ngx-datatable>
       </div>
       <div *ngIf="relationParameterName !== null;" class="col-md-4">
-        <app-table-parameter #courseParameter [hidden]="hiddenParameters" [tableTypeName]="'Course'" [isParameter]="true">Loading..</app-table-parameter>
+        <app-table-parameter #courseParameter [hidden]="hiddenParameters" [tableTypeName]="relationParameterName" [isParameter]="true">Loading..</app-table-parameter>
       </div>
     </div>
     <!-- <div class="row">

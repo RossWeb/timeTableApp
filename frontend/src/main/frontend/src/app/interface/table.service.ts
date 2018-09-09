@@ -8,8 +8,26 @@ import {Table} from "../interface/table.type";
 export class TableService<T extends Table> {
 
   protected type : T;
+  protected isParameterTable : boolean;
+  protected primaryKey : number;
 
   constructor(protected http: HttpClient) {
+  }
+
+  setParameterTable(isParameterTable: boolean){
+    this.isParameterTable = isParameterTable;
+  }
+
+  setPrimaryKey(primaryKey : number){
+    this.primaryKey = primaryKey;
+  }
+
+  getParametersUrlIfNeeded() : string {
+    if(this.isParameterTable){
+      return this.primaryKey + '/parameters/';
+    }else{
+      return '';
+    }
   }
 
   create(name: string, dataTableValues: string[]) {
@@ -33,7 +51,7 @@ export class TableService<T extends Table> {
 
   find(page: TablePage, dataTableValues: string[]){
     page.data =  this.type.getParams(dataTableValues);
-    return this.http.post<PagedData<T>>(this.type.getApiUrl() + 'find', page);
+    return this.http.post<PagedData<T>>(this.type.getApiUrl() + 'find/' +  this.getParametersUrlIfNeeded(), page);
   }
 
   get(id: string): any {

@@ -8,6 +8,7 @@ import {GroupService} from "../table-service/group.service";
 import {CourseService} from "../table-service/course.service";
 import {SubjectService} from "../table-service/subject.service";
 import {HoursLectureService} from "../table-service/hours.lecture.service";
+import {TeacherService} from "../table-service/teacher.service";
 
 
 @Component({
@@ -18,7 +19,7 @@ import {HoursLectureService} from "../table-service/hours.lecture.service";
   '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
   '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
   ],
-  providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider, HoursLectureService],
+  providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider, HoursLectureService, TeacherService],
   encapsulation: ViewEncapsulation.None
 })
 export class TableComponentComponent extends TableBaseComponent implements OnInit {

@@ -12,7 +12,7 @@ import pl.timetable.entity.Subject;
 @RequestMapping("/api/subject")
 public class SubjectController extends GenericRestController<SubjectDto, SubjectRequest, SubjectResponse> {
 
-    private static final Logger LOGGER = Logger.getLogger(Subject.class);
+    private static final Logger LOGGER = Logger.getLogger(SubjectController.class);
 
     public SubjectController() {
         super(LOGGER);

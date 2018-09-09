@@ -3,6 +3,7 @@ import {Table} from "../interface/table.type";
 export class Course implements Table {
   id: number;
   name: string;
+  subjectSet: any;
 
   getType(): string{
     return 'Course';
@@ -15,6 +16,7 @@ export class Course implements Table {
   getParams(dataTableValues: string[]): any {
     const params = {
       name : dataTableValues[0],
+      subjectId : dataTableValues[1]
     };
     return params;
   }
@@ -36,7 +38,7 @@ export class Course implements Table {
   }
 
   getRelationParameterName() : string {
-    return 'Subject';
+    return 'Course';
   }
 
   getApiUrl() : string {

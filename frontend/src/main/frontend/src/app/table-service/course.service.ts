@@ -6,35 +6,18 @@ import {TableService} from "../interface/table.service";
 import {Course} from "../model/course.type";
 import {TablePage} from '../model/page.type';
 import {PagedData} from '../model/paged-data.type';
-
+import {SubjectService} from "../table-service/subject.service";
 
 
 @Injectable()
 export class CourseService extends TableService<Course> {
   // private type;
-  private isParameterTable : boolean;
-  private primaryKey : number;
 
-  constructor(protected http: HttpClient) {
+  constructor(protected http: HttpClient, private subjectService: SubjectService) {
     super(http);
     this.type = new Course();
   }
 
-  private getParametersUrlIfNeeded() : string {
-    if(this.isParameterTable){
-      return this.primaryKey + '/parameters/';
-    }else{
-      return '';
-    }
-  }
-
-  setParameterTable(isParameterTable: boolean){
-    this.isParameterTable = isParameterTable;
-  }
-
-  setPrimaryKey(primaryKey : number){
-    this.primaryKey = primaryKey;
-  }
 
   create(name: string, dataTableValues: string[]) {
     return this.http.post('api/course/' + this.getParametersUrlIfNeeded(), this.type.getParams(dataTableValues),
@@ -81,7 +64,18 @@ export class CourseService extends TableService<Course> {
   }
 
   getDefinions(): any {
-    return new Observable(observer => {});
+    return new Observable(observer => {
+        observer.next(this.subjectService.list()
+          .map(
+            data => {
+              const params = {
+                Przedmioty : data
+              };
+              return params
+            }
+          ));
+          observer.complete();
+    });
   }
 
   getRelationParameterName() : string {

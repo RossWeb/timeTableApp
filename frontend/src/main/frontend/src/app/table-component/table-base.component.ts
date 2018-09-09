@@ -4,6 +4,7 @@ import {RoomService} from "../table-service/room.service";
 import {GroupService} from "../table-service/group.service";
 import {CourseService} from "../table-service/course.service";
 import {SubjectService} from "../table-service/subject.service";
+import {TeacherService} from "../table-service/teacher.service";
 import {HoursLectureService} from "../table-service/hours.lecture.service";
 import {Table} from "../interface/table.type";
 import {TablePage} from '../model/page.type';
@@ -34,7 +35,7 @@ export class ValuesPipe implements PipeTransform {
   '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
   '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
   ],
-  providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider, HoursLectureService]
+  providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider, HoursLectureService, TeacherService]
 
 
 })
@@ -42,7 +43,7 @@ export class TableBaseComponent implements OnInit {
 
   protected service;
 
-  @Input('isParameter') isParameter: boolean;
+  @Input('isParameter') isParameter: boolean = false;
   @Input('dataTableValues') dataTableValues: string[] = [];
   @Input('tableTypeName') tableTypeName: string;
   @Output('tableRows') tableRows: any;

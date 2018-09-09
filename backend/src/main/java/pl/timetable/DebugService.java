@@ -32,16 +32,20 @@ public class DebugService {
 
     private HoursLectureRepository hoursLectureRepository;
 
+    private TeacherRepository teacherRepository;
+
     @Autowired
     public DebugService(CourseRepository courseRepository,
                         SubjectRepository subjectRepository,
                         RoomRepository roomRepository,
                         HoursLectureRepository hoursLectureRepository,
+                        TeacherRepository teacherRepository,
                         GroupRepository groupRepository) {
         this.courseRepository = courseRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
         this.hoursLectureRepository = hoursLectureRepository;
+        this.teacherRepository = teacherRepository;
         this.roomRepository = roomRepository;
     }
 
@@ -81,6 +85,7 @@ public class DebugService {
     public void init() {
         Logger.info("Fill datatable default value");
         Set<Subject> subjectSet = new HashSet<>();
+        Set<Subject> allSubjects = new HashSet<>();
         Set<Course> courseSet = new HashSet<>();
         for (int i = 0; i < 3 ; i++) {
             Subject subject1 = createSubject("Matematyka" + i);
@@ -88,9 +93,13 @@ public class DebugService {
             Subject subject3 = createSubject("Fizyka" + i);
             Subject subject4 = createSubject("Biologia" + i);
             subjectSet.add(subject1);
+            allSubjects.add(subject1);
             subjectSet.add(subject2);
+            allSubjects.add(subject2);
             subjectSet.add(subject3);
+            allSubjects.add(subject3);
             subjectSet.add(subject4);
+            allSubjects.add(subject4);
 
         }
         for (int i = 0; i < 2 ; i++) {
@@ -122,6 +131,29 @@ public class DebugService {
             hoursLecture.setStartLectureTime(localTime);
             hoursLecture.setPosition(i+1);
             hoursLectureRepository.create(hoursLecture);
+        }
+
+        final String surname1 = "Kowalski";
+        final String surname2 = "Malinowski";
+        final String name1 = "Adam";
+        final String name2 = "Jan";
+
+        for(int i=0; i < 10; i++){
+            Teacher teacher = new Teacher();
+            teacher.setSurname((new Random().nextBoolean() ? surname1 : surname2) + " " + i);
+            teacher.setName((new Random().nextBoolean() ? name1 : name2) + " " + i);
+            Set<Subject> subjectSetTeacher = new HashSet<>();
+            do{
+                Integer position = new Random().ints(0, allSubjects.size()).findFirst().getAsInt();
+                Subject subject = (Subject) allSubjects.toArray()[position];
+                if(!subjectSetTeacher.contains(subject)) {
+                    subjectSetTeacher.add(subject);
+                }
+            }while (subjectSetTeacher.size() <= 3);
+
+            teacher.setSubjectSet(subjectSetTeacher);
+            teacherRepository.create(teacher);
+
         }
     }
 

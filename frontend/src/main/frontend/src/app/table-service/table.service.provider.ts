@@ -6,6 +6,7 @@ import {GroupService} from "../table-service/group.service";
 import {CourseService} from "../table-service/course.service";
 import {SubjectService} from "../table-service/subject.service";
 import {HoursLectureService} from "../table-service/hours.lecture.service";
+import {TeacherService} from "../table-service/teacher.service";
 
 @Injectable()
 export class TableServiceProvider {
@@ -14,10 +15,10 @@ export class TableServiceProvider {
 
   constructor(private roomService : RoomService, private groupService : GroupService,
       private courseService: CourseService, private subjectService: SubjectService,
-      private hoursLectureService: HoursLectureService
+      private hoursLectureService: HoursLectureService, private teacherService : TeacherService
     ) {
       this.tableServiceArray = [
-        roomService, groupService, courseService, subjectService, hoursLectureService
+        roomService, groupService, courseService, subjectService, hoursLectureService, teacherService
       ];
   }
 
