@@ -42,5 +42,8 @@ export class Subject implements Table {
     return null;
   }
 
+  getApiUrl() : string {
+    return '/api/subject/';
+  }
 
 }

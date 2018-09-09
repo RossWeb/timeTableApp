@@ -41,4 +41,8 @@ export class Room implements Table {
     return null;
   }
 
+  getApiUrl() : string {
+    return '/api/room/';
+  }
+
 }

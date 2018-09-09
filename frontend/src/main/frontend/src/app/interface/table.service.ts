@@ -1,31 +1,68 @@
 import {TablePage} from '../model/page.type';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import {PagedData} from '../model/paged-data.type';
+import { HttpClient } from '@angular/common/http';
+import {Table} from "../interface/table.type";
 
-export abstract class TableService<T> {
+export class TableService<T extends Table> {
 
   protected type : T;
 
-  abstract create(name: string, dataTableValues: string[]): any;
+  constructor(protected http: HttpClient) {
+  }
 
-  abstract update(dataTableValues: string[], id: string): any;
+  create(name: string, dataTableValues: string[]) {
+    return this.http.post(this.type.getApiUrl(), this.type.getParams(dataTableValues),
+      {responseType: 'text'});
+  }
 
-  abstract remove(id: string): any;
 
-  abstract list() : any;
+  remove(id: string){
+    return this.http.delete(this.type.getApiUrl() + id,{responseType: 'text'})
+  }
 
-  abstract find(page: TablePage, dataTableValues: string[]) : any;
+  update(dataTableValues: string[], id: string){
+    return this.http.put(this.type.getApiUrl() + id, this.type.getParams(dataTableValues),
+    {responseType: 'text'});
+  }
 
-  abstract get(id: string): any;
+  list() {
+    return this.http.get<T>(this.type.getApiUrl());
+  }
 
-  abstract getName(): string;
+  find(page: TablePage, dataTableValues: string[]){
+    page.data =  this.type.getParams(dataTableValues);
+    return this.http.post<PagedData<T>>(this.type.getApiUrl() + 'find', page);
+  }
 
-  abstract getDataTableParameters(): string[];
+  get(id: string): any {
+    return  this.http.get<T>(this.type.getApiUrl() + id);
+  }
 
-  abstract getTitle(): string;
+  getName(): string {
+    return this.type.getType();
+  }
 
-  abstract getDefinions(): any;
 
-  abstract getRelationParameterName() : string;
+  getDataTableParameters(): string[] {
+    return this.type.getDataTableParameters();
+  }
 
-  abstract transformValues(data: any) : any;
+  getTitle(): string {
+    return this.type.getTitle();
+  }
+
+  getDefinions(): any {
+    return new Observable(observer => {});
+  }
+
+  getRelationParameterName() : string {
+    return this.type.getRelationParameterName();
+  }
+
+  transformValues(data) : any {
+    return data;
+  }
 
 }

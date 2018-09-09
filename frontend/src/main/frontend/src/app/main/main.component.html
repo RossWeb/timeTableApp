@@ -10,7 +10,6 @@
     <div class="col-md-3">
       <div class="form-group" [ngClass]="displayFieldCss('weeksPerSemester')">
         <label for="weeksPerSemestr">Ilość tygodni w semestrze</label>
-<!-- formControlName="weeksPerSemestrFormC" #weeksPerSemestr="ngModel" required -->
         <input  type="number" formControlName="weeksPerSemester"
           min="1" class="form-control" id="weeksPerSemestr" placeholder="Tygodnie w semestrze">
       </div>
@@ -60,17 +59,28 @@
         <input type="number"  formControlName="populationSize" min="1" class="form-control " id="populationSize" placeholder="Liczba osobników">
       </div>
     </div>
-    <div class="col-md-2 col-md-offset-1">
+    <div class="col-md-3">
+      <div class="form-group" [ngClass]="displayFieldCss('lectureHour')">
+        <label for="lectureHour">Długość zajęć</label>
+        <input type="number"  formControlName="lectureHour" min="0" class="form-control " id="lectureHour" placeholder="Czas w minutach">
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-2 col-md-offset-10">
       <button (click)="init()" type="button" [disabled]="!form.valid" id="generateButton" class="btn btn-secondary pull-right top1">Generuj</button>
     </div>
   </div>
 </form>
   <div class="row">
-    <div class="form-group">
-      <label for="groupList">Grupa : </label>
-      <select class="form-control" id="groupList" (ngModelChange)="groupSelect($event)" [(ngModel)]="selectedGroupValue">
-        <option *ngFor="let group of groups" [ngValue]="group.id">{{group.name}}</option>
-      </select>
+    <div class="col-md-3 col-md-offset-9">
+      <div class="form-group">
+        <label for="groupList">Grupa : </label>
+        <select class="form-control" id="groupList" (ngModelChange)="groupSelect($event)" [(ngModel)]="selectedGroupValue">
+          <option *ngFor="let group of groups" [ngValue]="group.id">{{group.name}}</option>
+        </select>
+      </div>
+    </div>
   </div>
   <div class="row">
       <ngx-datatable

@@ -13,8 +13,8 @@ import {PagedData} from '../model/paged-data.type';
 export class SubjectService extends TableService<Subject> {
   // private type;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(protected http: HttpClient) {
+    super(http);
     this.type = new Subject();
   }
 

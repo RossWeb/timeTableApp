@@ -6,16 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.timetable.api.HoursLectureRequest;
 import pl.timetable.dto.GeneticInitialData;
-import pl.timetable.entity.Course;
-import pl.timetable.entity.Group;
-import pl.timetable.entity.Room;
-import pl.timetable.entity.Subject;
-import pl.timetable.repository.CourseRepository;
-import pl.timetable.repository.GroupRepository;
-import pl.timetable.repository.RoomRepository;
-import pl.timetable.repository.SubjectRepository;
+import pl.timetable.entity.*;
+import pl.timetable.repository.*;
 
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -34,16 +30,18 @@ public class DebugService {
 
     private RoomRepository roomRepository;
 
-
+    private HoursLectureRepository hoursLectureRepository;
 
     @Autowired
     public DebugService(CourseRepository courseRepository,
                         SubjectRepository subjectRepository,
                         RoomRepository roomRepository,
+                        HoursLectureRepository hoursLectureRepository,
                         GroupRepository groupRepository) {
         this.courseRepository = courseRepository;
         this.subjectRepository = subjectRepository;
         this.groupRepository = groupRepository;
+        this.hoursLectureRepository = hoursLectureRepository;
         this.roomRepository = roomRepository;
     }
 
@@ -113,6 +111,17 @@ public class DebugService {
         }
         for (int i = 0; i < 10; i++) {
             createRoom("room" + i, String.valueOf(i));
+        }
+
+        for (int i = 0; i < 4; i++) {
+            HoursLecture hoursLecture = new HoursLecture();
+            LocalTime localTime = LocalTime.now();
+            if(i != 0){
+                localTime = localTime.plusHours(i);
+            }
+            hoursLecture.setStartLectureTime(localTime);
+            hoursLecture.setPosition(i+1);
+            hoursLectureRepository.create(hoursLecture);
         }
     }
 

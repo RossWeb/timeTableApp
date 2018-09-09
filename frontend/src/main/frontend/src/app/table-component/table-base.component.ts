@@ -4,6 +4,7 @@ import {RoomService} from "../table-service/room.service";
 import {GroupService} from "../table-service/group.service";
 import {CourseService} from "../table-service/course.service";
 import {SubjectService} from "../table-service/subject.service";
+import {HoursLectureService} from "../table-service/hours.lecture.service";
 import {Table} from "../interface/table.type";
 import {TablePage} from '../model/page.type';
 import { Pipe, PipeTransform } from '@angular/core';
@@ -33,7 +34,7 @@ export class ValuesPipe implements PipeTransform {
   '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
   '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
   ],
-  providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider]
+  providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider, HoursLectureService]
 
 
 })
@@ -163,7 +164,7 @@ export class TableBaseComponent implements OnInit {
     });
     if(this.isEditButton){
       tempCols.push({name:"Edytuj",cellTemplate: this.editTmpl});
-      tempCols.push({name:"usun",cellTemplate: this.addDelTmpl});
+      tempCols.push({name:"Usun",cellTemplate: this.addDelTmpl});
     }else{
       tempCols.push({name:"Modyfikuj",cellTemplate: this.addDelTmpl});
     }

@@ -39,5 +39,9 @@ export class Course implements Table {
     return 'Subject';
   }
 
+  getApiUrl() : string {
+    return '/api/course/';
+  }
+
 
 }

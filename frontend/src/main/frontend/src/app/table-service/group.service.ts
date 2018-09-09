@@ -11,8 +11,8 @@ import {PagedData} from '../model/paged-data.type';
 @Injectable()
 export class GroupService extends TableService<Group> {
 
-  constructor(private courseService: CourseService, private http: HttpClient) {
-    super();
+  constructor(private courseService: CourseService, protected http: HttpClient) {
+    super(http);
     this.type = new Group();
   }
 

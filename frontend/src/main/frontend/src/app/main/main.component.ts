@@ -5,10 +5,12 @@ import {TimeTable} from '../model/timeTable.type';
 import {Observable} from 'rxjs/Rx';
 import { ViewEncapsulation } from '@angular/core';
 import {MainService} from './main.service';
+import {HoursLectureService} from '../table-service/hours.lecture.service';
 import { FormGroup, FormControl,FormBuilder, Validators } from '@angular/forms';
 import {ReportComponent} from '../report/report.component';
 import {PagedData} from '../model/paged-data.type';
 import {TimeTablePage} from '../model/page.type';
+import {TablePage} from '../model/page.type';
 import {Main} from '../model/main.type';
 
 @Injectable()
@@ -50,7 +52,7 @@ export class StartedDateValidator {
    '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
    '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
     ],
-    providers: [ReportService, MainService],
+    providers: [ReportService, MainService, HoursLectureService],
     encapsulation: ViewEncapsulation.None
  })
 export class MainComponent implements OnInit {
@@ -72,9 +74,10 @@ export class MainComponent implements OnInit {
   private cols = [];
   private dayMap = new Map();
   private groups = [];
-
+  private lectureHour = 0;
 
   constructor(private reportService : ReportService, private mainService : MainService,
+              private hoursLectureService : HoursLectureService,
               private formBuilder : FormBuilder) {
     this.page.pageNumber = 0;
     this.page.size = 0;
@@ -83,6 +86,7 @@ export class MainComponent implements OnInit {
     this.lecturePerDay = 5;
     this.daysPerWeek = 4;
     this.startedDay = 2;
+    this.lectureHour = 90;
     this.dayMap.set(1, 'Poniedziałek');
     this.dayMap.set(2, 'Wtorek');
     this.dayMap.set(3, 'Sroda');
@@ -103,6 +107,7 @@ export class MainComponent implements OnInit {
       startedDate: [null, [Validators.required, DateValidator.date]],
       startedDay: [null, [Validators.required, StartedDateValidator.startedDateValidate]],
       mutationValue: [null, [Validators.required]],
+      lectureHour: [null, [Validators.required]],
       populationSize: [null, [Validators.required]]
     });
     this.form.get('numberPerDay').value = (this.lecturePerDay);
@@ -112,6 +117,7 @@ export class MainComponent implements OnInit {
     this.form.get('populationSize').value = (100);
     this.form.get('startedDay').value = (this.startedDay);
     this.form.get('startedDate').value = ('2018-10-02');
+    this.form.get('lectureHour').value = (this.lectureHour);
     this.form.statusChanges.subscribe(
       result => {
         if(result === 'VALID'){
@@ -130,7 +136,7 @@ export class MainComponent implements OnInit {
     // );
   }
 
-  mapRowsAndCols(data: Main[]){
+  mapRowsAndCols(data: Main[], hoursLecture: any){
     let tempCols = [];
     let tempRows = [];
     let endPosition = this.startedDay + this.daysPerWeek;
@@ -148,9 +154,11 @@ export class MainComponent implements OnInit {
     let lectureStartPosition = 0;
     let lectureEndPosition = this.lecturePerDay -1;
 
+
+
     for(var i = 0; i < this.lecturePerDay; i++){
       tempRow = {};
-      tempRow['godziny'] = i;
+      tempRow['godziny'] = hoursLecture.get(i+1);
       tempDataRows[i] = tempRow;
     }
 
@@ -198,6 +206,28 @@ export class MainComponent implements OnInit {
     this.rows = tempDataRows;
   }
 
+  getHoursLecture(pagedData: any){
+    let  hoursLecturePage = new TablePage();
+    hoursLecturePage.pageNumber = 0;
+    hoursLecturePage.size = this.lecturePerDay;
+    this.hoursLectureService.find(hoursLecturePage, new Array()).subscribe(
+      hoursLecture => {
+        let hoursLectureMap = new Map();
+        hoursLecture.data.forEach((hour) => {
+          let timeTokens = hour.startLectureTime.split(':');
+          let angularHour = new Date(1970,0,1, Number(timeTokens[0]), Number(timeTokens[1]),0);
+          let angularHourText = angularHour.getHours() + ':' + angularHour.getMinutes();
+          angularHourText += ' - ';
+          angularHour.setMinutes(angularHour.getMinutes() + this.lectureHour);
+          angularHourText += angularHour.getHours() + ':' + angularHour.getMinutes();
+          hoursLectureMap.set(hour.position, angularHourText);
+        });
+        this.mapRowsAndCols(pagedData.data, hoursLectureMap);
+      },
+      err => {console.log("Error when get hours lecture for timetable.")}
+    );
+  }
+
   initDataTable(){
     this.groups = [];
     this.mainService.getGroup().subscribe(
@@ -227,7 +257,7 @@ export class MainComponent implements OnInit {
       // this.page.totalPages = pagedData.totalPages;
       // this.page.size = this.lecturePerDay;
       if(pagedData != null && pagedData.totalElements != 0){
-        this.mapRowsAndCols(pagedData.data);
+        this.getHoursLecture(pagedData);
       }
       // this.rows = pagedData.data;
     });
@@ -262,6 +292,7 @@ export class MainComponent implements OnInit {
     this.initProcess = new InitProcess(this.form);
     this.lecturePerDay = this.initProcess.numberPerDay;
     this.daysPerWeek = this.initProcess.daysPerWeek;
+    this.lectureHour = this.form.get('lectureHour').value;
     this.mainService.initProcess(this.initProcess).subscribe(
       data => {
         this.reportService.setTimeTableId(data.timeTableId);

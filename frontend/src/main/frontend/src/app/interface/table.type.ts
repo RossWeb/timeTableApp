@@ -10,4 +10,6 @@ export interface Table {
 
   getRelationParameterName() : string;
 
+  getApiUrl() : string; 
+
 }

@@ -15,8 +15,8 @@ export class CourseService extends TableService<Course> {
   private isParameterTable : boolean;
   private primaryKey : number;
 
-  constructor(private http: HttpClient) {
-    super();
+  constructor(protected http: HttpClient) {
+    super(http);
     this.type = new Course();
   }
 

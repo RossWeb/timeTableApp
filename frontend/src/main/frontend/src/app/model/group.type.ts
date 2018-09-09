@@ -40,4 +40,8 @@ export class Group implements Table {
     return 'Course';
   }
 
+  getApiUrl() : string {
+    return '/api/group/';
+  }
+
 }
