@@ -131,6 +131,17 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest,
                 .orElseThrow(() -> new EntityNotFoundException(id, "SubjectList"));
     }
 
+    public List<Subject> findParameters(CourseRequest request){
+        Integer first = request.getPageNumber() * request.getSize();
+        Integer max = first + request.getSize();
+        return Optional.ofNullable(courseRepository.findParameters(request.getId(), first, max))
+                .orElse(Collections.emptyList());
+    }
+
+    public Integer findParametersCount(){
+        return subjectRepository.findAll().get().size();
+    }
+
     private Subject getSubject(Integer subjectId) throws EntityNotFoundException {
         return Optional.ofNullable(subjectRepository.getById(subjectId))
                 .orElseThrow(() -> new EntityNotFoundException(subjectId, "Subject"));

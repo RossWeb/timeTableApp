@@ -1,3 +1,5 @@
+import {TablePage} from '../model/page.type';
+
 export abstract class TableService<T> {
 
   protected type : T;

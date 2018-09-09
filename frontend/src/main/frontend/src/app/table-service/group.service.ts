@@ -5,6 +5,8 @@ import 'rxjs/add/operator/map';
 import {TableService} from "../interface/table.service";
 import {CourseService} from "../table-service/course.service";
 import {Group} from "../model/group.type";
+import {TablePage} from '../model/page.type';
+import {PagedData} from '../model/paged-data.type';
 
 @Injectable()
 export class GroupService extends TableService<Group> {
@@ -30,7 +32,7 @@ export class GroupService extends TableService<Group> {
 
   find(page: TablePage, dataTableValues: string[]){
     page.data =  this.type.getParams(dataTableValues);
-    return this.http.post('api/group/find', page);
+    return this.http.post<PagedData<Group>>('api/group/find', page);
   }
 
   list() {
@@ -81,6 +83,9 @@ export class GroupService extends TableService<Group> {
   }
 
   transformValues(data) : any {
+    for(let value of data) {
+      value.course = value.course.name;
+    }
     return data;
   }
 

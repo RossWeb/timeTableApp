@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output,Injectable, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output,Injectable, ViewChild, TemplateRef  } from '@angular/core';
 import {ReportService} from '../report/report.service';
 import {InitProcess} from '../model/initProcess.type';
 import {TimeTable} from '../model/timeTable.type';
@@ -7,8 +7,9 @@ import { ViewEncapsulation } from '@angular/core';
 import {MainService} from './main.service';
 import { FormGroup, FormControl,FormBuilder, Validators } from '@angular/forms';
 import {ReportComponent} from '../report/report.component';
-import {PagedData} from ',./model/paged-data.type';
+import {PagedData} from '../model/paged-data.type';
 import {TimeTablePage} from '../model/page.type';
+import {Main} from '../model/main.type';
 
 @Injectable()
 export class DateValidator {
@@ -71,7 +72,7 @@ export class MainComponent implements OnInit {
   private cols = [];
   private dayMap = new Map();
   private groups = [];
-  
+
 
   constructor(private reportService : ReportService, private mainService : MainService,
               private formBuilder : FormBuilder) {
@@ -129,7 +130,7 @@ export class MainComponent implements OnInit {
     // );
   }
 
-  mapRowsAndCols(data: any){
+  mapRowsAndCols(data: Main[]){
     let tempCols = [];
     let tempRows = [];
     let endPosition = this.startedDay + this.daysPerWeek;
@@ -154,7 +155,7 @@ export class MainComponent implements OnInit {
     }
 
     data.forEach((value, index) => {
-        let cellText = {};
+        let cellText = {subject: "", room: ""};
         let actualLecture = value.lectureNumber;
         if(value.subject !== null){
             cellText.subject = value.subject.name;
@@ -250,11 +251,11 @@ export class MainComponent implements OnInit {
               .switchMap(() => this.mainService.checkStatus(this.reportService.getTimeTableId()))
 
       .takeWhile(data => data.status === "PENDING")
-      .subscribe(res => console.log(res), error => console.log("error when status check "+error), complete=>
+      .subscribe(res => console.log(res), error => console.log("error when status check "+error), ()=>
       {
         this.reportComponent.initReport();
         this.initDataTable();
-      }););
+      });
   }
 
   init() {

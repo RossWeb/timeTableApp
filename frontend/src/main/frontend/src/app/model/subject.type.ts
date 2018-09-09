@@ -3,6 +3,7 @@ import {Table} from "../interface/table.type";
 export class Subject implements Table {
   id: number;
   name: string;
+  size: number;
 
   getType(): string{
     return 'Subject';
@@ -15,6 +16,7 @@ export class Subject implements Table {
   getParams(dataTableValues: string[]): any {
     const params = {
       name : dataTableValues[0],
+      size: dataTableValues[1]
     };
     return params;
   }
@@ -25,7 +27,13 @@ export class Subject implements Table {
         value : 'Nazwa',
         data : 'name',
         type : 'Input'
+      },
+      {
+        value : 'Liczba',
+        data : 'size',
+        type : 'Input'
       }
+
     ];
     return params;
   }

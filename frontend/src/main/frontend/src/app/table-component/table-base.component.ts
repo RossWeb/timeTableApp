@@ -1,11 +1,13 @@
-import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, Output, ViewChild, TemplateRef } from '@angular/core';
 import {TableServiceProvider} from "../table-service/table.service.provider";
 import {RoomService} from "../table-service/room.service";
 import {GroupService} from "../table-service/group.service";
 import {CourseService} from "../table-service/course.service";
 import {SubjectService} from "../table-service/subject.service";
 import {Table} from "../interface/table.type";
+import {TablePage} from '../model/page.type';
 import { Pipe, PipeTransform } from '@angular/core';
+
 
 
 const ADD_NAME = 'Dodaj';
@@ -26,26 +28,39 @@ export class ValuesPipe implements PipeTransform {
 @Component({
   selector: 'app-table-base-component',
   templateUrl: './table-component.component.html',
-  styleUrls: ['./table-component.component.css'],
+  styleUrls: ['./table-component.component.css',
+  '../../../node_modules/@swimlane/ngx-datatable/release/index.css',
+  '../../../node_modules/@swimlane/ngx-datatable/release/themes/material.css',
+  '../../../node_modules/@swimlane/ngx-datatable/release/assets/icons.css'
+  ],
   providers: [SubjectService, CourseService, RoomService, GroupService, TableServiceProvider]
+
+
 })
 export class TableBaseComponent implements OnInit {
 
   protected service;
 
+  @Input('isParameter') isParameter: boolean;
   @Input('dataTableValues') dataTableValues: string[] = [];
   @Input('tableTypeName') tableTypeName: string;
-  @Output('tableRows') tableRows: Table;
+  @Output('tableRows') tableRows: any;
   @Output('dataTableNames') dataTableNames: any;
   @Output('title') title : string;
   @Output('rowActive') rowActive : string;
   @Output('selectDefinions') selectDefinions : any;
   @Output('hiddenParameters') hiddenParameters : boolean = true;
   @Output('addButtonName') addButtonName : string = ADD_NAME;
+  @Output('relationParameterName') relationParameterName : string;
+  @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
+  @ViewChild('indexTmpl') indexTmpl: TemplateRef<any>;
+  @ViewChild('addDelTmpl') addDelTmpl: TemplateRef<any>;
+  private page = new TablePage();
+  private rows = [];
+  private cols = [];
 
-
-  constructor(protected tableServiceProvider: TableServiceProvider){
-
+  constructor(protected tableServiceProvider: TableServiceProvider, private isEditButton : boolean){
+    this.isEditButton = isEditButton;
   }
 
   ngOnInit() {
@@ -65,12 +80,17 @@ export class TableBaseComponent implements OnInit {
     );
     this.dataTableNames = this.service.getDataTableParameters();
     this.title = this.service.getTitle();
+    this.relationParameterName = this.service.getRelationParameterName();
+    this.page.pageNumber = 0;
+    this.page.size = 5;
+    this.setPage({ offset: 0 });
   }
 
   protected refreshTable(){
-    this.dataTableValues = [];
-    this.list();
-    this.addButtonName = ADD_NAME;
+    this.setPage({offset : this.page.pageNumber});
+    // this.dataTableValues = [];
+    // this.list();
+    // this.addButtonName = ADD_NAME;
   }
 
   add(){
@@ -103,11 +123,73 @@ export class TableBaseComponent implements OnInit {
   list(){
     this.service.list().subscribe(
       data => {
-        this.tableRows = data;
+        let dataFromPage = data;
         console.log(data);
+        this.tableRows = dataFromPage;
       },
       err => {console.log("Error occured when get all elements.")}
     );
   }
+
+  find(){
+    this.service.find(this.page, this.dataTableValues).subscribe(
+      data => {
+        let dataFromPage = data.data;
+        if(this.isParameter !== true){
+          dataFromPage = this.service.transformValues(dataFromPage);
+        }
+        this.tableRows = dataFromPage;
+        console.log(data);
+        this.page.totalElements = data.totalElements;
+        this.initTable();
+      },
+      err => {console.log("Error occured when get all elements.")}
+    );
+  }
+
+  handlePageChange(event){
+    this.setPage({ offset: (event.page -1)});
+  }
+
+  initTable(){
+    // this.page.pageNumber = pageInfo.offset;
+    let tempCols = [];
+    let tempRows = [];
+
+    console.log(this.tableRows);
+      tempCols.push({name:"#", cellTemplate: this.indexTmpl});
+    this.dataTableNames.forEach((element, index) => {
+      tempCols.push({name:element.value});
+    });
+    if(this.isEditButton){
+      tempCols.push({name:"Edytuj",cellTemplate: this.editTmpl});
+      tempCols.push({name:"usun",cellTemplate: this.addDelTmpl});
+    }else{
+      tempCols.push({name:"Modyfikuj",cellTemplate: this.addDelTmpl});
+    }
+
+    this.tableRows.forEach((elementData, indexData) => {
+      let cellData = {};
+      this.dataTableNames.forEach((elementDefinition, indexDefinition) => {
+        cellData[elementDefinition.value.toLowerCase()] = elementData[elementDefinition.data];
+      });
+      if(this.isEditButton){
+        cellData['edytuj'] = elementData;
+        cellData['usun'] = elementData.id;
+      }else{
+        cellData['modyfikuj'] = elementData;
+      }
+      tempRows.push(cellData);
+    });
+    this.cols = tempCols;
+    this.rows = tempRows;
+  }
+
+  setPage(pageInfo){
+    this.page.pageNumber = pageInfo.offset;
+    this.page.size = 5;
+    this.find();
+  }
+
 
 }

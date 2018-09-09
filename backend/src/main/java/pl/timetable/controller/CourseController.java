@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.CourseRequest;
 import pl.timetable.api.CourseResponse;
+import pl.timetable.api.CourseSubjectResponse;
 import pl.timetable.dto.CourseDto;
 import pl.timetable.entity.Subject;
 import pl.timetable.exception.EntityDuplicateFoundException;
@@ -36,6 +37,17 @@ public class CourseController extends GenericRestController<CourseDto, CourseReq
     public void getParameters(@PathVariable(value = "id") int id, @PathVariable(value = "idParameters") int idParameters) throws EntityNotFoundException {
         courseService.deleteParameter(id, idParameters);
     }
+
+    @PostMapping(value = "/find/{id}/parameters")
+    @ResponseStatus(HttpStatus.OK)
+    public CourseSubjectResponse find(@RequestBody CourseRequest request, @PathVariable(value = "id") int id) {
+        request.setId(id);
+        CourseSubjectResponse response = new CourseSubjectResponse();
+        response.setData(courseService.findParameters(request));
+        response.setTotalElements(courseService.findParametersCount());
+        return response;
+    }
+
 
     @PostMapping(value = "{id}/parameters/{idParameters}")
     @ResponseStatus(HttpStatus.OK)

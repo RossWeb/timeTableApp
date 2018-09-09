@@ -9,4 +9,5 @@ public interface CourseRepository extends GenericRepository<Course> {
 
     List<Subject> getParameters(Integer id);
     public Course getCourseByName(String courseName);
+    public List<Subject> findParameters(Integer id, Integer first, Integer max);
 }

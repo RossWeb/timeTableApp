@@ -7,6 +7,15 @@ public class CourseRequest extends BaseRequest {
 
     private String name;
     private Integer subject;
+    private Integer id;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Integer getSubject() {
         return subject;

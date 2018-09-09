@@ -4,6 +4,8 @@ import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import {TableService} from "../interface/table.service";
 import {Course} from "../model/course.type";
+import {TablePage} from '../model/page.type';
+import {PagedData} from '../model/paged-data.type';
 
 
 
@@ -59,7 +61,7 @@ export class CourseService extends TableService<Course> {
 
   find(page: TablePage, dataTableValues: string[]){
     page.data =  this.type.getParams(dataTableValues);
-    return this.http.post('api/course/find', page);
+    return this.http.post<PagedData<Course>>('api/course/find/' + this.getParametersUrlIfNeeded(), page);
   }
 
   get(id: string): any {

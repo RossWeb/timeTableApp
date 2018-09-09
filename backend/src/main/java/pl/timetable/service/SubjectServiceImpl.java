@@ -88,12 +88,14 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(entity.getId());
         subjectDto.setName(entity.getName());
+        subjectDto.setSize(entity.getSize());
         return subjectDto;
     }
 
     private Subject mapRequestToEntity(SubjectRequest subjectRequest) {
         Subject subject = new Subject();
         subject.setName(subjectRequest.getName());
+        subject.setSize(subjectRequest.getSize());
         return subject;
     }
 

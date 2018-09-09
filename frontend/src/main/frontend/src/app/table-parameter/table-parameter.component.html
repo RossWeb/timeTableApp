@@ -1,4 +1,30 @@
-<div>
+<div class="row">
+  <ngx-datatable
+  class='material ngx-datatable fixed-header'
+  [rows]="rows"
+  [columns]="cols"
+  [columnMode]="'force'"
+  [headerHeight]="50"
+  [footerHeight]="50"
+  [rowHeight]="'auto'"
+  [externalPaging]="true"
+  [count]="page.totalElements"
+  [offset]="page.pageNumber"
+  [limit]="page.size"
+  [messages]="page.messages"
+  (page)='setPage($event)' >
+    <ng-template #addDelTmpl let-row="row" let-value="value">
+      <button *ngIf="value.exists === true; else falsyTemplate" type="button" class="btn btn-danger" (click)="remove(value.id)">Usuń</button>
+      <ng-template #falsyTemplate>
+        <button  type="button" class="btn btn-info" (click)="addParameters(value.id)">Dodaj</button>
+      </ng-template>
+    </ng-template>
+    <ng-template #indexTmpl let-value="value" width="10" let-rowIndex="rowIndex">
+        {{rowIndex + 1}}
+    </ng-template>
+  </ngx-datatable>
+</div>
+<!-- <div>
   <table class="table">
     <thead>
       <tr>
@@ -28,9 +54,9 @@
         <tr>
           <th scope="row">{{i + 1}}</th>
           <!-- <ng-container *ngFor=" let rowValues of row | values; let j = index"> -->
-            <td>{{row.name}}</td>
+            <!-- <td>{{row.name}}</td> -->
           <!-- </ng-container> -->
-          <td>
+          <!-- <td>
             <button *ngIf="row.exists === true; else falsyTemplate" type="button" class="btn btn-danger" (click)="remove(row.id)">Usuń</button>
             <ng-template #falsyTemplate>
               <button  type="button" class="btn btn-info" (click)="addParameters(row.id)">Dodaj</button>
@@ -41,4 +67,4 @@
 
     </tbody>
   </table>
-</div>
+</div> -->
