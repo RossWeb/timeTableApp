@@ -2,6 +2,7 @@ package pl.timetable.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public class GeneticInitialData {
 
@@ -10,6 +11,7 @@ public class GeneticInitialData {
     private List<GroupDto> groupDtoList;
     private List<RoomDto> roomDtoList;
     private List<SubjectDto> subjectDtoList;
+    private List<TeacherDto> teacherDtoList;
     private Integer populationSize;
     private Double mutationValue;
     private LocalDateTime startedDate;
@@ -76,5 +78,13 @@ public class GeneticInitialData {
 
     public void setPopulationSize(Integer populationSize) {
         this.populationSize = populationSize;
+    }
+
+    public List<TeacherDto> getTeacherDtoList() {
+        return teacherDtoList;
+    }
+
+    public void setTeacherDtoList(List<TeacherDto> teacherDtoList) {
+        this.teacherDtoList = teacherDtoList;
     }
 }

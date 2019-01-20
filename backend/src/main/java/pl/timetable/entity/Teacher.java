@@ -1,8 +1,11 @@
 package pl.timetable.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -10,7 +13,7 @@ public class Teacher extends BaseEntity{
 
     private String name;
     private String surname;
-    private Set<Subject> subjectSet;
+    private Set<Subject> subjectSet = new HashSet<>();
 
     @Column(name = "name", nullable = false, unique = true)
     public String getName() {
@@ -40,5 +43,29 @@ public class Teacher extends BaseEntity{
 
     public void setSubjectSet(Set<Subject> subjectSet) {
         this.subjectSet = subjectSet;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Teacher)) return false;
+
+        Teacher teacher = (Teacher) o;
+
+        return new EqualsBuilder()
+                .append(name, teacher.name)
+                .append(surname, teacher.surname)
+                .append(id, teacher.id)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(name)
+                .append(surname)
+                .append(id)
+                .toHashCode();
     }
 }

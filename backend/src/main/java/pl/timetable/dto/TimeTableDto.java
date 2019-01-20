@@ -1,9 +1,6 @@
 package pl.timetable.dto;
 
-import pl.timetable.entity.Group;
-import pl.timetable.entity.Room;
-import pl.timetable.entity.Subject;
-import pl.timetable.entity.TimeTableDescription;
+import pl.timetable.entity.*;
 
 public class TimeTableDto {
 
@@ -12,6 +9,7 @@ public class TimeTableDto {
     private Room room;
     private Group group;
     private Subject subject;
+    private Teacher teacher;
     private TimeTableDescription timeTableDescription;
 
     public Integer getLectureNumber() {
@@ -20,6 +18,14 @@ public class TimeTableDto {
 
     public void setLectureNumber(Integer lectureNumber) {
         this.lectureNumber = lectureNumber;
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 
     public Integer getDay() {

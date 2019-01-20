@@ -107,9 +107,18 @@ public class GeneticAlgorithmServiceTestIT {
         }
 
         @Bean
+        public TeacherRepository teacherRepository() {
+            return new TeacherRepositoryImpl();
+        }
+
+        @Bean
+        public TeacherServiceImpl teacherService(){
+            return new TeacherServiceImpl();
+        }
+        @Bean
         public TimeTableFacade timeTableFacade() {
             return new TimeTableFacade( timeTableService(), lectureDescriptionService(),timeTableDescriptionService(),
-                    reportPopulationService(), groupService(), roomService(), subjectService(),courseService());}
+                    reportPopulationService(), groupService(), roomService(), subjectService(),courseService(), teacherService());}
     }
 
     @Autowired
@@ -144,6 +153,8 @@ public class GeneticAlgorithmServiceTestIT {
     @Autowired
     private DebugService debugService;
     @Autowired
+    private TeacherRepository teacherRepository;
+    @Autowired
     private TimeTableService timeTableService;
 
     @Before
@@ -152,7 +163,7 @@ public class GeneticAlgorithmServiceTestIT {
         SoftGenotypeCriteria softGenotypeCriteria = new SoftGenotypeCriteria();
         GenotypeService genotypeService = new GenotypeService(hardGenotypeCriteria);
         genotypeService.setHardGenotypeCriteria(hardGenotypeCriteria);
-        FitnessService fitnessService = new FitnessService(hardGenotypeCriteria, softGenotypeCriteria);
+        FitnessService fitnessService = new FitnessService(hardGenotypeCriteria, genotypeService, softGenotypeCriteria);
         geneticAlgorithmService.setGenotypeService(genotypeService);
         geneticAlgorithmService.setFitnessService(fitnessService);
         geneticAlgorithmService.setTimeTableFacade(timeTableFacade);
@@ -164,6 +175,8 @@ public class GeneticAlgorithmServiceTestIT {
         debugService.setSubjectRepository(subjectRepository);
         debugService.setCourseRepository(courseRepository);
         debugService.setGroupRepository(groupRepository);
+        debugService.setTeacherRepository(teacherRepository);
+
     }
 
     @Test
@@ -172,7 +185,7 @@ public class GeneticAlgorithmServiceTestIT {
         //given
         GeneticInitialData geneticInitialData = getGeneticInitialData();
         debugService.init(geneticInitialData);
-        geneticInitialData.setPopulationSize(200);
+        geneticInitialData.setPopulationSize(100);
         //when
         Integer timeTableId = geneticAlgorithmService.init(geneticInitialData);
         //then

@@ -42,10 +42,10 @@ export class CourseService extends TableService<Course> {
     return this.http.get<Course>('api/course/' + this.getParametersUrlIfNeeded());
   }
 
-  find(page: TablePage, dataTableValues: string[]){
-    page.data =  this.type.getParams(dataTableValues);
-    return this.http.post<PagedData<Course>>('api/course/find/' + this.getParametersUrlIfNeeded(), page);
-  }
+  // find(page: TablePage, dataTableValues: string[]){
+  //   page.data =  this.type.getParams(dataTableValues);
+  //   return this.http.post<PagedData<Course>>('api/course/find/' + this.getParametersUrlIfNeeded(), page);
+  // }
 
   get(id: string): any {
     return  this.http.get<Course>('api/course/' + this.getParametersUrlIfNeeded() + id);

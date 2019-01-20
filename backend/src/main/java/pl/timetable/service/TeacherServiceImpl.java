@@ -1,12 +1,16 @@
 package pl.timetable.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.timetable.api.TeacherRequest;
-import pl.timetable.api.TeacherResponse;
+import pl.timetable.api.*;
 import pl.timetable.api.TeacherRequest;
 import pl.timetable.api.TeacherResponse;
 import pl.timetable.dto.TeacherDto;
@@ -51,13 +55,28 @@ public class TeacherServiceImpl extends AbstractService<TeacherDto, TeacherReque
         TeacherResponse teacherResponse = new TeacherResponse();
         Integer first = request.getPageNumber() * request.getSize();
         Integer max = first + request.getSize();
-        List<Teacher> teacherList = teacherRepository.getResult(first, max).orElse(Collections.emptyList());
+        List<Teacher> teacherList = teacherRepository.getResult(first, max,getFilter(request)).orElse(Collections.emptyList());
         teacherResponse.setData(teacherList.stream().map(teacher -> {
             Hibernate.initialize(teacher.getSubjectSet());
             return mapEntityToDto(teacher);
         }).collect(Collectors.toList()));
-        teacherResponse.setTotalElements(findAll().size());
+        teacherResponse.setTotalElements(teacherRepository.getResultSize(getFilter(request)));
         return teacherResponse;
+    }
+
+    private Criterion getFilter(TeacherRequest request){
+        Conjunction conjunction = Restrictions.conjunction();
+        if(StringUtils.isNotEmpty(request.getData().getName())){
+            conjunction.add(Restrictions.like("name", "%"+request.getData().getName()+"%"));
+        }
+        if(Objects.nonNull(request.getData().getSubject())){
+            conjunction.add(Restrictions.like("subject", "%"+request.getData().getSubject()+"%"));
+        }
+        if(StringUtils.isNotEmpty(request.getData().getSurname())){
+            conjunction.add(Restrictions.like("surname", "%"+request.getData().getSurname()+"%"));
+        }
+        return conjunction;
+
     }
 
     @Override
@@ -148,7 +167,7 @@ public class TeacherServiceImpl extends AbstractService<TeacherDto, TeacherReque
         return teacherDto;
     }
 
-    private Teacher mapDtoToEntity(TeacherDto teacherDto){
+    public static Teacher mapDtoToEntity(TeacherDto teacherDto){
         Teacher teacher = new Teacher();
         teacher.setName(teacherDto.getName());
         teacher.setSurname(teacherDto.getSurname());

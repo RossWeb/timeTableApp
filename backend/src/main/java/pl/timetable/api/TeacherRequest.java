@@ -6,6 +6,15 @@ public class TeacherRequest extends BaseRequest {
     private String surname;
     private Integer subject;
     private Integer id;
+    private TeacherRequest data;
+
+    public TeacherRequest getData() {
+        return data;
+    }
+
+    public void setData(TeacherRequest data) {
+        this.data = data;
+    }
 
     public Integer getId() {
         return id;

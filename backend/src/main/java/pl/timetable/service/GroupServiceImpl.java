@@ -1,12 +1,18 @@
 package pl.timetable.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.GroupRequest;
 import pl.timetable.api.GroupResponse;
+import pl.timetable.api.RoomRequest;
 import pl.timetable.dto.GroupDto;
 import pl.timetable.entity.Course;
 import pl.timetable.entity.Group;
@@ -51,14 +57,27 @@ public class GroupServiceImpl extends AbstractService<GroupDto, GroupRequest, Gr
         GroupResponse groupResponse = new GroupResponse();
         Integer first = request.getPageNumber() * request.getSize();
         Integer max = first + request.getSize();
-        List<Group> groupList = groupRepository.getResult(first, max).orElse(Collections.emptyList());
+        List<Group> groupList = groupRepository.getResult(first, max, getFilter(request)).orElse(Collections.emptyList());
         groupResponse.setData(groupList.stream().map(group -> {
             Hibernate.initialize(group.getCourse());
             Hibernate.initialize(group.getCourse().getSubjectSet());
             return mapEntityToDto(group);
         }).collect(Collectors.toList()));
-        groupResponse.setTotalElements(findAll().size());
+        groupResponse.setTotalElements(groupRepository.getResultSize(getFilter(request)));
         return groupResponse;
+    }
+
+
+    private Criterion getFilter(GroupRequest request){
+        Conjunction conjunction = Restrictions.conjunction();
+        if(StringUtils.isNotEmpty(request.getData().getName())){
+            conjunction.add(Restrictions.like("name", "%"+request.getData().getName()+"%"));
+        }
+        if(Objects.nonNull(request.getData().getCourseId())){
+            conjunction.add(Restrictions.like("courseId", "%"+request.getData().getCourseId()+"%"));
+        }
+        return conjunction;
+
     }
 
     @Override

@@ -1,6 +1,11 @@
 package pl.timetable.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +16,7 @@ import pl.timetable.entity.Room;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.repository.RoomRepository;
 
+import javax.persistence.criteria.Predicate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,10 +49,22 @@ public class RoomServiceImpl extends AbstractService<RoomDto, RoomRequest, RoomR
         RoomResponse roomResponse = new RoomResponse();
         Integer first = request.getPageNumber() * request.getSize();
         Integer max = first + request.getSize();
-        List<Room> roomList = roomRepository.getResult(first, max).orElse(Collections.emptyList());
+        List<Room> roomList = roomRepository.getResult(first, max, getFilter(request)).orElse(Collections.emptyList());
         roomResponse.setData(roomList.stream().map(RoomServiceImpl::mapEntityToDto).collect(Collectors.toList()));
-        roomResponse.setTotalElements(findAll().size());
+        roomResponse.setTotalElements(roomRepository.getResultSize(getFilter(request)));
         return roomResponse;
+    }
+
+    private Criterion getFilter(RoomRequest request){
+        Conjunction conjunction = Restrictions.conjunction();
+        if(StringUtils.isNotEmpty(request.getData().getName())){
+            conjunction.add(Restrictions.like("name", "%" + request.getData().getName() +"%"));
+        }
+        if(StringUtils.isNotEmpty(request.getData().getNumber())){
+            conjunction.add(Restrictions.like("number","%" + request.getData().getNumber() + "%"));
+        }
+        return conjunction;
+
     }
 
     @Override

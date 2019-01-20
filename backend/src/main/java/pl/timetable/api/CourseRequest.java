@@ -3,11 +3,22 @@ package pl.timetable.api;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import pl.timetable.entity.Course;
 
+import java.util.List;
+
 public class CourseRequest extends BaseRequest {
 
     private String name;
     private Integer subject;
     private Integer id;
+    private CourseRequest data;
+
+    public CourseRequest getData() {
+        return data;
+    }
+
+    public void setData(CourseRequest data) {
+        this.data = data;
+    }
 
     public Integer getId() {
         return id;

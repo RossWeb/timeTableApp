@@ -1,22 +1,22 @@
 import {Table} from "../interface/table.type";
 
-export class Subject extends Table {
+export class Teacher extends Table {
   id: number;
   name: string;
-  size: number;
+  surname: string;
 
   getType(): string{
-    return 'Subject';
+    return 'Teacher';
   }
 
   getTitle(): string {
-    return 'Zarządzanie przedmiotami';
+    return 'Zarządzanie wykładowcami';
   }
 
   getParams(dataTableValues: string[]): any {
     const params = {
       name : dataTableValues[0],
-      size: dataTableValues[1]
+      surname: dataTableValues[1]
     };
     return params;
   }
@@ -24,26 +24,31 @@ export class Subject extends Table {
   getDataTableParameters() : any {
     const params = [
       {
-        value : 'Nazwa',
-        data : 'name',
+        value : 'Imie',
+        data: 'name',
         type : 'Input'
       },
       {
-        value : 'Liczba',
-        data : 'size',
+        value : 'Nazwisko',
+        data: 'surname',
         type : 'Input'
+      },
+      {
+        value : 'Przedmioty',
+        data: "subjectSet",
+        type : 'Select'
       }
-
     ];
     return params;
   }
 
   getRelationParameterName() : string {
-    return null;
+    return 'Teacher';
   }
 
   getApiUrl() : string {
-    return '/api/subject/';
+    return '/api/teacher/';
   }
+
 
 }

@@ -9,6 +9,7 @@ public class Cell {
     private CourseDto courseDto;
     private SubjectDto subjectDto;
     private GroupDto groupDto;
+    private TeacherDto teacherDto;
     private Integer day;
 
     public Cell(Integer lecture, CourseDto courseDto, GroupDto groupDto, Integer day) {
@@ -16,6 +17,14 @@ public class Cell {
         this.courseDto = courseDto;
         this.groupDto = groupDto;
         this.day = day;
+    }
+
+    public TeacherDto getTeacherDto() {
+        return teacherDto;
+    }
+
+    public void setTeacherDto(TeacherDto teacherDto) {
+        this.teacherDto = teacherDto;
     }
 
     public Integer getDay() {

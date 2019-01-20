@@ -17,7 +17,7 @@ public class InitialGenotypeCriteriaTest {
     @Test
     public void roomAndLectureToSubjectIsValid(){
         LectureDescriptionDto lectureDescriptionDto = new LectureDescriptionDto(4,2, 8);
-        GeneticInitialData geneticInitialData = GeneticUtilityTestClass.getGeneticInitialDataParametrized(lectureDescriptionDto, 5, 5, 3, 5);
+        GeneticInitialData geneticInitialData = GeneticUtilityTestClass.getGeneticInitialDataParametrized(lectureDescriptionDto, 5, 5, 3, 5, 4);
         boolean isValid = initialGenotypeCriteria.checkData(geneticInitialData);
         Assert.assertTrue(isValid);
     }
@@ -26,7 +26,7 @@ public class InitialGenotypeCriteriaTest {
     public void roomAndLectureToSubjectIsNotValid(){
         LectureDescriptionDto lectureDescriptionDto = new LectureDescriptionDto(4,2, 1);
         GeneticInitialData geneticInitialData =
-                GeneticUtilityTestClass.getGeneticInitialDataParametrized(lectureDescriptionDto, 5, 5, 3, 5);
+                GeneticUtilityTestClass.getGeneticInitialDataParametrized(lectureDescriptionDto, 5, 5, 3, 5, 4);
         boolean isValid = initialGenotypeCriteria.checkData(geneticInitialData);
         Assert.assertTrue(isValid);
     }

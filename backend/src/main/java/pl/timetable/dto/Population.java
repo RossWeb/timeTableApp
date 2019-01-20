@@ -11,8 +11,17 @@ public class Population {
     private Genotype bestGenotype;
     private Genotype bestGenotypeGeneration;
     private Integer populationIteration = 0;
+    private GeneticInitialData geneticInitialData;
     private Genotype[] selectionArray = new Genotype[100];
     private LectureDescriptionDto lectureDescriptionDto;
+
+    public GeneticInitialData getGeneticInitialData() {
+        return geneticInitialData;
+    }
+
+    public void setGeneticInitialData(GeneticInitialData geneticInitialData) {
+        this.geneticInitialData = geneticInitialData;
+    }
 
     public Genotype getBestGenotypeGeneration() {
         return bestGenotypeGeneration;

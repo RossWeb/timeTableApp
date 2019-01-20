@@ -3,6 +3,9 @@ package pl.timetable.repository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
@@ -42,10 +45,17 @@ public abstract class AbstractGenericRepositoryWithSession<T extends Object> {
         return Optional.ofNullable((List<T>) getSession().createQuery( "from " + tableName).list());
     }
 
-    public Optional<List<T>> getResult(Integer first, Integer max){
-        String tableName = getClass().getSimpleName().replace("RepositoryImpl", "");
-        return Optional.ofNullable((List<T>) getSession().createQuery( "from " + tableName)
-                .setFirstResult(first).setMaxResults(max).list());
+    public Integer getResultSize(Criterion filter){
+        return ((Long) getSession().createCriteria((Class)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0])
+                .add(filter)
+                .setProjection(Projections.rowCount()).uniqueResult()).intValue();
+    }
+
+    public Optional<List<T>> getResult(Integer first, Integer max, Criterion filter){
+//        String tableName = getClass().getSimpleName().replace("RepositoryImpl", "");
+        return Optional.ofNullable((getSession().createCriteria((Class)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0])
+                .add(filter)
+                .setFirstResult(first).setMaxResults(max).list()));
     }
 
     protected Session getSession() {

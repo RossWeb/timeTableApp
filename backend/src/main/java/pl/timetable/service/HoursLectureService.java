@@ -1,14 +1,16 @@
 package pl.timetable.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.timetable.api.CourseRequest;
-import pl.timetable.api.CourseResponse;
-import pl.timetable.api.HoursLectureRequest;
-import pl.timetable.api.HoursLectureResponse;
+import pl.timetable.api.*;
 import pl.timetable.dto.CourseDto;
 import pl.timetable.dto.HoursLectureDto;
 import pl.timetable.entity.Course;
@@ -51,12 +53,21 @@ public class HoursLectureService extends AbstractService<HoursLectureDto, HoursL
         HoursLectureResponse response = new HoursLectureResponse();
         Integer first = request.getPageNumber() * request.getSize();
         Integer max = first + request.getSize();
-        List<HoursLecture> hoursList = hoursLectureRepository.getResult(first, max).orElse(Collections.emptyList());
+        List<HoursLecture> hoursList = hoursLectureRepository.getResult(first, max, getFilter(request)).orElse(Collections.emptyList());
         response.setData(hoursList.stream().map(hour -> {
             return mapEntityToDto(hour);
         }).collect(Collectors.toList()));
-        response.setTotalElements(findAll().size());
+        response.setTotalElements(hoursLectureRepository.getResultSize(getFilter(request)));
         return response;
+    }
+
+    private Criterion getFilter(HoursLectureRequest request){
+        Conjunction conjunction = Restrictions.conjunction();
+        if(Objects.nonNull(request.getData().getPosition())){
+            conjunction.add(Restrictions.like("position", "%"+request.getData().getPosition()+"%"));
+        }
+        return conjunction;
+
     }
 
     @Override

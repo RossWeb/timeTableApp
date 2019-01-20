@@ -6,6 +6,15 @@ public class RoomRequest extends BaseRequest {
 
     private String name;
     private String number;
+    private RoomRequest data;
+
+    public RoomRequest getData() {
+        return data;
+    }
+
+    public void setData(RoomRequest data) {
+        this.data = data;
+    }
 
     public String getNumber() {
         return number;

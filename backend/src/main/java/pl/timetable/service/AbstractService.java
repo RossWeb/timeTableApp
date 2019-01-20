@@ -2,7 +2,6 @@ package pl.timetable.service;
 
 import pl.timetable.api.BaseRequest;
 import pl.timetable.api.BaseResponse;
-import pl.timetable.entity.BaseEntity;
 import pl.timetable.exception.EntityNotFoundException;
 
 import java.util.List;

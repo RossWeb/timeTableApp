@@ -1,15 +1,26 @@
-export interface Table {
+export abstract class Table {
 
-  getType(): string;
+  abstract getType(): string;
 
-  getTitle(): string;
+  abstract getTitle(): string;
 
-  getParams(dataTableValues: string[]): any;
+  abstract getParams(dataTableValues: string[]): any;
 
-  getDataTableParameters() : string[];
+  getValuesSearch(dataTableValues: string[]): any {
+    var dataForBackend = [];
+    var dataTableParameters = this.getDataTableParameters();
+    dataTableParameters.forEach((elementData) => {
+      if(dataTableValues[elementData.value] != null){
+        dataForBackend[elementData["data"]] = dataTableValues[elementData.value]
+      }
+    });
+    return {...dataForBackend};
+  }
 
-  getRelationParameterName() : string;
+  abstract getDataTableParameters() : any;
 
-  getApiUrl() : string; 
+  abstract getRelationParameterName() : string;
+
+  abstract getApiUrl() : string;
 
 }

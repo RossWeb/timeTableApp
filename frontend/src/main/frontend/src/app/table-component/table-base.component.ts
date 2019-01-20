@@ -9,7 +9,7 @@ import {HoursLectureService} from "../table-service/hours.lecture.service";
 import {Table} from "../interface/table.type";
 import {TablePage} from '../model/page.type';
 import { Pipe, PipeTransform } from '@angular/core';
-
+import {TableService} from "../interface/table.service";
 
 
 const ADD_NAME = 'Dodaj';
@@ -40,11 +40,9 @@ export class ValuesPipe implements PipeTransform {
 
 })
 export class TableBaseComponent implements OnInit {
-
-  protected service;
-
   @Input('isParameter') isParameter: boolean = false;
   @Input('dataTableValues') dataTableValues: string[] = [];
+  @Input('dataTableSearch') dataTableSearch: string[] = [];
   @Input('tableTypeName') tableTypeName: string;
   @Output('tableRows') tableRows: any;
   @Output('dataTableNames') dataTableNames: any;
@@ -57,9 +55,11 @@ export class TableBaseComponent implements OnInit {
   @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
   @ViewChild('indexTmpl') indexTmpl: TemplateRef<any>;
   @ViewChild('addDelTmpl') addDelTmpl: TemplateRef<any>;
+  @ViewChild('searchTmpl') searchTmpl: TemplateRef<any>;
   private page = new TablePage();
   private rows = [];
   private cols = [];
+  protected service : TableService<Table>;
 
   constructor(protected tableServiceProvider: TableServiceProvider, private isEditButton : boolean){
     this.isEditButton = isEditButton;
@@ -140,7 +140,11 @@ export class TableBaseComponent implements OnInit {
         if(this.isParameter !== true){
           dataFromPage = this.service.transformValues(dataFromPage);
         }
-        this.tableRows = dataFromPage;
+        if(data.totalElements === 0){
+            this.tableRows = [];
+        }else{
+          this.tableRows = dataFromPage;
+        }
         console.log(data);
         this.page.totalElements = data.totalElements;
         this.initTable();
@@ -161,7 +165,7 @@ export class TableBaseComponent implements OnInit {
     console.log(this.tableRows);
       tempCols.push({name:"#", cellTemplate: this.indexTmpl});
     this.dataTableNames.forEach((element, index) => {
-      tempCols.push({name:element.value});
+      tempCols.push({name:element.value, headerTemplate: this.searchTmpl});
     });
     if(this.isEditButton){
       tempCols.push({name:"Edytuj",cellTemplate: this.editTmpl});

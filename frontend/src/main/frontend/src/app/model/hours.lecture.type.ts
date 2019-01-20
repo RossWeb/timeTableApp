@@ -1,22 +1,22 @@
 import {Table} from "../interface/table.type";
 
-export class Subject extends Table {
+export class HoursLecture extends Table {
   id: number;
-  name: string;
-  size: number;
+  startLectureTime: string;
+  position: number;
 
   getType(): string{
-    return 'Subject';
+    return 'HoursLecture';
   }
 
   getTitle(): string {
-    return 'Zarządzanie przedmiotami';
+    return 'Zarządzanie godzinami zajęć';
   }
 
   getParams(dataTableValues: string[]): any {
     const params = {
-      name : dataTableValues[0],
-      size: dataTableValues[1]
+      startLectureTime : dataTableValues[0],
+      position: dataTableValues[1]
     };
     return params;
   }
@@ -24,16 +24,15 @@ export class Subject extends Table {
   getDataTableParameters() : any {
     const params = [
       {
-        value : 'Nazwa',
-        data : 'name',
+        value : 'Poczatek',
+        data: "startLectureTime",
         type : 'Input'
       },
       {
-        value : 'Liczba',
-        data : 'size',
+        value : 'Pozycja',
+        data: 'position',
         type : 'Input'
       }
-
     ];
     return params;
   }
@@ -43,7 +42,7 @@ export class Subject extends Table {
   }
 
   getApiUrl() : string {
-    return '/api/subject/';
+    return '/api/hoursLecture/';
   }
 
 }

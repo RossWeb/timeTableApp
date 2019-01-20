@@ -1,6 +1,6 @@
 import {Table} from "../interface/table.type";
 
-export class Room implements Table {
+export class Room extends Table {
   id: number;
   name: string;
   number: string;

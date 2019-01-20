@@ -7,6 +7,15 @@ public class GroupRequest extends BaseRequest {
     private String name;
 
     private Integer courseId;
+    private GroupRequest data;
+
+    public GroupRequest getData() {
+        return data;
+    }
+
+    public void setData(GroupRequest data) {
+        this.data = data;
+    }
 
     public Integer getCourseId() {
         return courseId;

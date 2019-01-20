@@ -4,6 +4,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NamedQueries({
@@ -17,6 +19,7 @@ public class Subject extends BaseEntity {
     private String name;
     private boolean exists = false;
     private Integer size = 0;
+    private Set<Teacher> teachers = new HashSet<>();
 
     @Column(name = "name", nullable = false, unique = true)
     public String getName() {
@@ -34,6 +37,15 @@ public class Subject extends BaseEntity {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    @ManyToMany(mappedBy = "subjectSet")
+    public Set<Teacher> getTeachers() {
+        return teachers;
+    }
+
+    public void setTeachers(Set<Teacher> teachers) {
+        this.teachers = teachers;
     }
 
     @Transient

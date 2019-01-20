@@ -37,10 +37,11 @@ export class RoomService extends TableService<Room> {
     return this.http.get<Room>('/api/room');
   }
 
-  find(page: TablePage, dataTableValues: string[]){
-    page.data =  this.type.getParams(dataTableValues);
-    return this.http.post<PagedData<Room>>('api/room/find', page);
-  }
+  // find(page: TablePage, dataTableValues: string[]){
+  //   page.data =  this.type.getParams(dataTableValues);
+  //
+  //   return this.http.post<PagedData<Room>>('api/room/find', page);
+  // }
 
   getName(): string {
     return 'Room';

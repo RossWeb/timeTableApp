@@ -3,6 +3,7 @@ package pl.timetable.service;
 import pl.timetable.dto.*;
 import pl.timetable.entity.Course;
 import pl.timetable.entity.Subject;
+import pl.timetable.entity.Teacher;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -14,6 +15,8 @@ public class GeneticUtilityTestClass {
     private static Integer subjectNumber = 10;
     private static Integer courseNumber = 5;
     private static Integer groupNumber = 4;
+    private static Integer teacherNumber = 10;
+
     private static Supplier<RoomDto> supplierRoom = () -> {
         RoomDto roomDto = new RoomDto();
         roomDto.setName("room" + roomNumber--);
@@ -37,11 +40,20 @@ public class GeneticUtilityTestClass {
         return courseDto;
     };
 
+    private static Supplier<TeacherDto> supplierTeacher = () -> {
+        TeacherDto teacherDto = new TeacherDto();
+        Integer number = teacherNumber--;
+        teacherDto.setName("Jan" + number);
+        teacherDto.setSurname("Kowalski" + number);
+        return teacherDto;
+    };
+
     public static GeneticInitialData getGeneticInitialDataParametrized(LectureDescriptionDto lectureDescriptionDto,
                                                                        Integer roomSize,
                                                                        Integer subjectSize,
                                                                        Integer courseSize,
-                                                                       Integer groupSize) {
+                                                                       Integer groupSize,
+                                                                       Integer teacherSize) {
 
 
         GeneticInitialData geneticInitialData = new GeneticInitialData();
@@ -52,6 +64,9 @@ public class GeneticUtilityTestClass {
                 fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, subjectSize)).collect(Collectors.toList()));
         geneticInitialData.setGroupDtoList(getDtoList(supplierGroup, groupSize).stream()
                 .map(groupDto -> fillCourseToGroup(geneticInitialData.getCourseDtoList(), groupDto)).collect(Collectors.toList()));
+        geneticInitialData.setTeacherDtoList(getDtoList(supplierTeacher, teacherNumber).stream()
+                .map(teacherDto -> fillSubjectToTeacher(geneticInitialData.getSubjectDtoList(), teacherDto, teacherSize)).collect(Collectors.toList()));
+        geneticInitialData.setMutationValue(0.15);
         return geneticInitialData;
     }
 
@@ -62,6 +77,8 @@ public class GeneticUtilityTestClass {
         geneticInitialData.setLectureDescriptionDto(new LectureDescriptionDto(5, LectureDescriptionDto.REGULAR, 2));
         geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, roomNumber));
         geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, subjectNumber));
+        geneticInitialData.setTeacherDtoList(getDtoList(supplierTeacher, teacherNumber).stream()
+                .map(teacherDto -> fillSubjectToTeacher(geneticInitialData.getSubjectDtoList(), teacherDto, 4)).collect(Collectors.toList()));
         geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, courseNumber).stream().map(courseDto ->
                 fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 6)).collect(Collectors.toList()));
         geneticInitialData.setGroupDtoList(getDtoList(supplierGroup, groupNumber).stream()
@@ -87,6 +104,21 @@ public class GeneticUtilityTestClass {
         return groupDto;
     }
 
+    private static TeacherDto fillSubjectToTeacher(List<SubjectDto> subjectDtoList, TeacherDto teacherDto, Integer subjectSize){
+        Set<Subject> subjectDtos = new HashSet<>();
+        Teacher teacher = TeacherServiceImpl.mapDtoToEntity(teacherDto);
+        do {
+            Integer subjectNumber = new Random().ints(0, subjectDtoList.size()).findFirst().getAsInt();
+            if(subjectDtoList.get(subjectNumber).getTeachers().stream().noneMatch(teacherFounded -> teacherFounded.equals(teacher))) {
+                subjectDtoList.get(subjectNumber).getTeachers().add(teacher);
+                subjectDtos.add(mapSubjectDtoToSubject(subjectDtoList.get(subjectNumber)));
+            }
+        } while (subjectDtos.size() < subjectSize);
+
+        teacherDto.setSubjectSet(subjectDtos);
+        return teacherDto;
+    }
+
     private static Course mapCourseDtoToCourse(CourseDto courseDto) {
         Course course = new Course();
         course.setSubjectSet(courseDto.getSubjectSet());
@@ -99,6 +131,7 @@ public class GeneticUtilityTestClass {
         subject.setName(subjectDto.getName());
         subject.setSize(subjectDto.getSize());
         subject.setId(subjectDto.getId());
+        subject.setTeachers(new HashSet<>(subjectDto.getTeachers()));
         return subject;
     }
 

@@ -18,14 +18,18 @@ public class FitnessService {
 
     private HardGenotypeCriteria hardGenotypeCriteria;
     private SoftGenotypeCriteria softGenotypeCriteria;
+    private GenotypeService genotypeService;
 
     public FitnessService(HardGenotypeCriteria hardGenotypeCriteria,
+                          GenotypeService genotypeService,
                           SoftGenotypeCriteria softGenotypeCriteria) {
         this.hardGenotypeCriteria = hardGenotypeCriteria;
         this.softGenotypeCriteria = softGenotypeCriteria;
+        this.genotypeService = genotypeService;
     }
 
     public void fitPopulation(Population population) {
+
         List<Genotype> genotypes = population.getGenotypePopulation().stream()
 //                .filter(genotype -> hardGenotypeCriteria.checkData(genotype, population.getLectureDescriptionDto()))
                 .collect(Collectors.toList());
@@ -61,11 +65,22 @@ public class FitnessService {
         int secondGenotypePosition = new Random().ints(0, population.getGenotypePopulation().size()).findFirst().getAsInt();
         Genotype firstGenotype = population.getGenotypePopulation().get(firstGenotypePosition);
         Genotype secondGenotype = population.getGenotypePopulation().get(secondGenotypePosition);
-        if(firstGenotype.getFitnessScore() >= secondGenotype.getFitnessScore()){
+        if(firstGenotype.getHardFitnessScore() == 100 || secondGenotype.getHardFitnessScore() == 100){
+            LOGGER.info("100");
+        }
+        if(firstGenotype.getHardFitnessScore().equals(secondGenotype.getHardFitnessScore())){
+            if(firstGenotype.getFitnessScore() >= secondGenotype.getFitnessScore()){
+                return firstGenotype;
+            }else {
+                return secondGenotype;
+            }
+        }else if(firstGenotype.getHardFitnessScore() > secondGenotype.getHardFitnessScore()){
             return firstGenotype;
         }else {
             return secondGenotype;
         }
+
+
     }
 
     public void selectionRoulette(Population population) {

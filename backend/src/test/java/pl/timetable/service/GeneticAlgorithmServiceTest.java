@@ -38,7 +38,7 @@ public class GeneticAlgorithmServiceTest {
         SoftGenotypeCriteria softGenotypeCriteria = new SoftGenotypeCriteria();
         GenotypeService genotypeService = new GenotypeService(hardGenotypeCriteria);
         genotypeService.setHardGenotypeCriteria(hardGenotypeCriteria);
-        FitnessService fitnessService = new FitnessService(hardGenotypeCriteria, softGenotypeCriteria);
+        FitnessService fitnessService = new FitnessService(hardGenotypeCriteria,genotypeService, softGenotypeCriteria);
         geneticAlgorithmService.setGenotypeService(genotypeService);
         geneticAlgorithmService.setFitnessService(fitnessService);
         geneticAlgorithmService.setTimeTableFacade(timeTableFacade);

@@ -1,12 +1,18 @@
 package pl.timetable.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.CourseRequest;
 import pl.timetable.api.CourseResponse;
+import pl.timetable.api.RoomRequest;
 import pl.timetable.dto.CourseDto;
 import pl.timetable.entity.Course;
 import pl.timetable.entity.Subject;
@@ -47,13 +53,25 @@ public class CourseServiceImpl extends AbstractService<CourseDto, CourseRequest,
         CourseResponse courseResponse = new CourseResponse();
         Integer first = request.getPageNumber() * request.getSize();
         Integer max = first + request.getSize();
-        List<Course> courseList = courseRepository.getResult(first, max).orElse(Collections.emptyList());
+        List<Course> courseList = courseRepository.getResult(first, max, getFilter(request)).orElse(Collections.emptyList());
         courseResponse.setData(courseList.stream().map(course -> {
             Hibernate.initialize(course.getSubjectSet());
             return mapEntityToDto(course);
         }).collect(Collectors.toList()));
-        courseResponse.setTotalElements(findAll().size());
+        courseResponse.setTotalElements(courseRepository.getResultSize(getFilter(request)));
         return courseResponse;
+    }
+
+    private Criterion getFilter(CourseRequest request){
+        Conjunction conjunction = Restrictions.conjunction();
+        if(StringUtils.isNotEmpty(request.getData().getName())){
+            conjunction.add(Restrictions.like("name", "%"+ request.getData().getName() + "%"));
+        }
+        if(Objects.nonNull(request.getData().getSubject())){
+            conjunction.add(Restrictions.like("subject", "%"+ request.getData().getSubject() +"%"));
+        }
+        return conjunction;
+
     }
 
     @Override

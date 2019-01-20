@@ -1,6 +1,6 @@
 import {Table} from "../interface/table.type";
 
-export class Group implements Table {
+export class Group extends Table {
   id: number;
   name: string;
 

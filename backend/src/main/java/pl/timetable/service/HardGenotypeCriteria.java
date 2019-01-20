@@ -11,10 +11,9 @@ import java.util.stream.Collectors;
 
 /*
     1. Każda klasa nie może realizować zajęć w więcej niż jeden sali w tym samym czasie.
-    2. Zajęcia powinny być realizowane bez okienek
-    3. Każdy nauczyciel może realizować zajęcia tylko w jednej sali w tym samym czasie.
-    4. Każda sala może być przypisana do jednego przedmiotu w danym momencie.
-    5. Dwie klasy nie mogą realizować zajęć w tej samej sali w tym samym czasie
+    2. Każdy nauczyciel może realizować zajęcia tylko w jednej sali w tym samym czasie.
+    3. Każda sala może być przypisana do jednego przedmiotu w danym momencie.
+    4. Dwie klasy nie mogą realizować zajęć w tej samej sali w tym samym czasie
  */
 @Service(value = "hardGenotypeCriteria")
 public class HardGenotypeCriteria implements AbstractCriteria {
@@ -25,27 +24,40 @@ public class HardGenotypeCriteria implements AbstractCriteria {
     public boolean checkData(Genotype genotype, LectureDescriptionDto lectureDescriptionDto) {
         Boolean isValid = true;
         int groupSize = genotype.getGenotypeTable().length;
-        double hardFitnessScoreByGroupDefinition = 0.5;
+        double hardFitnessScoreByGroupDefinition = 0.33;
         double hardFitnessScoreByGroup = 0.0;
         for (Cell[] group: genotype.getGenotypeTable()) {
             Integer subjectSize = group[0].getCourseDto().getSubjectSet().stream().map(Subject::getSize).mapToInt(value -> value).sum();
             Integer lectureSize = ((Long) Arrays.stream(group).filter(cell -> Objects.nonNull(cell) && Objects.nonNull(cell.getRoomDto())).count()).intValue();
             boolean isEnoughSizeLecture = hasEnoughSizeLectureToSubject(lectureSize, subjectSize);
-            boolean hasNoEmptyLectureByGroup = hasNoEmptyLectureByGroup(genotype.getRoomByGroup().get(group[0].getGroupDto()), lectureDescriptionDto.getNumberPerDay());
             if(isEnoughSizeLecture){
-                hardFitnessScoreByGroup += 0.75 / groupSize;
-                if(hasNoEmptyLectureByGroup){
-                    hardFitnessScoreByGroup += 0.25 / groupSize;
-                }
+                hardFitnessScoreByGroup += 1.0 / groupSize;
             }
         }
 
-        genotype.setHardFitnessScore(hardFitnessScoreByGroup * hardFitnessScoreByGroupDefinition);
+        genotype.setHardFitnessScore(hardFitnessScoreByGroup * (hardFitnessScoreByGroupDefinition + 0.01));
         isValid = hasNoRoomDuplicatesByLecture(genotype.getRoomByLecture()) && hasNoGroupDuplicatesByRoom(genotype.getGenotypeTable());
         if(isValid){
             genotype.setHardFitnessScore(genotype.getHardFitnessScore() + hardFitnessScoreByGroupDefinition);
         }
+        isValid = hasNoTeacherPerLectureDuplicates(genotype.getLectureByTeacher());
+        if(isValid) {
+            genotype.setHardFitnessScore(genotype.getHardFitnessScore() + hardFitnessScoreByGroupDefinition);
+        }
         genotype.setHardFitnessScore(genotype.getHardFitnessScore()*100);
+        return isValid;
+    }
+
+    public boolean hasNoTeacherPerLectureDuplicates(Map<Integer,  List<Integer>> lectureByTeacher){
+        boolean isValid = true;
+        for (List<Integer> lectures : lectureByTeacher.values()) {
+            Set<Integer> lecturesSet = new HashSet<>(lectures);
+            if (lecturesSet.size() != lectures.size()) {
+                isValid = false;
+                LOGGER.error("Teacher has two lecture at the same time");
+                break;
+            }
+        }
         return isValid;
     }
 
@@ -92,43 +104,11 @@ public class HardGenotypeCriteria implements AbstractCriteria {
         return isValid;
     }
 
-    public boolean hasNoEmptyLectureByGroup(List<RoomDto> roomDtoList, Integer lecturePerDay) {
-//        List<GroupDto> groupList = new ArrayList<>(roomByGroup.keySet());
-        Boolean isValid = true;
-//        for (GroupDto groupDto : groupList) {
-            Integer lectureCounter = 0;
-            if(roomDtoList.isEmpty()){
-                return false;
-            }
-            Boolean firstRoomExisted = false;
-            Boolean lastEmptyRoomExisted = false;
-            for (int i = 0; i < roomDtoList.size(); i++) {
-                RoomDto roomDto = roomDtoList.get(i);
-                if (Objects.nonNull(roomDto) && !firstRoomExisted) {
-                    firstRoomExisted = true;
-                } else if (Objects.isNull(roomDto) && firstRoomExisted ) {
-                    lastEmptyRoomExisted = true;
-                } else if (Objects.nonNull(roomDto) && lastEmptyRoomExisted) {
-                    LOGGER.error("Group has empty room in the middle criterion not valid : " + roomDtoList + i);
-                    isValid = false;
-                    break;
-                }
-                lectureCounter++;
-                if(lectureCounter.equals(lecturePerDay)){
-                    firstRoomExisted = false;
-                    lastEmptyRoomExisted = false;
-                    lectureCounter = 0;
-                }
-            }
-
-//        }
-        return isValid;
-    }
-
     private <T> Set<T> findDuplicates(Collection<T> collection) {
         Set<T> uniques = new HashSet<>();
         return collection.stream()
                 .filter(e -> Objects.nonNull(e) && !uniques.add(e))
                 .collect(Collectors.toSet());
     }
+
 }

@@ -6,13 +6,13 @@
 <div class="collapse" id="collapseExample{{tableTypeName}}">
   <div class="card card-body">
     <div class="row">
-      <div class="col-md-8">
+      <div [ngClass]="{'col-md-8': relationParameterName !== null, 'col-md-12':relationParameterName === null}" class="">
         <ngx-datatable
         class='material ngx-datatable fixed-header'
         [rows]="rows"
         [columns]="cols"
         [columnMode]="'force'"
-        [headerHeight]="50"
+        [headerHeight]="80"
         [footerHeight]="100"
         [rowHeight]="'auto'"
         [externalPaging]="true"
@@ -23,6 +23,16 @@
         [selectionType]="'row'"
         (select)="onSelectRelationParameter($event)"
         (page)='setPage($event)' >
+
+        <ng-template #searchTmpl let-column="column" let-sort="sortFn" ngx-datatable-header-template>
+          <span class="datatable-header-cell-wrapper">
+            <span class="datatable-header-cell-label draggable" (click)="sort()">{{column.name}}</span>
+          </span>
+          <div class="row">
+            <input type="text" class="form-control " (input)="find()" [(ngModel)]="dataTableValues[column.name]"  placeholder="Szukaj">
+          </div>
+        </ng-template>
+
         <ng-template #indexTmpl let-value="value" width="10" let-rowIndex="rowIndex">
             {{rowIndex + 1}}
         </ng-template>
@@ -84,59 +94,4 @@
         <app-table-parameter #courseParameter [hidden]="hiddenParameters" [tableTypeName]="relationParameterName" [isParameter]="true">Loading..</app-table-parameter>
       </div>
     </div>
-    <!-- <div class="row">
-      <div class="col-md-8">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-                <th scope="col">{{colName.value}}</th>
-              </ng-container>
-              <th scope="col">Edytuj</th>
-              <th scope="col">Dodaj/Usuń</th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container  *ngFor="let row of tableRows; let i = index">
-              <tr>
-                <th scope="row">{{i + 1}}</th>
-                <ng-container *ngFor=" let rowValues of row | values; let j = index">
-                  <td (click)="onSelectRelationParameter(row)">{{rowValues}}</td>
-                </ng-container>
-                <td>
-                  <button type="button" class="btn btn-primary" (click)="edit(row)">Edytuj</button>
-                </td>
-                <td>
-                  <button type="button" class="btn btn-danger" (click)="remove(row.id)">Usuń</button>
-                </td>
-              </tr>
-            </ng-container>
-            <tr>
-              <th scope="row"></th>
-              <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-                <td *ngIf="colName.type === 'Select'; else elseBlock">
-                  <select [(ngModel)]="dataTableValues[i]">
-                    <option *ngFor="let item of selectDefinions[colName.value]" [ngValue]="item.id">{{item.name}}</option>
-                  </select>
-                </td>
-                <ng-template #elseBlock>
-                  <td>
-                    <input type="text" class="form-control" [(ngModel)]="dataTableValues[i]"  placeholder="{{colName.value}}">
-                  </td>
-                </ng-template>
-              </ng-container>
-              <td></td>
-              <td>
-                <button type="button" (click)="add()"class="btn btn-success">{{addButtonName}}</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div *ngIf="relationParameterName !== null;" class="col-md-4">
-        <app-table-parameter #courseParameter [hidden]="hiddenParameters" [tableTypeName]="'Course'" [isParameter]="true">Loading..</app-table-parameter>
-      </div>
-    </div>
-  </div> -->
 </div>

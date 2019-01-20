@@ -35,6 +35,11 @@ export class TableService<T extends Table> {
       {responseType: 'text'});
   }
 
+  createParameters(id: number) {
+    return this.http.post(this.type.getApiUrl() + this.getParametersUrlIfNeeded()  + id, null,
+      {responseType: 'text'});
+  }
+
 
   remove(id: string){
     return this.http.delete(this.type.getApiUrl() + id,{responseType: 'text'})
@@ -49,8 +54,8 @@ export class TableService<T extends Table> {
     return this.http.get<T>(this.type.getApiUrl());
   }
 
-  find(page: TablePage, dataTableValues: string[]){
-    page.data =  this.type.getParams(dataTableValues);
+  find(page: TablePage, dataTableValues: string[]): any{
+    page.data = this.type.getValuesSearch(dataTableValues);
     return this.http.post<PagedData<T>>(this.type.getApiUrl() + 'find/' +  this.getParametersUrlIfNeeded(), page);
   }
 

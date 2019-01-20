@@ -3,18 +3,19 @@ package pl.timetable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.timetable.api.HoursLectureRequest;
 import pl.timetable.dto.GeneticInitialData;
 import pl.timetable.entity.*;
 import pl.timetable.repository.*;
+import pl.timetable.service.SubjectServiceImpl;
+import pl.timetable.service.TeacherServiceImpl;
 
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -52,6 +53,10 @@ public class DebugService {
     public DebugService() {
     }
 
+    public void setTeacherRepository(TeacherRepository teacherRepository) {
+        this.teacherRepository = teacherRepository;
+    }
+
     public void setCourseRepository(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }
@@ -68,18 +73,36 @@ public class DebugService {
         this.roomRepository = roomRepository;
     }
 
-    public void init(GeneticInitialData geneticInitialData){
-        geneticInitialData.getRoomDtoList().forEach(roomDto -> createRoom(roomDto.getName(), roomDto.getNumber()));
-        geneticInitialData.getSubjectDtoList().forEach(subjectDto -> createSubject(subjectDto.getName()));
+    public void init(GeneticInitialData geneticInitialData) {
+        geneticInitialData.getRoomDtoList().forEach(roomDto -> {
+            roomDto.setId(createRoom(roomDto.getName(), roomDto.getNumber()));
+        });
+        geneticInitialData.getSubjectDtoList().forEach(subjectDto -> {
+            subjectDto.setId(createSubject(subjectDto.getName()).getId());
+        });
+        geneticInitialData.getTeacherDtoList().forEach(teacherDto -> {
+            teacherDto.setId(createTeacher(
+                    TeacherServiceImpl.mapDtoToEntity(teacherDto), new HashSet<>(subjectRepository.findAll()
+                            .get())).getId());
+        });
+
+        geneticInitialData.setSubjectDtoList(subjectRepository.findAll()
+                .map(subjects -> subjects.stream().map(SubjectServiceImpl::mapEntityToDto).collect(Collectors.toList())).get());
         geneticInitialData.getCourseDtoList().forEach(courseDto -> {
             Set<Subject> subjectSet = new HashSet<>();
-            courseDto.getSubjectSet().forEach(subject -> subjectSet.add(subjectRepository.getSubjectByName(subject.getName())));
-            createCourse(subjectSet, courseDto.getName());
+            courseDto.getSubjectSet().forEach(subject -> {
+                Subject subjectFromDataBase = subjectRepository.getSubjectByName(subject.getName());
+                subjectSet.add(subjectFromDataBase);
+            });
+            courseDto.setId(createCourse(subjectSet, courseDto.getName()).getId());
+            courseDto.setSubjectSet(subjectSet);
         });
         geneticInitialData.getGroupDtoList().forEach(groupDto -> {
             Course course = courseRepository.getCourseByName(groupDto.getCourse().getName());
-            createGroup(course, groupDto.getName());
+            groupDto.setCourse(course);
+            groupDto.setId(createGroup(course, groupDto.getName()));
         });
+        Logger.info("da");
     }
 
     public void init() {
@@ -87,7 +110,7 @@ public class DebugService {
         Set<Subject> subjectSet = new HashSet<>();
         Set<Subject> allSubjects = new HashSet<>();
         Set<Course> courseSet = new HashSet<>();
-        for (int i = 0; i < 3 ; i++) {
+        for (int i = 0; i < 3; i++) {
             Subject subject1 = createSubject("Matematyka" + i);
             Subject subject2 = createSubject("Polski" + i);
             Subject subject3 = createSubject("Fizyka" + i);
@@ -102,21 +125,21 @@ public class DebugService {
             allSubjects.add(subject4);
 
         }
-        for (int i = 0; i < 2 ; i++) {
+        for (int i = 0; i < 2; i++) {
             Set<Subject> subjectCourse = new HashSet<>();
-            do{
+            do {
                 Integer position = new Random().ints(0, subjectSet.size()).findFirst().getAsInt();
                 Subject subject = (Subject) subjectSet.toArray()[position];
-                if(!subjectCourse.contains(subject)) {
+                if (!subjectCourse.contains(subject)) {
                     subjectCourse.add(subject);
                 }
-            }while (subjectCourse.size() <= 4);
+            } while (subjectCourse.size() <= 4);
             Course course = createCourse(subjectCourse, "Informatyka" + i);
             courseSet.add(course);
         }
-        for (int i = 0; i < 4 ; i++) {
+        for (int i = 0; i < 4; i++) {
             Integer position = new Random().ints(0, courseSet.size()).findFirst().getAsInt();
-            createGroup((Course)courseSet.toArray()[position], "Informatyka " + i);
+            createGroup((Course) courseSet.toArray()[position], "Informatyka " + i);
         }
         for (int i = 0; i < 10; i++) {
             createRoom("room" + i, String.valueOf(i));
@@ -125,11 +148,11 @@ public class DebugService {
         for (int i = 0; i < 4; i++) {
             HoursLecture hoursLecture = new HoursLecture();
             LocalTime localTime = LocalTime.now();
-            if(i != 0){
+            if (i != 0) {
                 localTime = localTime.plusHours(i);
             }
             hoursLecture.setStartLectureTime(localTime);
-            hoursLecture.setPosition(i+1);
+            hoursLecture.setPosition(i + 1);
             hoursLectureRepository.create(hoursLecture);
         }
 
@@ -138,37 +161,46 @@ public class DebugService {
         final String name1 = "Adam";
         final String name2 = "Jan";
 
-        for(int i=0; i < 10; i++){
+        for (int i = 0; i < 10; i++) {
             Teacher teacher = new Teacher();
             teacher.setSurname((new Random().nextBoolean() ? surname1 : surname2) + " " + i);
             teacher.setName((new Random().nextBoolean() ? name1 : name2) + " " + i);
-            Set<Subject> subjectSetTeacher = new HashSet<>();
-            do{
-                Integer position = new Random().ints(0, allSubjects.size()).findFirst().getAsInt();
-                Subject subject = (Subject) allSubjects.toArray()[position];
-                if(!subjectSetTeacher.contains(subject)) {
-                    subjectSetTeacher.add(subject);
-                }
-            }while (subjectSetTeacher.size() <= 3);
-
-            teacher.setSubjectSet(subjectSetTeacher);
-            teacherRepository.create(teacher);
-
+            createTeacher(teacher, allSubjects);
         }
+
     }
 
-    private void createRoom(String name, String number){
+    private Teacher createTeacher(Teacher teacher, Set<Subject> allSubjects) {
+        Set<Subject> subjectSetTeacher = new HashSet<>();
+        do {
+            Integer position = new Random().ints(0, allSubjects.size()).findFirst().getAsInt();
+            Subject subject = (Subject) allSubjects.toArray()[position];
+            if (!subjectSetTeacher.contains(subject)) {
+                subjectSetTeacher.add(subject);
+            }
+        } while (subjectSetTeacher.size() <= 3);
+
+        teacher.setSubjectSet(subjectSetTeacher);
+        teacherRepository.create(teacher);
+        for (Subject subject : subjectSetTeacher) {
+            subject.getTeachers().add(teacher);
+            subjectRepository.update(subject);
+        }
+        return teacher;
+    }
+
+    private Integer createRoom(String name, String number) {
         Room room = new Room();
         room.setNumber(number);
         room.setName(name);
-        roomRepository.create(room);
+        return roomRepository.create(room).getId();
     }
 
-    private void createGroup(Course course, String name) {
+    private Integer createGroup(Course course, String name) {
         Group group = new Group();
         group.setCourse(course);
         group.setName(name);
-        groupRepository.create(group);
+        return groupRepository.create(group).getId();
     }
 
     private Course createCourse(Set<Subject> subjectSet, String name) {

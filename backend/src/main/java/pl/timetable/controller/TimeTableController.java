@@ -3,6 +3,7 @@ package pl.timetable.controller;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.*;
 import pl.timetable.dto.*;
@@ -12,6 +13,7 @@ import pl.timetable.facade.TimeTableFacade;
 import pl.timetable.service.GeneticAlgorithmService;
 import pl.timetable.service.RoomServiceImpl;
 import pl.timetable.service.SubjectServiceImpl;
+import pl.timetable.service.TeacherServiceImpl;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/timetable")
+@Transactional
 public class TimeTableController {
 
     private static final Logger LOGGER = Logger.getLogger(TimeTableController.class);
@@ -82,6 +85,9 @@ public class TimeTableController {
                 if(Objects.nonNull(timeTableDto.getSubject())) {
                     response.setSubject(SubjectServiceImpl.mapEntityToDto(timeTableDto.getSubject()));
                 }
+                if(Objects.nonNull(timeTableDto.getTeacher())){
+                    response.setTeacher(TeacherServiceImpl.mapEntityToDto(timeTableDto.getTeacher()));
+                }
                 response.setDay(timeTableDto.getDay());
                 return response;
             }).collect(Collectors.toList()));
@@ -89,8 +95,10 @@ public class TimeTableController {
             resultResponse.setTotalPages(timeTableResultDto.getTotalPages());
             return ResponseEntity.status(HttpStatus.OK).body(resultResponse);
         } catch (EntityNotFoundException e) {
+            LOGGER.error("TimeTable result error", e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (Exception e) {
+            LOGGER.error("TimeTable result error", e);
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(null);
         }
     }

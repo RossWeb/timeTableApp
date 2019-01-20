@@ -29,6 +29,8 @@ public class InitialGenotypeCriteria {
     }
 
     //sprawdzenie groupy i zajecia razy sale
+    //sprawdzenie czy wykladowcy moga obsluzyc dane przedmioty
+    //
 }
 
 

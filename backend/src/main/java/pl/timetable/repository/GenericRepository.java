@@ -1,5 +1,7 @@
 package pl.timetable.repository;
 
+import org.hibernate.criterion.Criterion;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,5 +17,7 @@ public interface GenericRepository<T extends Object> {
 
     Optional<List<T>> findAll();
 
-    Optional<List<T>> getResult(Integer first, Integer max);
+    Integer getResultSize(Criterion filter);
+
+    Optional<List<T>> getResult(Integer first, Integer max, Criterion filter);
 }

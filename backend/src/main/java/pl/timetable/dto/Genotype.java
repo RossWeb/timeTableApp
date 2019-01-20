@@ -10,7 +10,8 @@ public class Genotype {
     private Cell[][] genotypeTable;
     private Map<Integer, LinkedList<RoomDto>> roomByLecture = new HashMap<>();
     private Map<GroupDto, LinkedList<RoomDto>> roomByGroup = new HashMap<>();
-    private Map<SubjectDto, List<RoomDto>> roomBySubject = new HashMap<>();
+    private Map<Integer, List<RoomDto>> roomBySubject = new HashMap<>();
+    private Map<Integer, List<Integer>> lectureByTeacher = new HashMap<>();
     private Double fitnessScore = 0.0;
     private Double softFitnessScore = 0.0;
     private Double hardFitnessScore = 0.0;
@@ -53,7 +54,7 @@ public class Genotype {
         return roomByLecture;
     }
 
-    public Map<SubjectDto, List<RoomDto>> getRoomBySubject() {
+    public Map<Integer, List<RoomDto>> getRoomBySubject() {
         return roomBySubject;
     }
 
@@ -69,8 +70,16 @@ public class Genotype {
         this.roomByLecture = roomByLecture;
     }
 
-    public void setRoomBySubject(Map<SubjectDto, List<RoomDto>> roomBySubject) {
+    public void setRoomBySubject(Map<Integer, List<RoomDto>> roomBySubject) {
         this.roomBySubject = roomBySubject;
+    }
+
+    public Map<Integer, List<Integer>> getLectureByTeacher() {
+        return lectureByTeacher;
+    }
+
+    public void setLectureByTeacher(Map<Integer, List<Integer>> lectureByTeacher) {
+        this.lectureByTeacher = lectureByTeacher;
     }
 
     public Double getFitnessScore() {

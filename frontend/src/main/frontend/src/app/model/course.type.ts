@@ -1,6 +1,6 @@
 import {Table} from "../interface/table.type";
 
-export class Course implements Table {
+export class Course extends Table {
   id: number;
   name: string;
   subjectSet: any;
