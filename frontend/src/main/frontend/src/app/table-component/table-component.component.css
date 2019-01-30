@@ -81,3 +81,14 @@
 .margin-left-md { margin-left: 1em; }
 .margin-left-lg { margin-left: 1.5em; }
 .margin-left-xl { margin-left: 3em; }
+
+.container {
+     margin-right: 3em;
+     margin-left: 3em;
+}
+
+.bottom-column
+{
+    float: none;
+    margin: 0 auto;
+}

@@ -61,6 +61,7 @@ export class MainComponent implements OnInit {
   // private timeTableId: number;
   private errorGlobalHidden: boolean = true;
   @Output("errorGlobalText") errorGlobalText: String = "";
+  @Output("errorSpecificText") errorSpecificText: String = "Przeładuj stronę i spróbuj jeszcze raz";
   @ViewChild('form') form;
   @ViewChild(ReportComponent) reportComponent;
   @ViewChild('editTmpl') editTmpl: TemplateRef<any>;
@@ -224,8 +225,14 @@ export class MainComponent implements OnInit {
         });
         this.mapRowsAndCols(pagedData.data, hoursLectureMap);
       },
-      err => {console.log("Error when get hours lecture for timetable.")}
+      err => {this.showModalError("Error when get hours lecture for timetable.")}
     );
+  }
+
+  showModalError(errorMsg: string){
+    this.errorSpecificText = errorMsg;
+    $('#errorModal').modal("show");
+    $('#generateTimeTableModal').modal("hide");
   }
 
   initDataTable(){
@@ -281,11 +288,17 @@ export class MainComponent implements OnInit {
               .switchMap(() => this.mainService.checkStatus(this.reportService.getTimeTableId()))
 
       .takeWhile(data => data.status === "PENDING")
-      .subscribe(res => console.log(res), error => console.log("error when status check "+error), ()=>
-      {
-        this.reportComponent.initReport();
-        this.initDataTable();
-      });
+      .subscribe(res => {
+
+        if(res.status === "ERROR"){
+            this.showModalError("error when generating timetable");
+        }else {
+          this.reportComponent.initReport();
+          this.initDataTable();
+
+        }
+      }, error => this.showModalError("error when status check "+error),
+      ()=>{$('#generateTimeTableModal').modal("hide");}    );
   }
 
   init() {
@@ -293,12 +306,15 @@ export class MainComponent implements OnInit {
     this.lecturePerDay = this.initProcess.numberPerDay;
     this.daysPerWeek = this.initProcess.daysPerWeek;
     this.lectureHour = this.form.get('lectureHour').value;
+    $('#generateTimeTableModal').modal({ backdrop: 'static',
+    keyboard: false});
     this.mainService.initProcess(this.initProcess).subscribe(
       data => {
         this.reportService.setTimeTableId(data.timeTableId);
         this.checkStatus();
       },
-      err => {console.log("Error when init process.")}
+      err => {this.showModalError("Error when init process.")}
+
     );
   }
 }

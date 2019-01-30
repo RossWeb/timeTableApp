@@ -10,7 +10,7 @@ export class Page {
 
     messages = {
                 emptyMessage: 'Brak danych do wyświetlenia',
-                totalMessage: 'Liczba elementów'
+                totalMessage: 'elementów'
                }
 
     constructor(){

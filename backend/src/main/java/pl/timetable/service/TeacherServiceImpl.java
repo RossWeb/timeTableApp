@@ -45,7 +45,7 @@ public class TeacherServiceImpl extends AbstractService<TeacherDto, TeacherReque
     public List<TeacherDto> findAll() {
         List<Teacher> entityTeachers = teacherRepository.findAll().orElse(Collections.emptyList());
         return entityTeachers.stream().map(course -> {
-            Hibernate.initialize(course.getSubjectSet());
+//            Hibernate.initialize(course.getSubjectSet());
             return mapEntityToDto(course);
         }).collect(Collectors.toList());
     }
@@ -57,7 +57,7 @@ public class TeacherServiceImpl extends AbstractService<TeacherDto, TeacherReque
         Integer max = first + request.getSize();
         List<Teacher> teacherList = teacherRepository.getResult(first, max,getFilter(request)).orElse(Collections.emptyList());
         teacherResponse.setData(teacherList.stream().map(teacher -> {
-            Hibernate.initialize(teacher.getSubjectSet());
+//            Hibernate.initialize(teacher.getSubjectSet());
             return mapEntityToDto(teacher);
         }).collect(Collectors.toList()));
         teacherResponse.setTotalElements(teacherRepository.getResultSize(getFilter(request)));

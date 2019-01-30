@@ -3,9 +3,9 @@
   class='material ngx-datatable fixed-header'
   [rows]="rows"
   [columns]="cols"
-  [columnMode]="'force'"
+  [columnMode]="'standard'"
   [headerHeight]="50"
-  [footerHeight]="50"
+  [footerHeight]="70"
   [rowHeight]="'auto'"
   [externalPaging]="true"
   [count]="page.totalElements"
@@ -19,52 +19,40 @@
         <button  type="button" class="btn btn-info" (click)="addParameters(value.id)">Dodaj</button>
       </ng-template>
     </ng-template>
-    <ng-template #indexTmpl let-value="value" width="10" let-rowIndex="rowIndex">
+    <ng-template #indexTmpl let-value="value" width="1" let-rowIndex="rowIndex">
         {{rowIndex + 1}}
     </ng-template>
+    <ngx-datatable-footer>
+      <ng-template
+        let-curPage="curPage"
+        let-offset="offset"
+        let-pageSize="pageSize"
+        let-rowCount="rowCount"
+        let-selected="selected"
+        ngx-datatable-footer-template>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12  col-lg-12 col-sm-12">
+              <datatable-pager class=" pull-right "
+              [pagerLeftArrowIcon]="'datatable-icon-left'"
+              [pagerRightArrowIcon]="'datatable-icon-right'"
+              [pagerPreviousIcon]="'datatable-icon-prev'"
+              [pagerNextIcon]="'datatable-icon-skip'"
+              [page]="curPage"
+              [size]="pageSize"
+              [count]="rowCount"
+              [hidden]="((rowCount / pageSize) === 0)"
+              (change)="handlePageChange($event)">
+              </datatable-pager>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12  col-lg-12 col-sm-12">
+              <div class="pull-right"> {{rowCount}} elementów</div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ngx-datatable-footer>
   </ngx-datatable>
 </div>
-<!-- <div>
-  <table class="table">
-    <thead>
-      <tr>
-        <th colspan="2">Parametry dodatkowe</th>
-      </tr>
-      <tr>
-        <th scope="row"></th>
-        <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-            <td>
-              <input type="text" class="form-control" [(ngModel)]="dataTableValuesSearched[i]"  placeholder="{{colName.value}}">
-            </td>
-        </ng-container>
-        <td>
-          <button type="button" (click)="search()"class="btn btn-success">Szukaj</button>
-        </td>
-      </tr>
-      <tr>
-        <th scope="col">#</th>
-        <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-          <th scope="col">{{colName.value}}</th>
-        </ng-container>
-        <th scope="col">Dodaj/Usuń</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container  *ngFor="let row of tableRows; let i = index">
-        <tr>
-          <th scope="row">{{i + 1}}</th>
-          <!-- <ng-container *ngFor=" let rowValues of row | values; let j = index"> -->
-            <!-- <td>{{row.name}}</td> -->
-          <!-- </ng-container> -->
-          <!-- <td>
-            <button *ngIf="row.exists === true; else falsyTemplate" type="button" class="btn btn-danger" (click)="remove(row.id)">Usuń</button>
-            <ng-template #falsyTemplate>
-              <button  type="button" class="btn btn-info" (click)="addParameters(row.id)">Dodaj</button>
-            </ng-template>
-          </td>
-        </tr>
-      </ng-container>
-
-    </tbody>
-  </table>
-</div> -->

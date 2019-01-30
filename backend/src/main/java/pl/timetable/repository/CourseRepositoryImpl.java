@@ -14,7 +14,7 @@ public class CourseRepositoryImpl extends AbstractGenericRepositoryWithSession<C
     public List<Subject> getParameters(Integer id){
         Course course = getById(id);
         Set<Subject> subjectRootSet = course.getSubjectSet();
-        List<Subject> subjectSet = getSession().createCriteria(Subject.class).list();
+        List<Subject> subjectSet = getSession().createQuery("from Subject").list();
 //        subjectSet = subjectSet.stream().filter(subjectRootSet::contains).collect(Collectors.toList());
         subjectSet.stream().filter(subjectRootSet::contains).forEach(subject -> subject.setExists(true));
         return subjectSet;
@@ -23,7 +23,7 @@ public class CourseRepositoryImpl extends AbstractGenericRepositoryWithSession<C
     public List<Subject> findParameters(Integer id, Integer first, Integer max){
         Course course = getById(id);
         Set<Subject> subjectRootSet = course.getSubjectSet();
-        List<Subject> subjectSet = getSession().createCriteria(Subject.class)
+        List<Subject> subjectSet = getSession().createQuery("from Subject")
                 .setFirstResult(first)
                 .setMaxResults(max)
                 .list();

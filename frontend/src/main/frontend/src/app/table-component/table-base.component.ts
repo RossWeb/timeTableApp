@@ -133,6 +133,10 @@ export class TableBaseComponent implements OnInit {
     );
   }
 
+  filter(){
+    this.setPage({ offset: 0 });
+  }
+
   find(){
     this.service.find(this.page, this.dataTableValues).subscribe(
       data => {
@@ -163,15 +167,19 @@ export class TableBaseComponent implements OnInit {
     let tempRows = [];
 
     console.log(this.tableRows);
-      tempCols.push({name:"#", cellTemplate: this.indexTmpl});
+      tempCols.push({name:"#",width:"10", cellTemplate: this.indexTmpl});
     this.dataTableNames.forEach((element, index) => {
-      tempCols.push({name:element.value, headerTemplate: this.searchTmpl});
+      if(element.type === 'Input'){
+        tempCols.push({name:element.value, headerTemplate: this.searchTmpl});
+      }else{
+        tempCols.push({name:element.value});
+      }
     });
     if(this.isEditButton){
-      tempCols.push({name:"Edytuj",cellTemplate: this.editTmpl});
-      tempCols.push({name:"Usun",cellTemplate: this.addDelTmpl});
+      tempCols.push({name:"Edytuj",width:"80", cellTemplate: this.editTmpl});
+      tempCols.push({name:"Usun",width:"80",cellTemplate: this.addDelTmpl});
     }else{
-      tempCols.push({name:"Modyfikuj",cellTemplate: this.addDelTmpl});
+      tempCols.push({name:"Modyfikuj",width:"100",cellTemplate: this.addDelTmpl});
     }
 
     this.tableRows.forEach((elementData, indexData) => {

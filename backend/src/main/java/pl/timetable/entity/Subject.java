@@ -39,7 +39,7 @@ public class Subject extends BaseEntity {
         this.size = size;
     }
 
-    @ManyToMany(mappedBy = "subjectSet")
+    @ManyToMany(mappedBy = "subjectSet", fetch = FetchType.EAGER)
     public Set<Teacher> getTeachers() {
         return teachers;
     }

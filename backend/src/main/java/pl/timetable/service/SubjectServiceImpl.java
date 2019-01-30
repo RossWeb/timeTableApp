@@ -42,7 +42,7 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
     public List<SubjectDto> findAll() {
         List<Subject> subjectList = subjectRepository.findAll().orElse(Collections.emptyList());
         return subjectList.stream().map(subject -> {
-            Hibernate.initialize(subject.getTeachers());
+//            Hibernate.initialize(subject.getTeachers());
             return SubjectServiceImpl.mapEntityToDto(subject);
         }).collect(Collectors.toList());
     }
@@ -54,7 +54,7 @@ public class SubjectServiceImpl extends AbstractService<SubjectDto, SubjectReque
         Integer max = first + request.getSize();
         List<Subject> subjectList = subjectRepository.getResult(first, max, getFilter(request)).orElse(Collections.emptyList());
         subjectResponse.setData(subjectList.stream().map(subject -> {
-            Hibernate.initialize(subject.getTeachers());
+//            Hibernate.initialize(subject.getTeachers());
             return SubjectServiceImpl.mapEntityToDto(subject);
         }).collect(Collectors.toList()));
         subjectResponse.setTotalElements(subjectRepository.getResultSize(getFilter(request)));

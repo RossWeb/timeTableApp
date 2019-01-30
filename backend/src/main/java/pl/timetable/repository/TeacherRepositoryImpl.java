@@ -14,7 +14,7 @@ public class TeacherRepositoryImpl extends AbstractGenericRepositoryWithSession<
     public List<Subject> findParameters(Integer id, Integer first, Integer max) {
         Teacher teacher = getById(id);
         Set<Subject> subjectRootSet = teacher.getSubjectSet();
-        List<Subject> subjectSet = getSession().createCriteria(Subject.class)
+        List<Subject> subjectSet = getSession().createQuery("from Subject")
                 .setFirstResult(first)
                 .setMaxResults(max)
                 .list();
@@ -26,7 +26,7 @@ public class TeacherRepositoryImpl extends AbstractGenericRepositoryWithSession<
     public List<Subject> getParameters(Integer id) {
         Teacher teacher = getById(id);
         Set<Subject> subjectRootSet = teacher.getSubjectSet();
-        List<Subject> subjectSet = getSession().createCriteria(Subject.class).list();
+        List<Subject> subjectSet = getSession().createQuery("from Subject").list();
         subjectSet.stream().filter(subjectRootSet::contains).forEach(subject -> subject.setExists(true));
         return subjectSet;
     }

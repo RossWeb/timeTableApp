@@ -1,4 +1,4 @@
-<p>
+<p class="padding-top-lg">
   <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample{{tableTypeName}}" aria-expanded="false" aria-controls="collapseExample">
     {{title}}
   </a>
@@ -6,14 +6,16 @@
 <div class="collapse" id="collapseExample{{tableTypeName}}">
   <div class="card card-body">
     <div class="row">
-      <div [ngClass]="{'col-md-8': relationParameterName !== null, 'col-md-12':relationParameterName === null}" class="">
+      <div [ngClass]="{'col-md-6': relationParameterName !== null && dataTableNames.length < 3,
+       'col-md-7': relationParameterName !== null && dataTableNames.length > 2,
+       'col-md-12':relationParameterName === null}" class="">
         <ngx-datatable
         class='material ngx-datatable fixed-header'
         [rows]="rows"
         [columns]="cols"
-        [columnMode]="'force'"
+        [columnMode]="'standard'"
         [headerHeight]="80"
-        [footerHeight]="100"
+        [footerHeight]="140"
         [rowHeight]="'auto'"
         [externalPaging]="true"
         [count]="page.totalElements"
@@ -29,12 +31,12 @@
             <span class="datatable-header-cell-label draggable" (click)="sort()">{{column.name}}</span>
           </span>
           <div class="row">
-            <input type="text" class="form-control " (input)="find()" [(ngModel)]="dataTableValues[column.name]"  placeholder="Szukaj">
+            <input type="text" class="form-control " (input)="filter()" [(ngModel)]="dataTableValues[column.name]"  placeholder="Szukaj">
           </div>
         </ng-template>
 
-        <ng-template #indexTmpl let-value="value" width="10" let-rowIndex="rowIndex">
-            {{rowIndex + 1}}
+        <ng-template #indexTmpl let-value="value" let-column="column" width="10" let-rowIndex="rowIndex" >
+            {{(rowIndex + 1)+(page.pageNumber * page.size) }}
         </ng-template>
         <ng-template #editTmpl let-value="value">
             <button type="button" class="btn btn-primary" (click)="edit(value)">Edytuj</button>
@@ -51,47 +53,56 @@
                 let-selected="selected"
                 ngx-datatable-footer-template>
                 <div class="container">
-                  <div class="row pull-right margin-bottom-md">
-                    <div class="col-md-1 col-lg-1 col-sm-1">
-                    </div>
+                  <div class="row">
                     <ng-container  *ngFor="let colName of dataTableNames; let i = index">
-                      <td *ngIf="colName.type === 'Select'; else elseBlock">
+                      <ng-container *ngIf="colName.type === 'Select'; else elseBlock">
                         <div class="col-md-4  col-lg-4 col-sm-4">
-                          <select [(ngModel)]="dataTableValues[i]">
+                          <select class="form-control" [(ngModel)]="dataTableValues[i]">
                             <option *ngFor="let item of selectDefinions[colName.value]" [ngValue]="item.id">{{item.name}}</option>
                           </select>
                         </div>
-                      </td>
+                      </ng-container>
                       <ng-template #elseBlock>
                           <div class="col-md-4 col-lg-4 col-sm-4">
                             <input type="text" class="form-control " [(ngModel)]="dataTableValues[i]"  placeholder="{{colName.value}}">
                           </div>
                       </ng-template>
                     </ng-container>
-                      <div class="col-md-1 col-lg-1 col-sm-1">
-                        <button type="button" (click)="add()"class="btn btn-success">{{addButtonName}}</button>
-                      </div>
+
+                  </div>
+                  <div class="row margin-top-sm margin-bottom-sm">
+                    <div class="col-md-1 col-lg-1 col-sm-1 col-md-offset-8">
+                      <button type="button" (click)="add()"class="btn btn-success">{{addButtonName}}</button>
+                    </div>
                   </div>
                   <div class="row">
-                    <datatable-pager class=" pull-right "
-                    [pagerLeftArrowIcon]="'datatable-icon-left'"
-                    [pagerRightArrowIcon]="'datatable-icon-right'"
-                    [pagerPreviousIcon]="'datatable-icon-prev'"
-                    [pagerNextIcon]="'datatable-icon-skip'"
-                    [page]="curPage"
-                    [size]="pageSize"
-                    [count]="rowCount"
-                    [hidden]="!((rowCount / pageSize) > 1)"
-                    (change)="handlePageChange($event)">
-                    </datatable-pager>
+                    <div class="col-md-12  col-lg-12 col-sm-12">
+                      <datatable-pager class=" pull-right "
+                      [pagerLeftArrowIcon]="'datatable-icon-left'"
+                      [pagerRightArrowIcon]="'datatable-icon-right'"
+                      [pagerPreviousIcon]="'datatable-icon-prev'"
+                      [pagerNextIcon]="'datatable-icon-skip'"
+                      [page]="curPage"
+                      [size]="pageSize"
+                      [count]="rowCount"
+                      [hidden]="((rowCount / pageSize) === 0)"
+                      (change)="handlePageChange($event)">
+                      </datatable-pager>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12  col-lg-12 col-sm-12">
+                      <div class="pull-right"> {{rowCount}} elementów</div>
+                    </div>
                   </div>
                 </div>
               </ng-template>
             </ngx-datatable-footer>
         </ngx-datatable>
       </div>
-      <div *ngIf="relationParameterName !== null;" class="col-md-4">
-        <app-table-parameter #courseParameter [hidden]="hiddenParameters" [tableTypeName]="relationParameterName" [isParameter]="true">Loading..</app-table-parameter>
+      <div *ngIf="relationParameterName !== null;" [ngClass]="{'col-md-offset-1': relationParameterName !== null && dataTableNames.length < 3}"
+       class="col-md-5">
+        <app-table-parameter #additionalParameter [hidden]="hiddenParameters" [tableTypeName]="relationParameterName" [isParameter]="true">Loading..</app-table-parameter>
       </div>
     </div>
 </div>

@@ -123,3 +123,36 @@
     <app-report ></app-report>
 
   </div>
+  <div>
+    <div class="modal fade" id="generateTimeTableModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="generateTimeTableModalLabel">Generowanie planu zajęć</h4>
+        </div>
+        <div class="modal-body">
+            <div class="loader" id="loader-1"></div>
+        </div>
+        <div class="modal-footer">
+          <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="generateTimeTableModalLabel">Wystąpił błąd</h4>
+        </div>
+        <div class="modal-body">
+            <div id="contentError">{{errorSpecificText}}</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Zamknij</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
