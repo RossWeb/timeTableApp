@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class GeneticUtilityTestClass {
 
-    private static Integer roomNumber = 25;
+    private static Integer roomNumber = 10;
     private static Integer subjectNumber = 10;
     private static Integer courseNumber = 5;
     private static Integer groupNumber = 4;
@@ -78,7 +78,7 @@ public class GeneticUtilityTestClass {
         geneticInitialData.setRoomDtoList(getDtoList(supplierRoom, roomNumber));
         geneticInitialData.setSubjectDtoList(getDtoList(supplierSubject, subjectNumber));
         geneticInitialData.setTeacherDtoList(getDtoList(supplierTeacher, teacherNumber).stream()
-                .map(teacherDto -> fillSubjectToTeacher(geneticInitialData.getSubjectDtoList(), teacherDto, 4)).collect(Collectors.toList()));
+                .map(teacherDto -> fillSubjectToTeacher(geneticInitialData.getSubjectDtoList(), teacherDto, 8)).collect(Collectors.toList()));
         geneticInitialData.setCourseDtoList(getDtoList(supplierCourse, courseNumber).stream().map(courseDto ->
                 fillSubjectToCourse(geneticInitialData.getSubjectDtoList(), courseDto, 6)).collect(Collectors.toList()));
         geneticInitialData.setGroupDtoList(getDtoList(supplierGroup, groupNumber).stream()
@@ -106,16 +106,22 @@ public class GeneticUtilityTestClass {
 
     private static TeacherDto fillSubjectToTeacher(List<SubjectDto> subjectDtoList, TeacherDto teacherDto, Integer subjectSize){
         Set<Subject> subjectDtos = new HashSet<>();
+        List<SubjectDto> subjectFound = new ArrayList<>();
         Teacher teacher = TeacherServiceImpl.mapDtoToEntity(teacherDto);
         do {
             Integer subjectNumber = new Random().ints(0, subjectDtoList.size()).findFirst().getAsInt();
-            if(subjectDtoList.get(subjectNumber).getTeachers().stream().noneMatch(teacherFounded -> teacherFounded.equals(teacher))) {
-                subjectDtoList.get(subjectNumber).getTeachers().add(teacher);
+            if(subjectFound.stream().noneMatch(s -> s.equals(subjectDtoList.get(subjectNumber)))) {
+//                subjectDtoList.get(subjectNumber).getTeachers().add(teacher);
                 subjectDtos.add(mapSubjectDtoToSubject(subjectDtoList.get(subjectNumber)));
+                subjectFound.add(subjectDtoList.get(subjectNumber));
             }
         } while (subjectDtos.size() < subjectSize);
 
         teacherDto.setSubjectSet(subjectDtos);
+        teacherDto.getSubjectSet().forEach(subject -> subject.getTeachers().add(TeacherServiceImpl.mapDtoToEntity(teacherDto)));
+        for (SubjectDto subjectDto : subjectFound){
+            subjectDto.getTeachers().add(TeacherServiceImpl.mapDtoToEntity(teacherDto));
+        }
         return teacherDto;
     }
 

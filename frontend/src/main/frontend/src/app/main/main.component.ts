@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output,Injectable, ViewChild, TemplateRef  } from '@angular/core';
+declare var $: any;
 import {ReportService} from '../report/report.service';
 import {InitProcess} from '../model/initProcess.type';
 import {TimeTable} from '../model/timeTable.type';

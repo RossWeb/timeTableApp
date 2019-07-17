@@ -1,6 +1,7 @@
 package pl.timetable.facade;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.Dialect;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.api.TimeTableRequest;
 import pl.timetable.dto.*;
+import pl.timetable.entity.TimeTableDescription;
 import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.service.*;
@@ -116,11 +118,11 @@ public class TimeTableFacade {
         return geneticInitialData;
     }
 
-    public LectureDescriptionDto getLectureDescriptionByTimeTableDescription(TimeTableDescriptionDto timeTableDescriptionDto) {
+    public LectureDescriptionDto getLectureDescriptionByTimeTableDescription(TimeTableDescription timeTableDescription) {
         try {
-            return lectureDescriptionService.getLectureDescriptionByTimeTableDescription(timeTableDescriptionDto);
+            return lectureDescriptionService.getLectureDescriptionByTimeTableDescription(timeTableDescription);
         } catch (EntityNotFoundException e) {
-            LOGGER.error("Couldnt get any lecture description by timetableId : " + timeTableDescriptionDto.getId());
+            LOGGER.error("Couldnt get any lecture description by timetableId : " + timeTableDescription.getId());
             return null;
         }
     }
@@ -132,6 +134,16 @@ public class TimeTableFacade {
         timeTableResultDto.setTotalElements(timeTableService.getTimeTableResultCount(pagingRequestDto.getId(), pagingRequestDto.getGroupId(), pagingRequestDto.getDays()));
         timeTableResultDto.setTotalPages(timeTableResultDto.getTotalElements() / pagingRequestDto.getSize());
         return timeTableResultDto;
+    }
+
+    public Workbook getWorkBookTimeTableById(Integer timeTableId) throws EntityNotFoundException {
+        List<TimeTableDto> timeTableResult = timeTableService.getTimeTableResultById(timeTableId);
+        if(Objects.nonNull(timeTableResult) && !timeTableResult.isEmpty()) {
+            TimeTableDescription timeTableDescription = timeTableResult.get(0).getTimeTableDescription();
+            LectureDescriptionDto lectureDescriptionByTimeTableDescription = getLectureDescriptionByTimeTableDescription(timeTableDescription);
+            return WorkBookService.createWorkBookByGenotype(timeTableResult, lectureDescriptionByTimeTableDescription);
+        }
+        throw new EntityNotFoundException( timeTableId, "TimeTable is empty");
     }
 
     private void saveGroup(Cell[] cells, TimeTableDescriptionDto timeTableDescriptionDto) throws EntityNotFoundException {

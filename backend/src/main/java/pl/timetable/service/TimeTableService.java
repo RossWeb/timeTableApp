@@ -67,6 +67,12 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
                 .map(this::mapEntityToDto).collect(Collectors.toList());
     }
 
+    public List<TimeTableDto> getTimeTableResultById(Integer timeTableId) throws EntityNotFoundException {
+        return Optional.ofNullable(timeTableRepository.getTimeTableResult(timeTableId))
+                .orElseThrow(() -> new EntityNotFoundException(timeTableId, "TimeTable")).stream()
+                .map(this::mapEntityToDto).collect(Collectors.toList());
+    }
+
     public Integer getTimeTableResultCount(Integer timeTableId, Integer groupId, Integer days){
         return timeTableRepository.getTimeTableCount(timeTableId, groupId) / days;
     }

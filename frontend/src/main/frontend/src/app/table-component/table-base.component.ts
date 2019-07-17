@@ -67,6 +67,7 @@ export class TableBaseComponent implements OnInit {
 
   ngOnInit() {
     this.service = this.tableServiceProvider.getServiceByName(this.tableTypeName);
+    // this.service.setParameterTable(false);
     // this.list();
     this.selectDefinions =
     this.service.getDefinions().subscribe(
@@ -109,14 +110,16 @@ export class TableBaseComponent implements OnInit {
     }
   };
 
-  remove(rowId){
+  remove(rowId, event){
+    event.stopPropagation();
     this.service.remove(rowId).subscribe(
       data => {this.refreshTable()},
       err => {console.log("Error occured when remove.")}
     );
   };
 
-  edit(row: any){
+  edit(row: any, event){
+    event.stopPropagation();
     this.rowActive = row.id;
     this.dataTableValues = (<any>Object).values(row).splice(1);
     this.addButtonName = SAVE_NAME;
@@ -141,7 +144,7 @@ export class TableBaseComponent implements OnInit {
     this.service.find(this.page, this.dataTableValues).subscribe(
       data => {
         let dataFromPage = data.data;
-        if(this.isParameter !== true){
+        if(this.isParameter !== true && dataFromPage !== undefined){
           dataFromPage = this.service.transformValues(dataFromPage);
         }
         if(data.totalElements === 0){

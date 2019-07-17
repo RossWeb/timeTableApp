@@ -8,6 +8,7 @@ import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.facade.TimeTableFacade;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -21,11 +22,18 @@ public class GeneticAlgorithmService {
     private GenotypeService genotypeService;
     private FitnessService fitnessService;
     private TimeTableFacade timeTableFacade;
+    private InitialGenotypeCriteria initialGenotypeCriteria;
 
-    public GeneticAlgorithmService(GenotypeService genotypeService, FitnessService fitnessService, TimeTableFacade timeTableFacade) {
+    public GeneticAlgorithmService(GenotypeService genotypeService, FitnessService fitnessService,
+                                   TimeTableFacade timeTableFacade, InitialGenotypeCriteria initialGenotypeCriteria) {
         this.genotypeService = genotypeService;
         this.fitnessService = fitnessService;
         this.timeTableFacade = timeTableFacade;
+        this.initialGenotypeCriteria = initialGenotypeCriteria;
+    }
+
+    public void setInitialGenotypeCriteria(InitialGenotypeCriteria initialGenotypeCriteria) {
+        this.initialGenotypeCriteria = initialGenotypeCriteria;
     }
 
     public void setFitnessService(FitnessService fitnessService) {
@@ -42,26 +50,27 @@ public class GeneticAlgorithmService {
 
     public Integer init(GeneticInitialData geneticInitialData) {
 
+        initialGenotypeCriteria.checkData(geneticInitialData);
         LectureDescriptionDto lectureDescriptionDto = geneticInitialData.getLectureDescriptionDto();
         TimeTableDescriptionDto timeTableDescriptionDto = timeTableFacade.saveTimeTableDescription("timeTable" + LocalDateTime.now(),
                 LocalDateTime.now());
         lectureDescriptionDto.setTimeTableDescriptionId(timeTableDescriptionDto.getId());
         timeTableFacade.saveLectureDescription(lectureDescriptionDto);
         //generate population async
-//        generatePopulation(geneticInitialData, timeTableDescriptionDto);
-        CompletableFuture.supplyAsync(() -> generatePopulation(geneticInitialData, timeTableDescriptionDto)).whenComplete((population, throwable) -> {
-            if (Objects.nonNull(throwable)) {
-                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
-                LOGGER.error("Error when async generic genotype. " + throwable);
-            }
-
-            if (Objects.nonNull(population)) {
-                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.SUCCESS);
-            } else {
-                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
-                LOGGER.error("No population. Genetic algorithm couldnt completed");
-            }
-        });
+        generatePopulation(geneticInitialData, timeTableDescriptionDto);
+//        CompletableFuture.supplyAsync(() -> generatePopulation(geneticInitialData, timeTableDescriptionDto)).whenComplete((population, throwable) -> {
+//            if (Objects.nonNull(throwable)) {
+//                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
+//                LOGGER.error("Error when async generic genotype. " + throwable);
+//            }
+//
+//            if (Objects.nonNull(population)) {
+//                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.SUCCESS);
+//            } else {
+//                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
+//                LOGGER.error("No population. Genetic algorithm couldnt completed");
+//            }
+//        });
         return timeTableDescriptionDto.getId();
 
     }
@@ -79,7 +88,7 @@ public class GeneticAlgorithmService {
         population.setGeneticInitialData(geneticInitialData);
         Double globalFitnessScore = 0.0;
         Integer counterSameFitnessScore = 0;
-        Integer sameFitnessScoreNumber = 100;
+        Integer sameFitnessScoreNumber = 20;
 //        Integer populationIteration = 0;
         for (int i = 0; i < geneticInitialData.getPopulationSize(); i++) {
             LOGGER.info("Create population : " + i);
@@ -89,10 +98,15 @@ public class GeneticAlgorithmService {
 //                LOGGER.error(e);
 //            }
         }
+//        WorkBookService.createWorkBookByGenotype(population.getGenotypePopulation().get(0));
 //        Population newPopulation = processGenetic(population);
         for (; ; ) {
             population.setLectureDescriptionDto(geneticInitialData.getLectureDescriptionDto());
-            population = processGenetic(population, geneticInitialData);
+            try {
+                population = processGenetic(population, geneticInitialData);
+            } catch (CloneNotSupportedException e) {
+                LOGGER.error("Error generating timetable");
+            }
             LOGGER.info("Population generation : " + population.getPopulationIteration());
             if ((population.getBestGenotype().getHardFitnessScore() == 100 && population.getBestGenotype().getFitnessScore() >= 200)
                     || population.getGenotypePopulation().size() == 0
@@ -134,7 +148,7 @@ public class GeneticAlgorithmService {
         timeTableFacade.addReportGenotype(reportPopulationDto);
     }
 
-    private Population processGenetic(Population population, GeneticInitialData geneticInitialData) {
+    private Population processGenetic(Population population, GeneticInitialData geneticInitialData) throws CloneNotSupportedException {
         Integer populationSize = population.getGenotypePopulation().size();
         //fitness function
         population.setFitnessScore(0.0);
@@ -142,11 +156,11 @@ public class GeneticAlgorithmService {
         fitnessService.fitPopulation(population);
         List<Genotype> genotypes = population.getGenotypePopulation().stream().filter(genotype -> genotype.getHardFitnessScore() > 30.0).collect(Collectors.toList());
         Integer genotypeSize = populationSize - genotypes.size();
-        for (int i = 0; i < genotypeSize; i++) {
-            genotypes.add(genotypeService.createInitialGenotype(population.getGeneticInitialData()));
-        }
+//        for (int i = 0; i < genotypeSize; i++) {
+//            genotypes.add(genotypeService.createInitialGenotype(population.getGeneticInitialData()));
+//        }
         population.setGenotypePopulation(genotypes);
-        fitnessService.fitPopulation(population);
+//        fitnessService.fitPopulation(population);
         //selection by roulete
 //        fitnessService.selectionRoulette(population);
         //crossover
@@ -155,7 +169,7 @@ public class GeneticAlgorithmService {
         newPopulation.setBestGenotypeGeneration(population.getBestGenotypeGeneration());
         newPopulation.setGeneticInitialData(population.getGeneticInitialData());
         newPopulation.setPopulationIteration(population.getPopulationIteration() + 1);
-        for (int i = 0; i < population.getGenotypePopulation().size() ; i++) {
+        for (int i = 0; i < populationSize ; i++) {
 //            Genotype genotypeFirst = fitnessService.getGenotypeBySelection(population);
             Genotype genotypeFirst = new Genotype(fitnessService.selectionTournament(population));
 //            Genotype genotypeSecond = fitnessService.getGenotypeBySelection(population);
@@ -163,14 +177,24 @@ public class GeneticAlgorithmService {
 //            genotypeService.crossover(genotypeFirst, genotypeSecond, population.getLectureDescriptionDto().getNumberPerDay());
 //            genotypeService.crossoverPlus(genotypeFirst, genotypeSecond, population.getLectureDescriptionDto().getNumberPerDay());
 //            newPopulation.getGenotypePopulation().add(genotypeService.crossoverChild(genotypeFirst, genotypeSecond));
-            newPopulation.getGenotypePopulation().add(genotypeService.crossoverReal(genotypeFirst, genotypeSecond));
+            Genotype genotype = genotypeService.crossoverNew(genotypeFirst, genotypeSecond);
+            newPopulation.getGenotypePopulation().add(genotype);
 //            newPopulation.getGenotypePopulation().add(genotypeFirst);
 //            newPopulation.getGenotypePopulation().add(genotypeSecond);
+            if(Arrays.stream(newPopulation.getGenotypePopulation().get(0).getGenotypeTable()[0]).filter(room -> Objects.nonNull(room) && Objects.isNull(room.getRoomDto())).count() != 2 ||
+                    Arrays.stream(newPopulation.getGenotypePopulation().get(0).getGenotypeTable()[1]).filter(room -> Objects.nonNull(room) && Objects.isNull(room.getRoomDto())).count() != 2 ||
+                    Arrays.stream(newPopulation.getGenotypePopulation().get(0).getGenotypeTable()[2]).filter(room -> Objects.nonNull(room) && Objects.isNull(room.getRoomDto())).count() != 2  ||
+                    Arrays.stream(newPopulation.getGenotypePopulation().get(0).getGenotypeTable()[3]).filter(room -> Objects.nonNull(room) && Objects.isNull(room.getRoomDto())).count() != 2 ){
+                LOGGER.info("Dupa");
+            }
         }
         for (int i = 0; i < newPopulation.getGenotypePopulation().size(); i++) {
-//            genotypeService.mutateGenotype(newPopulation.getGenotypePopulation().get(i), geneticInitialData);
+
+            genotypeService.mutateGenotype(newPopulation.getGenotypePopulation().get(i), geneticInitialData);
             genotypeService.mapHintGenotype(newPopulation.getGenotypePopulation().get(i));
+
         }
+
         return newPopulation;
     }
 }

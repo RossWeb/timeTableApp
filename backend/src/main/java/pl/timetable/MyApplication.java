@@ -29,9 +29,15 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.accept.ContentNegotiationManager;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
+import pl.timetable.config.ExcelViewResolver;
 
 import javax.persistence.EntityManagerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import static org.springframework.orm.hibernate5.SessionFactoryUtils.getDataSource;
@@ -57,6 +63,23 @@ public class MyApplication {
             throw new NullPointerException("factory is not a hibernate factory");
         }
         return entityManagerFactory.unwrap(SessionFactory.class);
+    }
+
+    /*
+     * Configure ContentNegotiatingViewResolver
+     */
+    @Bean
+    public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
+        ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
+        resolver.setContentNegotiationManager(manager);
+
+        // Define all possible view resolvers
+        List<ViewResolver> resolvers = new ArrayList<>();
+
+        resolvers.add(new ExcelViewResolver());
+
+        resolver.setViewResolvers(resolvers);
+        return resolver;
     }
 
 //    @Bean

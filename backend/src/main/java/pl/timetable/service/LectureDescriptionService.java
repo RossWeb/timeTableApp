@@ -48,9 +48,8 @@ public class LectureDescriptionService {
         lectureDescriptionRepository.create(lectureDescription);
     }
 
-    public LectureDescriptionDto getLectureDescriptionByTimeTableDescription(TimeTableDescriptionDto timeTableDescriptionDto) throws EntityNotFoundException {
-        timeTableDescriptionService.get(timeTableDescriptionDto.getId());
-        LectureDescription lectureDescription = lectureDescriptionRepository.getByTimeTableDescription(TimeTableDescriptionService.mapDtoToEntity(timeTableDescriptionDto));
+    public LectureDescriptionDto getLectureDescriptionByTimeTableDescription(TimeTableDescription timeTableDescription) throws EntityNotFoundException {
+        LectureDescription lectureDescription = lectureDescriptionRepository.getByTimeTableDescription(timeTableDescription);
         return mapEntityToDto(lectureDescription);
     }
 

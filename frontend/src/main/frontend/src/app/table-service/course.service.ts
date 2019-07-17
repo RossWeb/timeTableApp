@@ -20,7 +20,7 @@ export class CourseService extends TableService<Course> {
 
 
   create(name: string, dataTableValues: string[]) {
-    return this.http.post('api/course/' + this.getParametersUrlIfNeeded(), this.type.getParams(dataTableValues),
+    return this.http.post('api/course/', this.type.getParams(dataTableValues),
       {responseType: 'text'});
   }
 
@@ -30,7 +30,7 @@ export class CourseService extends TableService<Course> {
   }
 
   remove(id: string){
-    return this.http.delete('api/course/' + this.getParametersUrlIfNeeded() + id,{responseType: 'text'})
+    return this.http.delete('api/course/' + id,{responseType: 'text'})
   }
 
   update(dataTableValues: string[], id: string){

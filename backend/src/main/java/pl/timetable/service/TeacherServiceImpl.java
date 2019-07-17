@@ -172,6 +172,7 @@ public class TeacherServiceImpl extends AbstractService<TeacherDto, TeacherReque
         teacher.setName(teacherDto.getName());
         teacher.setSurname(teacherDto.getSurname());
         teacher.setSubjectSet(teacherDto.getSubjectSet());
+        teacher.setId(teacherDto.getId());
         return teacher;
     }
 }

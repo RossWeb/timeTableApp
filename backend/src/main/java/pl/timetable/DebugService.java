@@ -5,9 +5,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.timetable.dto.GeneticInitialData;
+import pl.timetable.dto.*;
 import pl.timetable.entity.*;
 import pl.timetable.repository.*;
+import pl.timetable.service.CourseServiceImpl;
+import pl.timetable.service.RoomServiceImpl;
 import pl.timetable.service.SubjectServiceImpl;
 import pl.timetable.service.TeacherServiceImpl;
 
@@ -75,15 +77,19 @@ public class DebugService {
 
     public void init(GeneticInitialData geneticInitialData) {
         geneticInitialData.getRoomDtoList().forEach(roomDto -> {
-            roomDto.setId(createRoom(roomDto.getName(), roomDto.getNumber()));
+            roomDto.setId(createRoom(roomDto).getId());
         });
         geneticInitialData.getSubjectDtoList().forEach(subjectDto -> {
-            subjectDto.setId(createSubject(subjectDto.getName()).getId());
+            subjectDto.setId(createSubject(subjectDto).getId());
         });
         geneticInitialData.getTeacherDtoList().forEach(teacherDto -> {
-            teacherDto.setId(createTeacher(
-                    TeacherServiceImpl.mapDtoToEntity(teacherDto), new HashSet<>(subjectRepository.findAll()
-                            .get())).getId());
+            Set<Subject> subjectSet = new HashSet<>();
+            teacherDto.getSubjectSet().forEach(subject -> {
+                Subject subjectFromDataBase = subjectRepository.getSubjectByName(subject.getName());
+                subjectSet.add(subjectFromDataBase);
+            });
+            teacherDto.setSubjectSet(subjectSet);
+            teacherDto.setId(createTeacher(teacherDto).getId());
         });
 
         geneticInitialData.setSubjectDtoList(subjectRepository.findAll()
@@ -94,8 +100,8 @@ public class DebugService {
                 Subject subjectFromDataBase = subjectRepository.getSubjectByName(subject.getName());
                 subjectSet.add(subjectFromDataBase);
             });
-            courseDto.setId(createCourse(subjectSet, courseDto.getName()).getId());
             courseDto.setSubjectSet(subjectSet);
+            courseDto.setId(createCourse(subjectSet, courseDto.getName()).getId());
         });
         geneticInitialData.getGroupDtoList().forEach(groupDto -> {
             Course course = courseRepository.getCourseByName(groupDto.getCourse().getName());
@@ -215,5 +221,25 @@ public class DebugService {
         subject.setName(name);
         subject.setSize(5);
         return subjectRepository.create(subject);
+    }
+
+    private Subject createSubject(SubjectDto subjectDto){
+        return subjectRepository.create(SubjectServiceImpl.mapDtoToEntity(subjectDto));
+    }
+
+    private Teacher createTeacher(TeacherDto teacherDto){
+        return teacherRepository.create(TeacherServiceImpl.mapDtoToEntity(teacherDto));
+    }
+
+    private Room createRoom(RoomDto roomDto){
+        return roomRepository.create(RoomServiceImpl.mapDtoToEntity(roomDto));
+    }
+
+    private Course createCourse(CourseDto courseDto){
+        Course course = new Course();
+        course.setId(courseDto.getId());
+        course.setSubjectSet(courseDto.getSubjectSet());
+        course.setName(courseDto.getName());
+        return courseRepository.create(course);
     }
 }

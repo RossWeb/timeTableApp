@@ -2,7 +2,7 @@ package pl.timetable.dto;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-public class Cell {
+public class Cell implements Cloneable {
 
     private Integer lecture;
     private RoomDto roomDto;
@@ -73,6 +73,16 @@ public class Cell {
 
     public SubjectDto getSubjectDto() {
         return subjectDto;
+    }
+
+    @Override
+    public Cell clone() throws CloneNotSupportedException {
+        super.clone();
+        Cell cell = new Cell(this.lecture, this.courseDto, this.groupDto, this.day);
+        cell.setTeacherDto(this.teacherDto);
+        cell.setRoomDto(this.roomDto);
+        cell.setSubjectDto(this.subjectDto);
+        return cell;
     }
 
     @Override

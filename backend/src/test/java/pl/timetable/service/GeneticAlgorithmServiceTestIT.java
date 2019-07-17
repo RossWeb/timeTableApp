@@ -90,8 +90,13 @@ public class GeneticAlgorithmServiceTestIT {
             return new TimeTableService(groupService(), roomService(), subjectService(), timeTableDescriptionService(), timeTableRepository());
         }
         @Bean
+        public InitialGenotypeCriteria initialGenotypeCriteria(){
+            return new InitialGenotypeCriteria();
+        }
+
+        @Bean
         public GeneticAlgorithmService geneticAlgorithmService(){
-            return new GeneticAlgorithmService(null, null, null);
+            return new GeneticAlgorithmService(null, null, null, null);
         }
         @Bean
         public DebugService debugService(){return new DebugService();}
@@ -156,6 +161,8 @@ public class GeneticAlgorithmServiceTestIT {
     private TeacherRepository teacherRepository;
     @Autowired
     private TimeTableService timeTableService;
+    @Autowired
+    private InitialGenotypeCriteria initialGenotypeCriteria;
 
     @Before
     public void init(){
@@ -167,6 +174,7 @@ public class GeneticAlgorithmServiceTestIT {
         geneticAlgorithmService.setGenotypeService(genotypeService);
         geneticAlgorithmService.setFitnessService(fitnessService);
         geneticAlgorithmService.setTimeTableFacade(timeTableFacade);
+        geneticAlgorithmService.setInitialGenotypeCriteria(initialGenotypeCriteria);
         timeTableDescriptionService.setTimeTableDescriptionRepository(timeTableDescriptionRepository);
         lectureDescriptionService.setLectureDescriptionRepository(lectureDescriptionRepository);
         subjectService.setSubjectRepository(subjectRepository);
@@ -192,7 +200,9 @@ public class GeneticAlgorithmServiceTestIT {
         Assert.assertNotNull(timeTableId);
         TimeTableDescriptionDto timeTableDescriptionDto = timeTableDescriptionService.findAll().get(0);
         Assert.assertThat(timeTableDescriptionDto, notNullValue());
-        LectureDescriptionDto lectureDescriptionDto = lectureDescriptionService.getLectureDescriptionByTimeTableDescription(timeTableDescriptionDto);
+        TimeTableDescription timeTableDescription = new TimeTableDescription();
+        timeTableDescription.setId(timeTableDescriptionDto.getId());
+        LectureDescriptionDto lectureDescriptionDto = lectureDescriptionService.getLectureDescriptionByTimeTableDescription(timeTableDescription);
         Assert.assertThat(lectureDescriptionDto, notNullValue());
         List<TimeTableDto> timeTableDtoList= timeTableService.findAll();
         Assert.assertThat(timeTableDtoList.isEmpty(), is(false));

@@ -16,8 +16,14 @@ public class Genotype {
     private Double softFitnessScore = 0.0;
     private Double hardFitnessScore = 0.0;
 
-    public Genotype(Genotype another) {
-        this.genotypeTable = Arrays.copyOf(another.getGenotypeTable(), another.getGenotypeTable().length);
+    public Genotype(Genotype another) throws CloneNotSupportedException {
+        this.genotypeTable = new Cell[another.genotypeTable.length][];
+        for (int i = 0; i < this.genotypeTable.length; i++) {
+            this.genotypeTable[i] = another.genotypeTable[i].clone();
+            for (int j = 0; j < this.genotypeTable[i].length ; j++) {
+                this.genotypeTable[i][j] = another.genotypeTable[i][j].clone();
+            }
+        }
         this.roomByLecture = new HashMap<>(another.getRoomByLecture());
         this.roomByGroup = new HashMap<>(another.getRoomByGroup());
         this.roomBySubject = new HashMap<>(another.getRoomBySubject());

@@ -39,10 +39,10 @@
             {{(rowIndex + 1)+(page.pageNumber * page.size) }}
         </ng-template>
         <ng-template #editTmpl let-value="value">
-            <button type="button" class="btn btn-primary" (click)="edit(value)">Edytuj</button>
+            <button type="button" class="btn btn-primary" (click)="edit(value, $event)">Edytuj</button>
         </ng-template>
         <ng-template #addDelTmpl let-value="value">
-            <button type="button" class="btn btn-danger" (click)="remove(value)">Usuń</button>
+            <button type="button" class="btn btn-danger" (click)="remove(value, $event)">Usuń</button>
         </ng-template>
             <ngx-datatable-footer>
               <ng-template

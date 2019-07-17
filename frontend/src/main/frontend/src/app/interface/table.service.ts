@@ -23,7 +23,7 @@ export class TableService<T extends Table> {
   }
 
   getParametersUrlIfNeeded() : string {
-    if(this.isParameterTable){
+    if(this.isParameterTable && this.primaryKey !== undefined){
       return this.primaryKey + '/parameters/';
     }else{
       return '';

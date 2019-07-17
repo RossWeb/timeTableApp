@@ -1,9 +1,11 @@
 package pl.timetable.controller;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.*;
 import pl.timetable.dto.*;
@@ -117,4 +119,17 @@ public class TimeTableController {
         }
 
     }
+
+    @GetMapping("{id}/download")
+    public String download(Model model, @PathVariable("id") Integer timeTableId) {
+        try {
+            Workbook workBookTimeTableById = timeTableFacade.getWorkBookTimeTableById(timeTableId);
+            model.addAttribute("workbook", workBookTimeTableById);
+        } catch (EntityNotFoundException e) {
+            LOGGER.error("timetable was not found", e);
+        }
+        return "";
+    }
+
+
 }

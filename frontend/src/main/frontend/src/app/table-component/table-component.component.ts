@@ -60,7 +60,27 @@ export class TableComponentComponent extends TableBaseComponent implements OnIni
         this.parameterComponent.first.refreshTable();
       }
 
-    console.log('Select parameter ' + row.selected[0].edytuj.id);
   }
+
+  remove(rowId, event){
+    super.remove(rowId, event);
+    if(this.relationParameterName !== null){
+      this.hiddenParameters = true;
+      console.log(this.parameterComponent);
+      this.parameterComponent.first.setPrimaryKey(undefined);
+      this.parameterComponent.first.refreshTable();
+    }
+  }
+
+  edit(row: any, event){
+    super.edit(row, event)
+    if(this.relationParameterName !== null){
+      this.hiddenParameters = true;
+      console.log(this.parameterComponent);
+      this.parameterComponent.first.setPrimaryKey(undefined);
+      this.parameterComponent.first.refreshTable();
+    }
+  };
+
 
 }

@@ -26,6 +26,14 @@ public class TimeTableRepositoryImpl extends AbstractGenericRepositoryWithSessio
                 .list();
     }
 
+    @Override
+    public List<TimeTable> getTimeTableResult(Integer timeTableId) {
+        return (List<TimeTable>) getSession().createCriteria(TimeTable.class)
+                .add(Restrictions.eq("timeTableDescription.id", timeTableId))
+                .addOrder(Order.asc("lectureNumber"))
+                .list();
+    }
+
     public Integer getTimeTableCount(Integer timeTableId, Integer groupId){
         return getSession().createCriteria(TimeTable.class)
                 .add(Restrictions.eq("timeTableDescription.id", timeTableId))
