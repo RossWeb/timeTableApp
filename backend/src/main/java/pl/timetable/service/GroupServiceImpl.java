@@ -150,6 +150,7 @@ public class GroupServiceImpl extends AbstractService<GroupDto, GroupRequest, Gr
     private Group mapRequestToEntity(GroupRequest groupRequest) {
         Group entity = new Group();
         entity.setName(groupRequest.getName());
+        entity.setCourse(courseRepository.getById(groupRequest.getCourseId()));
         return entity;
     }
 }

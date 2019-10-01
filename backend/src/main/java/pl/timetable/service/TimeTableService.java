@@ -24,16 +24,19 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
     private GroupServiceImpl groupService;
     private RoomServiceImpl roomService;
     private SubjectServiceImpl subjectService;
+    private TeacherServiceImpl teacherService;
     private TimeTableDescriptionService timeTableDescriptionService;
     private TimeTableRepository timeTableRepository;
 
     public TimeTableService(GroupServiceImpl groupService, RoomServiceImpl roomService, SubjectServiceImpl subjectService,
-                            TimeTableDescriptionService timeTableDescriptionService, TimeTableRepository timeTableRepository) {
+                            TimeTableDescriptionService timeTableDescriptionService, TimeTableRepository timeTableRepository,
+                            TeacherServiceImpl teacherService) {
         this.groupService = groupService;
         this.roomService = roomService;
         this.subjectService = subjectService;
         this.timeTableDescriptionService = timeTableDescriptionService;
         this.timeTableRepository = timeTableRepository;
+        this.teacherService = teacherService;
     }
 
     @Override
@@ -59,8 +62,8 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
     }
 
     public List<TimeTableDto> getTimeTableResult(TimeTablePagingDto pagingRequestDto) throws EntityNotFoundException {
-        Integer firstResult = pagingRequestDto.getPageNumber() * pagingRequestDto.getDays() + 1;
-        Integer maxResult = firstResult + pagingRequestDto.getDays();
+        Integer firstResult = pagingRequestDto.getPageNumber() * pagingRequestDto.getDays() +1;
+        Integer maxResult = firstResult + pagingRequestDto.getDays() ;
         return Optional.ofNullable(timeTableRepository.getTimeTableResult(
                 pagingRequestDto.getId(), firstResult, maxResult, pagingRequestDto.getGroupId()))
                 .orElseThrow(() -> new EntityNotFoundException(pagingRequestDto.getId(), "TimeTable")).stream()
@@ -100,6 +103,7 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
         timeTableDto.setRoom(timeTable.getRoom());
         timeTableDto.setTimeTableDescription(timeTable.getTimeTableDescription());
         timeTableDto.setSubject(timeTable.getSubject());
+        timeTableDto.setTeacher(timeTable.getTeacher());
         return timeTableDto;
     }
 
@@ -113,6 +117,11 @@ public class TimeTableService extends AbstractService<TimeTableDto, TimeTableReq
         if(Objects.nonNull(timeTableDto.getRoom())) {
             timeTable.setRoom(RoomServiceImpl.mapDtoToEntity(
                     roomService.getRoomByNameAndNumber(timeTableDto.getRoom().getName(), timeTableDto.getRoom().getNumber())));
+        }
+
+        if(Objects.nonNull(timeTableDto.getTeacher())) {
+            timeTable.setTeacher(TeacherServiceImpl.mapDtoToEntity(
+                    teacherService.get(timeTableDto.getTeacher().getId())));
         }
         timeTable.setGroup(GroupServiceImpl.mapDtoToEntity(groupService.getByGroupName(timeTableDto.getGroup().getName())));
         timeTable.setDay(timeTableDto.getDay());

@@ -4,6 +4,7 @@ import 'rxjs/add/operator/map';
 import {PagedData} from '../model/paged-data.type';
 import { HttpClient } from '@angular/common/http';
 import {Table} from "../interface/table.type";
+import { AdminPanelComponent } from '../admin-panel-component/admin-panel-component.component';
 
 export class TableService<T extends Table> {
 
@@ -40,6 +41,11 @@ export class TableService<T extends Table> {
       {responseType: 'text'});
   }
 
+  removeParameters(id: number) {
+    return this.http.delete(this.type.getApiUrl() + this.getParametersUrlIfNeeded()  + id, 
+      {responseType: 'text'});
+  }
+
 
   remove(id: string){
     return this.http.delete(this.type.getApiUrl() + id,{responseType: 'text'})
@@ -65,6 +71,10 @@ export class TableService<T extends Table> {
 
   getName(): string {
     return this.type.getType();
+  }
+
+  refreshOtherTableIfNeeded(parent: AdminPanelComponent): void {
+    //specify implementation on concrete class
   }
 
 

@@ -63,40 +63,43 @@ public class InitialGenotypeCriteria {
 
     private boolean checkTeacherHasEnoughSubjectLecture(GeneticInitialData geneticInitialData){
         List<TeacherDto> teacherDtoList = geneticInitialData.getTeacherDtoList();
-        Integer lectureSizePerWeek = geneticInitialData.getLectureDescriptionDto().getNumberPerDay() * geneticInitialData.getLectureDescriptionDto().getDaysPerWeek();
-        Integer lectureSizePerSemester = lectureSizePerWeek * geneticInitialData.getLectureDescriptionDto().getWeeksPerSemester();
-        for (TeacherDto teacherDto : teacherDtoList) {
-            int subjectSizePerTeacher = teacherDto.getSubjectSet().stream().mapToInt(subject -> {
-                if (subject.getTeachers().size() == 1) {
-                    return subject.getSize();
+        List<SubjectDto> subjectDtoList = geneticInitialData.getSubjectDtoList();
+//        Integer lectureSizePerWeek = geneticInitialData.getLectureDescriptionDto().getNumberPerDay() * geneticInitialData.getLectureDescriptionDto().getDaysPerWeek();
+        Integer subjectSizePerSemester = geneticInitialData.getCourseDtoList().stream().mapToInt(courseDto -> courseDto.getSubjectSet().stream().mapToInt(Subject::getSize).sum()).sum();
+        Integer subjectSizePerTeacher = 0;
+        for (SubjectDto subjectDto : subjectDtoList) {
+            subjectSizePerTeacher = subjectSizePerSemester + subjectDto.getTeachers().stream().mapToInt(teacher -> {
+                if (subjectDto.getTeachers().size() == 1) {
+                    return subjectDto.getSize();
                 } else {
-                    boolean anyTeacherIsOnlyForThisSubject = subject.getTeachers().stream().anyMatch(teacher -> {
-                        return teacher.getSubjectSet().size() == 1;
-                    });
-                    if(anyTeacherIsOnlyForThisSubject) {
-                        return 0;
-                    }else if(subject.getTeachers().size() > 1){
-                        int subjectPerTeacher = subject.getSize() / subject.getTeachers().size();
+//                    boolean anyTeacherIsOnlyForThisSubject = subject.getTeachers().stream().anyMatch(teacher -> {
+//                        return teacher.getSubjectSet().size() == 1;
+//                    });
+//                    if(anyTeacherIsOnlyForThisSubject) {
+//                        return subject.getSize();
+                    if(subjectDto.getTeachers().size() > 1){
+                        int subjectPerTeacher = subjectDto.getSize() / subjectDto.getTeachers().size();
                         if(subjectPerTeacher == 0){
                             return 0;
                         }
-                        Teacher teacherWithMaxSubject = getTeacherWithMaxSubject(subject);
-                        int restSubject = subject.getSize() - subject.getTeachers().size() * subjectPerTeacher;
-                        if(restSubject != 0 && teacherWithMaxSubject.getId().equals(teacherDto.getId()) ){
+                        Teacher teacherWithMaxSubject = getTeacherWithMaxSubject(subjectDto);
+                        int restSubject = subjectDto.getSize() - subjectDto.getTeachers().size() * subjectPerTeacher;
+                        if(restSubject != 0 && teacherWithMaxSubject.getId().equals(teacher.getId()) ){
                             return subjectPerTeacher + restSubject;
+                        }else{
+                            return subjectPerTeacher;
                         }
+
                     }
                     return 0;
                 }
             }).sum();
-            if (subjectSizePerTeacher > lectureSizePerSemester) {
-                return true;
-            }
+
         }
-        return false;
+        return subjectSizePerTeacher >= subjectSizePerSemester;
     }
 
-    private Teacher getTeacherWithMaxSubject(Subject subject) {
+    private Teacher getTeacherWithMaxSubject(SubjectDto subject) {
         Teacher teacherHasMaxSubject = null;
         for (Teacher teacher :  subject.getTeachers()) {
             if(Objects.isNull(teacherHasMaxSubject)){

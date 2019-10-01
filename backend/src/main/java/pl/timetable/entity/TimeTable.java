@@ -16,6 +16,7 @@ public class TimeTable extends BaseEntity {
     private Room room;
     private Group group;
     private Subject subject;
+    private Teacher teacher;
     private TimeTableDescription timeTableDescription;
 
     @ManyToOne
@@ -70,5 +71,14 @@ public class TimeTable extends BaseEntity {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    @ManyToOne
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 }

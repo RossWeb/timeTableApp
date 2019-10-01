@@ -20,7 +20,7 @@ export class TableParameterComponent extends TableBaseComponent implements OnIni
   @Output('buttonParameterName') buttonParameterName: string;
 
   constructor(tableServiceProvider: TableServiceProvider) {
-    super(tableServiceProvider, false);
+    super(tableServiceProvider, false, null);
   }
 
   ngOnInit() {
@@ -49,6 +49,13 @@ export class TableParameterComponent extends TableBaseComponent implements OnIni
     this.service.createParameters(rowId).subscribe(
       data => {this.refreshTable()},
       err => {console.log("Error occured when add.")}
+    );
+  }
+
+  removeParameters(rowId: number){
+    this.service.removeParameters(rowId).subscribe(
+      data => {this.refreshTable()},
+      err => {console.log("Error occured when remove.")}
     );
   }
 

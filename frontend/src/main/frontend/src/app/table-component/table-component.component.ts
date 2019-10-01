@@ -1,7 +1,8 @@
-import { Component, OnInit, Input, Output, ViewChildren, ViewChild } from '@angular/core';
+import { Component, OnInit, Input,Inject, Output, ViewChildren, ViewChild } from '@angular/core';
 import { ViewEncapsulation } from '@angular/core';
 import { TableParameterComponent } from '../table-parameter/table-parameter.component';
 import { TableBaseComponent } from './table-base.component';
+import { AdminPanelComponent } from '../admin-panel-component/admin-panel-component.component';
 import {TableServiceProvider} from "../table-service/table.service.provider";
 import {RoomService} from "../table-service/room.service";
 import {GroupService} from "../table-service/group.service";
@@ -27,8 +28,8 @@ export class TableComponentComponent extends TableBaseComponent implements OnIni
 
   @ViewChildren(TableParameterComponent) parameterComponent;
 
-  constructor(tableServiceProvider: TableServiceProvider) {
-    super(tableServiceProvider, true);
+  constructor(tableServiceProvider: TableServiceProvider,@Inject(AdminPanelComponent) private parent: AdminPanelComponent) {
+    super(tableServiceProvider, true, parent);
   }
 
   ngOnInit() {

@@ -1,12 +1,14 @@
 package pl.timetable.service;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pl.timetable.dto.*;
 import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.facade.TimeTableFacade;
 
+import javax.naming.OperationNotSupportedException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +25,8 @@ public class GeneticAlgorithmService {
     private FitnessService fitnessService;
     private TimeTableFacade timeTableFacade;
     private InitialGenotypeCriteria initialGenotypeCriteria;
+    @Value("${sameFitnessScore}")
+    private String sameFitnessScoreNumber = "20" ;
 
     public GeneticAlgorithmService(GenotypeService genotypeService, FitnessService fitnessService,
                                    TimeTableFacade timeTableFacade, InitialGenotypeCriteria initialGenotypeCriteria) {
@@ -48,29 +52,32 @@ public class GeneticAlgorithmService {
         this.timeTableFacade = timeTableFacade;
     }
 
-    public Integer init(GeneticInitialData geneticInitialData) {
+    public Integer init(GeneticInitialData geneticInitialData) throws OperationNotSupportedException {
 
-        initialGenotypeCriteria.checkData(geneticInitialData);
+        boolean initalGenotypeCriteriaIsValid = initialGenotypeCriteria.checkData(geneticInitialData);
+        if(!initalGenotypeCriteriaIsValid){
+            throw new OperationNotSupportedException("GenotypeNotValid");
+        }
         LectureDescriptionDto lectureDescriptionDto = geneticInitialData.getLectureDescriptionDto();
         TimeTableDescriptionDto timeTableDescriptionDto = timeTableFacade.saveTimeTableDescription("timeTable" + LocalDateTime.now(),
                 LocalDateTime.now());
         lectureDescriptionDto.setTimeTableDescriptionId(timeTableDescriptionDto.getId());
         timeTableFacade.saveLectureDescription(lectureDescriptionDto);
         //generate population async
-        generatePopulation(geneticInitialData, timeTableDescriptionDto);
-//        CompletableFuture.supplyAsync(() -> generatePopulation(geneticInitialData, timeTableDescriptionDto)).whenComplete((population, throwable) -> {
-//            if (Objects.nonNull(throwable)) {
-//                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
-//                LOGGER.error("Error when async generic genotype. " + throwable);
-//            }
-//
-//            if (Objects.nonNull(population)) {
-//                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.SUCCESS);
-//            } else {
-//                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
-//                LOGGER.error("No population. Genetic algorithm couldnt completed");
-//            }
-//        });
+//        generatePopulation(geneticInitialData, timeTableDescriptionDto);
+        CompletableFuture.supplyAsync(() -> generatePopulation(geneticInitialData, timeTableDescriptionDto)).whenComplete((population, throwable) -> {
+            if (Objects.nonNull(throwable)) {
+                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
+                LOGGER.error("Error when async generic genotype. " + throwable);
+            }
+
+            if (Objects.nonNull(population)) {
+                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.SUCCESS);
+            } else {
+                changeTimeTableDescriptionStatus(timeTableDescriptionDto, TimeTableDescriptionStatus.ERROR);
+                LOGGER.error("No population. Genetic algorithm couldnt completed");
+            }
+        });
         return timeTableDescriptionDto.getId();
 
     }
@@ -84,19 +91,19 @@ public class GeneticAlgorithmService {
 
     @Async
     private Population generatePopulation(GeneticInitialData geneticInitialData, TimeTableDescriptionDto timeTableDescriptionDto) {
+        long start = System.currentTimeMillis();
         Population population = new Population();
         population.setGeneticInitialData(geneticInitialData);
         Double globalFitnessScore = 0.0;
         Integer counterSameFitnessScore = 0;
-        Integer sameFitnessScoreNumber = 20;
 //        Integer populationIteration = 0;
         for (int i = 0; i < geneticInitialData.getPopulationSize(); i++) {
             LOGGER.info("Create population : " + i);
-//            try {
+            try {
                 population.getGenotypePopulation().add(genotypeService.createInitialGenotype(geneticInitialData));
-//            }catch (Exception e){
-//                LOGGER.error(e);
-//            }
+            }catch (Exception e){
+                LOGGER.error(e);
+            }
         }
 //        WorkBookService.createWorkBookByGenotype(population.getGenotypePopulation().get(0));
 //        Population newPopulation = processGenetic(population);
@@ -110,13 +117,14 @@ public class GeneticAlgorithmService {
             LOGGER.info("Population generation : " + population.getPopulationIteration());
             if ((population.getBestGenotype().getHardFitnessScore() == 100 && population.getBestGenotype().getFitnessScore() >= 200)
                     || population.getGenotypePopulation().size() == 0
-                    || counterSameFitnessScore.equals(sameFitnessScoreNumber)) {
+                    || counterSameFitnessScore.equals(Integer.valueOf(sameFitnessScoreNumber))) {
                 break;
             } else {
                 addGenotypeReport(timeTableDescriptionDto, population);
                 if (globalFitnessScore.equals(population.getBestGenotype().getFitnessScore())) {
                     counterSameFitnessScore++;
                 } else {
+                    counterSameFitnessScore = 0;
                     globalFitnessScore = population.getBestGenotype().getFitnessScore();
                 }
             }
@@ -126,6 +134,7 @@ public class GeneticAlgorithmService {
             LOGGER.info("Max fitness score for generation " + population.getBestGenotype().getFitnessScore());
 
         }
+        LOGGER.info("Algorithm duration " + (System.currentTimeMillis() - start) + "ms");
         LOGGER.info("Max fitness score : " + population.getBestGenotype().getFitnessScore());
         LOGGER.info("Max hard fitness score : " + population.getBestGenotype().getHardFitnessScore());
         LOGGER.info("Max soft fitness score : " + population.getBestGenotype().getSoftFitnessScore());
@@ -154,13 +163,13 @@ public class GeneticAlgorithmService {
         population.setFitnessScore(0.0);
         //check fitness score of population
         fitnessService.fitPopulation(population);
-        List<Genotype> genotypes = population.getGenotypePopulation().stream().filter(genotype -> genotype.getHardFitnessScore() > 30.0).collect(Collectors.toList());
+        List<Genotype> genotypes = population.getGenotypePopulation().stream().filter(genotype -> genotype.getHardFitnessScore() > 80.0).collect(Collectors.toList());
         Integer genotypeSize = populationSize - genotypes.size();
-//        for (int i = 0; i < genotypeSize; i++) {
-//            genotypes.add(genotypeService.createInitialGenotype(population.getGeneticInitialData()));
-//        }
+        for (int i = 0; i < genotypeSize; i++) {
+            genotypes.add(genotypeService.createInitialGenotype(population.getGeneticInitialData()));
+        }
         population.setGenotypePopulation(genotypes);
-//        fitnessService.fitPopulation(population);
+        fitnessService.fitPopulation(population);
         //selection by roulete
 //        fitnessService.selectionRoulette(population);
         //crossover

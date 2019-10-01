@@ -1,5 +1,6 @@
 package pl.timetable.repository;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.common.util.impl.LoggerFactory;
@@ -55,6 +56,7 @@ public abstract class AbstractGenericRepositoryWithSession<T extends Object> {
 //        String tableName = getClass().getSimpleName().replace("RepositoryImpl", "");
         return Optional.ofNullable((getSession().createCriteria((Class)((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0])
                 .add(filter)
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
                 .setFirstResult(first).setMaxResults(max).list()));
     }
 

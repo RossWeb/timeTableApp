@@ -13,6 +13,7 @@ import {PagedData} from '../model/paged-data.type';
 import {TimeTablePage} from '../model/page.type';
 import {TablePage} from '../model/page.type';
 import {Main} from '../model/main.type';
+import { takeWhile, filter } from 'rxjs/operators';
 
 @Injectable()
 export class DateValidator {
@@ -165,13 +166,14 @@ export class MainComponent implements OnInit {
     }
 
     data.forEach((value, index) => {
-        let cellText = {subject: "", room: ""};
+        let cellText = {subject: "", room: "", teacher: ""};
         let actualLecture = value.lectureNumber;
         if(value.subject !== null){
             cellText.subject = value.subject.name;
         }
         if(value.room !== null){
           cellText.room = 'Sala ' + value.room.name + ' numer: '+  value.room.number;
+          cellText.teacher = value.teacher.name + ' '+  value.teacher.surname;
         }
 
         if(value.lectureNumber > this.lecturePerDay){
@@ -206,6 +208,20 @@ export class MainComponent implements OnInit {
 
     this.cols = tempCols;
     this.rows = tempDataRows;
+  }
+
+  private downloadFile(data: Response) {
+    const blob = new Blob([data], { type: 'application/vnd.ms-excel' });
+    const url= URL.createObjectURL(blob);
+    window.open(url);
+
+  }
+
+  download(){
+    this.mainService.download(this.reportService.getTimeTableId()).subscribe(
+      data => this.downloadFile(data),
+      error => console.log('Error downloading the file.')
+    );
   }
 
   getHoursLecture(pagedData: any){
@@ -284,22 +300,26 @@ export class MainComponent implements OnInit {
   }
 
   checkStatus(){
+    var completeData;
     Observable.interval(5000)
               .startWith(0)
               .switchMap(() => this.mainService.checkStatus(this.reportService.getTimeTableId()))
 
-      .takeWhile(data => data.status === "PENDING")
-      .subscribe(res => {
-
-        if(res.status === "ERROR"){
-            this.showModalError("error when generating timetable");
-        }else {
-          this.reportComponent.initReport();
-          this.initDataTable();
-
-        }
-      }, error => this.showModalError("error when status check "+error),
-      ()=>{$('#generateTimeTableModal').modal("hide");}    );
+      .takeWhile(data => data.status == "PENDING")
+      .subscribe(res => { completeData = res},
+         error => {
+           completeData = error;
+           this.showModalError("error when status check "+error);
+         },
+         () => {
+          if(completeData !== undefined && (completeData.status === "ERROR")){
+              this.showModalError("error when generating timetable");
+          }else {
+            this.initDataTable();
+            this.reportComponent.initReport();
+          }
+        $('#generateTimeTableModal').modal("hide");
+      });
   }
 
   init() {

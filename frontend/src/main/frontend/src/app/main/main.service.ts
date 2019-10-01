@@ -1,5 +1,5 @@
 import { Injectable, Input, Output, EventEmitter } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders} from '@angular/common/http';
 import {InitProcess} from '../model/initProcess.type';
 import {TimeTablePage} from '../model/page.type';
 import {BaseResponse} from "../model/base.response.type";
@@ -26,7 +26,14 @@ export class MainService {
     return  this.http.get('api/group');
   }
 
-  public getResults(page: TimeTablePage, timeTableId: number): any  {
+  getResults(page: TimeTablePage, timeTableId: number): any  {
         return  this.http.post('api/timetable/' + timeTableId + "/result", page);
-    }
+  }
+
+  download(timeTableId: number): any {
+    let headers = new HttpHeaders();
+    return  this.http.get('api/timetable/' + timeTableId + "/download", {
+        headers: headers,
+        responseType: 'blob'});
+  }
 }

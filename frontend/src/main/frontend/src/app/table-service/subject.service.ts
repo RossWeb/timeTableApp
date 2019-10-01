@@ -6,12 +6,11 @@ import {TableService} from "../interface/table.service";
 import {Subject} from "../model/subject.type";
 import {TablePage} from '../model/page.type';
 import {PagedData} from '../model/paged-data.type';
-
+import { AdminPanelComponent } from '../admin-panel-component/admin-panel-component.component';
 
 
 @Injectable()
 export class SubjectService extends TableService<Subject> {
-  // private type;
 
   constructor(protected http: HttpClient) {
     super(http);
@@ -67,6 +66,11 @@ export class SubjectService extends TableService<Subject> {
 
   transformValues(data) : any {
     return data;
+  }
+
+  refreshOtherTableIfNeeded(parent: AdminPanelComponent): void {
+    parent.refreshTableByName("courseTable");
+    parent.refreshTableByName("teacherTable");
   }
 
 }

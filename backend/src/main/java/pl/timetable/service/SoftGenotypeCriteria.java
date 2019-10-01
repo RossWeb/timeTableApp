@@ -28,7 +28,7 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
         int bonusScoreDefinition = lectureDescriptionDto.getNumberPerDay() * lectureDescriptionDto.getNumberPerDay();
         int daysSize = lectureDescriptionDto.getWeeksPerSemester() * lectureDescriptionDto.getDaysPerWeek();
         int maxBonus = bonusScoreDefinition * daysSize;
-        int groupSize = genotype.getGenotypeTable().length;
+        Integer groupSize = genotype.getGenotypeTable().length;
         int score = Arrays.stream(genotype.getGenotypeTable()).mapToInt(group -> {
             int bonusScore = 0;
             for (int i = 0; i < daysSize ; i++) {
@@ -45,7 +45,7 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
             }
             return bonusScore;
         }).sum();
-        return calculateScorePerCriteria(score / groupSize, maxBonus);
+        return calculateScorePerCriteria(score / groupSize.doubleValue(), maxBonus);
 
     }
 
@@ -53,7 +53,7 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
 
     public Double addBonusForLecturePerAnyDayPerWeekForSemester(Genotype genotype, LectureDescriptionDto lectureDescriptionDto){
         int maxBonus = lectureDescriptionDto.getWeeksPerSemester() * lectureDescriptionDto.getDaysPerWeek();
-        int groupSize = genotype.getGenotypeTable().length;
+        Integer groupSize = genotype.getGenotypeTable().length;
         int score = Arrays.stream(genotype.getGenotypeTable()).mapToInt(group -> {
             int bonusScore = 0;
             for (int i = 0; i < group.length/ lectureDescriptionDto.getNumberPerDay() ; i++) {
@@ -66,7 +66,7 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
             }
             return bonusScore;
         }).sum();
-        return calculateScorePerCriteria(score /groupSize , maxBonus);
+        return calculateScorePerCriteria(score /groupSize.doubleValue() , maxBonus);
     }
 
     public Double hasNoEmptyLectureByGroup(Map<GroupDto, LinkedList<RoomDto>> roomByGroup , Integer lecturePerDay) {
@@ -106,7 +106,7 @@ public class SoftGenotypeCriteria implements AbstractCriteria {
         return (1 - emptyRooms / roomsSize.doubleValue()) * 0.34;
     }
 
-    private static Double calculateScorePerCriteria(Integer score, Integer maxBonus){
+    private static Double calculateScorePerCriteria(Double score, Integer maxBonus){
         return score / maxBonus.doubleValue() * 0.33;
     }
 

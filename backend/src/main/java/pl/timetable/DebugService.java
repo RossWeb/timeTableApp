@@ -167,7 +167,7 @@ public class DebugService {
         final String name1 = "Adam";
         final String name2 = "Jan";
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < subjectSet.size(); i++) {
             Teacher teacher = new Teacher();
             teacher.setSurname((new Random().nextBoolean() ? surname1 : surname2) + " " + i);
             teacher.setName((new Random().nextBoolean() ? name1 : name2) + " " + i);
@@ -178,13 +178,16 @@ public class DebugService {
 
     private Teacher createTeacher(Teacher teacher, Set<Subject> allSubjects) {
         Set<Subject> subjectSetTeacher = new HashSet<>();
-        do {
-            Integer position = new Random().ints(0, allSubjects.size()).findFirst().getAsInt();
-            Subject subject = (Subject) allSubjects.toArray()[position];
-            if (!subjectSetTeacher.contains(subject)) {
-                subjectSetTeacher.add(subject);
-            }
-        } while (subjectSetTeacher.size() <= 3);
+        Subject subjectFound = (Subject) allSubjects.toArray()[0];
+        subjectSetTeacher.add(subjectFound);
+        allSubjects.remove(subjectFound);
+//        do {
+//            Integer position = new Random().ints(0, allSubjects.size()).findFirst().getAsInt();
+//            Subject subject = (Subject) allSubjects.toArray()[position];
+//            if (!subjectSetTeacher.contains(subject)) {
+//                subjectSetTeacher.add(subject);
+//            }
+//        } while (subjectSetTeacher.size() <= 3);
 
         teacher.setSubjectSet(subjectSetTeacher);
         teacherRepository.create(teacher);

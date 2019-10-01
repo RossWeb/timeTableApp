@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component,ViewChild, OnInit, ElementRef } from '@angular/core';
 
 
 @Component({
@@ -8,9 +8,25 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AdminPanelComponent implements OnInit {
 
-  constructor() { }
+  @ViewChild('groupTable') groupTable: ElementRef;
+  @ViewChild('courseTable') courseTable: ElementRef;
+  @ViewChild('teacherTable') teacherTable: ElementRef;
 
-  ngOnInit() {
+
+  private tableComponentArray = new Map();
+
+  constructor() {
+
   }
 
+  ngOnInit() {
+    this.tableComponentArray.set('groupTable',this.groupTable);
+    this.tableComponentArray.set('courseTable', this.courseTable);
+    this.tableComponentArray.set('teacherTable', this.teacherTable);
+  }
+
+  refreshTableByName(nameTable : string){
+    this.tableComponentArray.get(nameTable).getDefinions();
+
+  }
 }

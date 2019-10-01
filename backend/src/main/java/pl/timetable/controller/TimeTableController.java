@@ -2,13 +2,16 @@ package pl.timetable.controller;
 
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.IOUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pl.timetable.api.*;
-import pl.timetable.dto.*;
+import pl.timetable.dto.GeneticInitialData;
+import pl.timetable.dto.ReportPopulationDto;
+import pl.timetable.dto.TimeTablePagingDto;
+import pl.timetable.dto.TimeTableResultDto;
 import pl.timetable.enums.TimeTableDescriptionStatus;
 import pl.timetable.exception.EntityNotFoundException;
 import pl.timetable.facade.TimeTableFacade;
@@ -17,6 +20,12 @@ import pl.timetable.service.RoomServiceImpl;
 import pl.timetable.service.SubjectServiceImpl;
 import pl.timetable.service.TeacherServiceImpl;
 
+import javax.naming.OperationNotSupportedException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +52,12 @@ public class TimeTableController {
     public ResponseEntity<TimeTableInitResponse> genericTimeTable(@RequestBody TimeTableRequest timeTableRequest) {
         LOGGER.info("Try to generic timetable");
         GeneticInitialData geneticInitialData = timeTableFacade.getGeneticInitialData(timeTableRequest);
-        Integer timeTableDescriptionId = geneticAlgorithmService.init(geneticInitialData);
+        Integer timeTableDescriptionId = null;
+        try {
+            timeTableDescriptionId = geneticAlgorithmService.init(geneticInitialData);
+        } catch (OperationNotSupportedException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new TimeTableInitResponse("CHECK INIT MODEL"));
+        }
         if (Objects.isNull(timeTableDescriptionId)) {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(new TimeTableInitResponse("INIT_FAILED"));
         }
@@ -81,13 +95,13 @@ public class TimeTableController {
             resultResponse.setData(timeTableResultDto.getTimeTableDtos().stream().map(timeTableDto -> {
                 TimeTableResponse response = new TimeTableResponse();
                 response.setLectureNumber(timeTableDto.getLectureNumber());
-                if(Objects.nonNull(timeTableDto.getRoom())) {
+                if (Objects.nonNull(timeTableDto.getRoom())) {
                     response.setRoom(RoomServiceImpl.mapEntityToDto(timeTableDto.getRoom()));
                 }
-                if(Objects.nonNull(timeTableDto.getSubject())) {
+                if (Objects.nonNull(timeTableDto.getSubject())) {
                     response.setSubject(SubjectServiceImpl.mapEntityToDto(timeTableDto.getSubject()));
                 }
-                if(Objects.nonNull(timeTableDto.getTeacher())){
+                if (Objects.nonNull(timeTableDto.getTeacher())) {
                     response.setTeacher(TeacherServiceImpl.mapEntityToDto(timeTableDto.getTeacher()));
                 }
                 response.setDay(timeTableDto.getDay());
@@ -121,14 +135,20 @@ public class TimeTableController {
     }
 
     @GetMapping("{id}/download")
-    public String download(Model model, @PathVariable("id") Integer timeTableId) {
+    public HttpStatus download(HttpServletResponse response, @PathVariable("id") Integer timeTableId) throws IOException {
         try {
             Workbook workBookTimeTableById = timeTableFacade.getWorkBookTimeTableById(timeTableId);
-            model.addAttribute("workbook", workBookTimeTableById);
+            response.setContentType("application/vnd.ms-excel");
+            response.setHeader("Content-Disposition", "attachment; filename=planzajec.xls");
+            ServletOutputStream out = response.getOutputStream();
+            workBookTimeTableById.write(out);
+            out.flush();
+            out.close();
+            return HttpStatus.OK;
         } catch (EntityNotFoundException e) {
             LOGGER.error("timetable was not found", e);
+            return HttpStatus.NOT_FOUND;
         }
-        return "";
     }
 
 

@@ -16,7 +16,8 @@ export class Teacher extends Table {
   getParams(dataTableValues: string[]): any {
     const params = {
       name : dataTableValues[0],
-      surname: dataTableValues[1]
+      surname: dataTableValues[1],
+      subject: dataTableValues[2]
     };
     return params;
   }

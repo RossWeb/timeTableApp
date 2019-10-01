@@ -14,7 +14,7 @@
   [messages]="page.messages"
   (page)='setPage($event)' >
     <ng-template #addDelTmpl let-row="row" let-value="value">
-      <button *ngIf="value.exists === true; else falsyTemplate" type="button" class="btn btn-danger" (click)="remove(value.id)">Usuń</button>
+      <button *ngIf="value.exists === true; else falsyTemplate" type="button" class="btn btn-danger" (click)="removeParameters(value.id)">Usuń</button>
       <ng-template #falsyTemplate>
         <button  type="button" class="btn btn-info" (click)="addParameters(value.id)">Dodaj</button>
       </ng-template>

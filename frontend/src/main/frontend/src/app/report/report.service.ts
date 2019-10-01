@@ -21,4 +21,6 @@ export class ReportService {
   get(): any {
     return  this.http.get<Report>('api/timetable/' + this.timeTableId + "/report");
   }
+
+  
 }

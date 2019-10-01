@@ -5,9 +5,9 @@ import { AdminPanelComponent } from './admin-panel-component/admin-panel-compone
 
 const routes: Routes = [
     { path: 'konfiguracja', component: AdminPanelComponent },
-    { path: 'main',      component: MainComponent },
+    { path: 'start',      component: MainComponent },
     { path: '',
-      redirectTo: '/main',
+      redirectTo: '/start',
       pathMatch: 'full'
     },
     { path: '**', component: MainComponent }

@@ -108,15 +108,17 @@
       <ng-template #editTmpl let-value="value">
           <strong>{{value.subject}}</strong>
           <br/>
+          <i>{{value.teacher}}</i>
+          <br/>
           {{value.room}}
 
       </ng-template>
 
       </ngx-datatable>
 
-      <div class="form-group">
-        <label for="exampleInputFile">File input</label>
-        <input type="file" id="exampleInputFile">
+      <div class="form-group top1">
+        <label for="saveReport">Pobierz plan zajęć</label>
+        <button (click)="download()"  class="btn btn-default" type="button" id="downloadFile">Pobierz</button>
       </div>
   </div>
   <div class="row top1">

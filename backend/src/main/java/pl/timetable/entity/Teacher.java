@@ -9,13 +9,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Table(name = "teacher",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "surname"})
+)
 public class Teacher extends BaseEntity{
 
     private String name;
     private String surname;
     private Set<Subject> subjectSet = new HashSet<>();
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     public String getName() {
         return name;
     }
@@ -24,7 +27,7 @@ public class Teacher extends BaseEntity{
         this.name = name;
     }
 
-    @Column(name = "surname", nullable = false, unique = true)
+    @Column(name = "surname", nullable = false)
     public String getSurname() {
         return surname;
     }

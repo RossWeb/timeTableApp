@@ -10,6 +10,7 @@ import {Table} from "../interface/table.type";
 import {TablePage} from '../model/page.type';
 import { Pipe, PipeTransform } from '@angular/core';
 import {TableService} from "../interface/table.service";
+import { AdminPanelComponent } from '../admin-panel-component/admin-panel-component.component';
 
 
 const ADD_NAME = 'Dodaj';
@@ -61,7 +62,7 @@ export class TableBaseComponent implements OnInit {
   private cols = [];
   protected service : TableService<Table>;
 
-  constructor(protected tableServiceProvider: TableServiceProvider, private isEditButton : boolean){
+  constructor(protected tableServiceProvider: TableServiceProvider, private isEditButton : boolean, private parentComponent: AdminPanelComponent){
     this.isEditButton = isEditButton;
   }
 
@@ -69,6 +70,16 @@ export class TableBaseComponent implements OnInit {
     this.service = this.tableServiceProvider.getServiceByName(this.tableTypeName);
     // this.service.setParameterTable(false);
     // this.list();
+    this.getDefinions();
+    this.dataTableNames = this.service.getDataTableParameters();
+    this.title = this.service.getTitle();
+    this.relationParameterName = this.service.getRelationParameterName();
+    this.page.pageNumber = 0;
+    this.page.size = 5;
+    this.setPage({ offset: 0 });
+  }
+
+  getDefinions(){
     this.selectDefinions =
     this.service.getDefinions().subscribe(
       dataDefinions => {
@@ -81,16 +92,12 @@ export class TableBaseComponent implements OnInit {
       },
       err => {console.log("Error occured when get definions")}
     );
-    this.dataTableNames = this.service.getDataTableParameters();
-    this.title = this.service.getTitle();
-    this.relationParameterName = this.service.getRelationParameterName();
-    this.page.pageNumber = 0;
-    this.page.size = 5;
-    this.setPage({ offset: 0 });
   }
 
   protected refreshTable(){
+    console.log("call refresh");
     this.setPage({offset : this.page.pageNumber});
+    this.service.refreshOtherTableIfNeeded(this.parentComponent);
     // this.dataTableValues = [];
     // this.list();
     // this.addButtonName = ADD_NAME;

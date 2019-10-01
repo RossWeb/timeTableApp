@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.timetable.dto.*;
 import pl.timetable.entity.Subject;
 import pl.timetable.entity.Teacher;
+import pl.timetable.exception.RandomSubjectProcessException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -349,37 +350,51 @@ public class GenotypeService {
         );
     }
 
-    private void setRandomSubject(Genotype genotype, Set<Subject> subjectSet, List<Cell> listRoom) {
-        subjectSet.forEach(subject ->
-                {
-                    SubjectDto subjectDto = SubjectServiceImpl.mapEntityToDto(subject);
-                    genotype.getRoomBySubject().putIfAbsent(subjectDto.getId(), new ArrayList<>());
-                    for (int j = 0; j < subject.getSize(); j++) {
-                        Integer roomPosition = -1;
-                        if (listRoom.size() != 0) {
-                            Cell cell;
-                            do {
-                                roomPosition = new Random().ints(0, listRoom.size()).findFirst().getAsInt();
-                                cell = listRoom.get(roomPosition);
-                                cell.setSubjectDto(subjectDto);
-                            }
-                            while (Objects.isNull(cell.getRoomDto()) || checkCollisionSubjectForGroupLecture(genotype, cell));
+    private void setRandomSubject(Genotype genotype, Set<Subject> subjectSet, List<Cell> listRoomRaw) {
+        List<Cell> listRoom = new ArrayList<>(listRoomRaw);
+        Map<Integer, List<RoomDto>> roomBySubjectTemp = new HashMap<>();
+        try {
+            for (Subject subject:subjectSet)
+//            subjectSet.forEach(subject ->
+                    {
+                        SubjectDto subjectDto = SubjectServiceImpl.mapEntityToDto(subject);
+                        roomBySubjectTemp.putIfAbsent(subjectDto.getId(), new ArrayList<>());
+                        for (int j = 0; j < subject.getSize(); j++) {
+                            Integer roomPosition = -1;
+                            if (listRoom.size() != 0) {
+                                List<Cell> listRoomTemp = new ArrayList<>(listRoom);
+                                Cell cell;
+                                do {
+                                    if(listRoomTemp.isEmpty()) {
+                                        throw new RandomSubjectProcessException();
+                                    }
+                                    roomPosition = new Random().ints(0, listRoom.size()).findFirst().getAsInt();
+                                    cell = listRoom.get(roomPosition);
+                                    cell.setSubjectDto(subjectDto);
+                                    listRoomTemp.remove(cell);
 
-                            genotype.getRoomBySubject().get(subjectDto.getId()).add(cell.getRoomDto());
-                            listRoom.get(roomPosition).setSubjectDto(subjectDto);
-                            listRoom.remove(roomPosition.intValue());
-                        } else {
-                            LOGGER.info("Rooms list is empty");
-                            if (subject.getSize() != j + 1) {
-                                LOGGER.info("End process break");
-                                break;
+                                }
+                                while (Objects.isNull(cell.getRoomDto()) || checkCollisionSubjectForGroupLecture(genotype, cell));
+
+                                roomBySubjectTemp.get(subjectDto.getId()).add(cell.getRoomDto());
+                                listRoom.get(roomPosition).setSubjectDto(subjectDto);
+                                listRoom.remove(roomPosition.intValue());
+                            } else {
+                                LOGGER.info("Rooms list is empty");
+                                if (subject.getSize() != j + 1) {
+                                    LOGGER.info("End process break");
+                                    break;
+                                }
                             }
+
+
                         }
-
-
                     }
-                }
-        );
+//            );
+            genotype.setRoomBySubject(roomBySubjectTemp);
+        } catch (RandomSubjectProcessException e) {
+            setRandomSubject(genotype, subjectSet, listRoomRaw);
+        }
     }
 
 
@@ -427,19 +442,13 @@ public class GenotypeService {
             if (choice) {
                 cellWithRoom = getCellFromCrossover(roomsFirstGenotype);
                 cellWithRoom = getSubjectFromCrossover(roomsFirstGenotype, roomsSecondGenotype, child, cellWithRoom);
-                cellWithRoom = getTeacherFromCrossover(roomsFirstGenotype, roomsSecondGenotype, child, cellWithRoom);
+//                cellWithRoom = getTeacherFromCrossover(roomsFirstGenotype, roomsSecondGenotype, child, cellWithRoom);
+//                roomsFirstGenotype.remove(0);
             } else {
                 cellWithRoom = getCellFromCrossover(roomsSecondGenotype);
                 cellWithRoom = getSubjectFromCrossover(roomsSecondGenotype, roomsFirstGenotype, child, cellWithRoom);
-                cellWithRoom = getTeacherFromCrossover(roomsSecondGenotype, roomsFirstGenotype, child, cellWithRoom);
-//                if (checkCollisionRoomForGroupPerLecture(child, cellWithRoom) || checkCollisionForTeacherPerGroup(child, cellWithRoom)){
-//                    cellWithRoom = roomsFirstGenotype.get(0);
-//                    crossoverMoveSubject(roomsSecondGenotype, cellWithRoom);
-//                    crossoverMoveTeacher(roomsSecondGenotype, cellWithRoom);
-//                }else{
-//                    crossoverMoveSubject(roomsFirstGenotype, cellWithRoom);
-//                    crossoverMoveTeacher(roomsFirstGenotype, cellWithRoom);
-//                }
+//                cellWithRoom = getTeacherFromCrossover(roomsSecondGenotype, roomsFirstGenotype, child, cellWithRoom);
+//                roomsSecondGenotype.remove(0);
             }
             LOGGER.info("i : " + i + " , " + cellWithRoom);
             if (Objects.nonNull(cellWithRoom.getSubjectDto())) {
@@ -455,8 +464,8 @@ public class GenotypeService {
                 }
             }
             child.getGenotypeTable()[groupNumber][cellWithRoom.getLecture()] = cellWithRoom;
-            roomsSecondGenotype.remove(0);
-            roomsFirstGenotype.remove(0);
+//            roomsSecondGenotype.remove(0);
+//            roomsFirstGenotype.remove(0);
 
         }
 
@@ -469,10 +478,18 @@ public class GenotypeService {
 
     private Cell getSubjectFromCrossover(List<Cell> roomsFirstGenotype, List<Cell> roomsSecondGenotype, Genotype child, Cell cellWithRoom) {
         if (checkCollisionRoomForGroupPerLecture(child, cellWithRoom) || checkCollisionSubjectForGroupLecture(child, cellWithRoom)) {
-            cellWithRoom = roomsSecondGenotype.get(0);
+            LOGGER.info("SecondGenotype choosing :" + roomsSecondGenotype.size());
+            try {
+                cellWithRoom = roomsSecondGenotype.get(0);
+            }catch (Exception e){
+                LOGGER.error(e);
+            }
             crossoverMoveSubject(roomsFirstGenotype, cellWithRoom);
+            roomsSecondGenotype.remove(0);
         } else {
+            LOGGER.info("FirstGenotype choosing :" + roomsFirstGenotype.size());
             crossoverMoveSubject(roomsSecondGenotype, cellWithRoom);
+            roomsFirstGenotype.remove(0);
         }
         return cellWithRoom;
     }
@@ -490,7 +507,8 @@ public class GenotypeService {
     private void crossoverMoveTeacher(List<Cell> roomsGenotype, Cell cellWithRoom) {
         final TeacherDto teacherToFillCell = cellWithRoom.getTeacherDto();
         if (Objects.nonNull(teacherToFillCell)) {
-            roomsGenotype.stream().filter(cell -> teacherToFillCell.getId().equals(cell.getTeacherDto().getId())).findFirst()
+            roomsGenotype.stream().filter(cell -> teacherToFillCell.getId().equals(cell.getTeacherDto().getId())
+                    && cellWithRoom.getLecture().equals(cell.getLecture())).findFirst()
                     .ifPresent(cell -> {
                         Cell cellToChange = roomsGenotype.get(0);
                         final TeacherDto teacherDto = cell.getTeacherDto();
@@ -503,12 +521,18 @@ public class GenotypeService {
     private void crossoverMoveSubject(List<Cell> roomsGenotype, Cell cellWithRoom) {
         final SubjectDto subjectToFillCell = cellWithRoom.getSubjectDto();
         if (Objects.nonNull(subjectToFillCell)) {
-            roomsGenotype.stream().filter(cell -> subjectToFillCell.getId().equals(cell.getSubjectDto().getId())).findFirst()
-                    .ifPresent(cell -> {
-                        Cell cellToChange = roomsGenotype.get(0);
-                        cell.setSubjectDto(cellToChange.getSubjectDto());
-                        cellToChange.setSubjectDto(subjectToFillCell);
-                    });
+            for (int i = 0; i < roomsGenotype.size(); i++) {
+                if(roomsGenotype.get(i).getSubjectDto().getId().equals(subjectToFillCell.getId())) {
+                    roomsGenotype.remove(i);
+                    break;
+                }
+            }
+//            roomsGenotype.stream().filter(cell -> subjectToFillCell.getId().equals(cell.getSubjectDto().getId())).findFirst()
+//                    .ifPresent(cell -> {
+//                        Cell cellToChange = roomsGenotype.get(0);
+//                        cell.setSubjectDto(cellToChange.getSubjectDto());
+//                        cellToChange.setSubjectDto(subjectToFillCell);
+//                    });
         }
 
     }

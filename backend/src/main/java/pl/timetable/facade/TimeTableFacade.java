@@ -132,7 +132,7 @@ public class TimeTableFacade {
         timeTableResultDto.setTimeTableDtos(
                 timeTableService.getTimeTableResult(pagingRequestDto));
         timeTableResultDto.setTotalElements(timeTableService.getTimeTableResultCount(pagingRequestDto.getId(), pagingRequestDto.getGroupId(), pagingRequestDto.getDays()));
-        timeTableResultDto.setTotalPages(timeTableResultDto.getTotalElements() / pagingRequestDto.getSize());
+        timeTableResultDto.setTotalPages(pagingRequestDto.getDays());
         return timeTableResultDto;
     }
 

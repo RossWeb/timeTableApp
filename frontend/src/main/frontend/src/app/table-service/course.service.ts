@@ -7,7 +7,7 @@ import {Course} from "../model/course.type";
 import {TablePage} from '../model/page.type';
 import {PagedData} from '../model/paged-data.type';
 import {SubjectService} from "../table-service/subject.service";
-
+import { AdminPanelComponent } from '../admin-panel-component/admin-panel-component.component';
 
 @Injectable()
 export class CourseService extends TableService<Course> {
@@ -87,6 +87,10 @@ export class CourseService extends TableService<Course> {
         value.subjectSet = value.subjectSet.length;
     }
     return data;
+  }
+
+  refreshOtherTableIfNeeded(parent: AdminPanelComponent): void {
+    parent.refreshTableByName("groupTable");
   }
 
 }
